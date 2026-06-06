@@ -30,7 +30,11 @@
                         <h3 style="font-size: 18px; margin-bottom: 8px;">{{ $gift->item_name }}</h3>
                         <p style="color: #777; font-size: 14px; margin-bottom: 10px;">{{ $gift->category }}</p>
                         <p style="color: #f5a623; font-weight: bold; font-size: 18px; margin-bottom: 15px;">Rs. {{ number_format($gift->price, 2) }}</p>
-                        <a href="/gift-design/{{ $gift->gift_design_id }}" style="background-color: #f5a623; color: #1a1a1a; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">View Details</a>
+                        <a href="https://wa.me/94717714267?text=Hi!%20I%20want%20to%20order%20{{ urlencode($gift->item_name) }}%20-%20Rs.{{ $gift->price }}" 
+                          target="_blank"
+                          style="background-color: #25D366; color: #fff; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                          🟢 Order via WhatsApp
+                        </a>
                     </div>
                 </div>
                 @endforeach

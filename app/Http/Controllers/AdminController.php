@@ -230,4 +230,11 @@ public function storeEvent(Request $request)
     Event::findOrFail($id)->delete();
     return redirect('/admin/services')->with('success', 'Event deleted!');
   }
+
+  public function updateOrderStatus(Request $request, $id)
+  {
+    $order = Order::findOrFail($id);
+    $order->update(['status' => $request->status]);
+    return redirect('/admin/orders')->with('success', 'Order status updated!');
+  }
 }

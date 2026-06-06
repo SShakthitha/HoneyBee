@@ -27,7 +27,11 @@
                         <p style="color: #777; font-size: 14px; margin-bottom: 5px;">{{ $event->event_type }}</p>
                         <p style="color: #777; font-size: 14px; margin-bottom: 10px;">📅 {{ $event->event_date }}</p>
                         <p style="color: #f5a623; font-weight: bold; font-size: 18px; margin-bottom: 15px;">Rs. {{ number_format($event->price, 2) }}</p>
-                        <a href="/events/{{ $event->event_id }}" style="background-color: #f5a623; color: #1a1a1a; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">View Details</a>
+                        <a href="https://wa.me/94717714267?text=Hi!%20I%20want%20to%20book%20{{ urlencode($event->event_name) }}%20-%20Rs.{{ $event->price }}" 
+                          target="_blank"
+                          style="background-color: #25D366; color: #fff; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                          🟢 Book via WhatsApp
+                        </a>
                     </div>
                 </div>
                 @endforeach

@@ -77,3 +77,22 @@ Route::prefix('admin')->group(function () {
     Route::put('/event/{id}', [AdminController::class, 'updateEvent'])->name('admin.event.update');
     Route::delete('/event/{id}', [AdminController::class, 'destroyEvent'])->name('admin.event.destroy');
 });
+
+// Orders
+Route::middleware('auth')->group(function () {
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders/create/{service_id}', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+});
+
+Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+Route::post('/contact', [HomeController::class, 'sendContact'])->name('contact.send');
+
+Route::get('/about', [HomeController::class, 'about'])->name('about');
+
+// Delete routes
+Route::get('/gift/{id}/delete', [AdminController::class, 'destroyGift'])->name('admin.gift.delete');
+Route::get('/laser/{id}/delete', [AdminController::class, 'destroyLaser'])->name('admin.laser.delete');
+Route::get('/event/{id}/delete', [AdminController::class, 'destroyEvent'])->name('admin.event.delete');
+
+Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');

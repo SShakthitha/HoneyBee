@@ -27,13 +27,22 @@
             <li><a href="/gift-design">Gift & Design</a></li>
             <li><a href="/laser-work">Laser Work</a></li>
             <li><a href="/events">Events</a></li>
+            @auth
+              <li><a href="/orders">My Orders</a></li>
+            @endauth
         </ul>
         <div class="nav-buttons">
-            @auth
-                <a href="/dashboard">{{ Auth::user()->name }}</a>
-            @else
-                <a href="/login">Login</a>
-            @endauth
+          @auth
+          <a href="/dashboard">{{ Auth::user()->name }}</a>
+          <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+            @csrf
+            <button type="submit" style="background-color: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; margin-left: 10px;">
+                Logout
+            </button>
+          </form>
+          @else
+            <a href="/login">Login</a>
+          @endauth
         </div>
     </nav>
 
@@ -41,8 +50,41 @@
         @yield('content')
     </main>
 
-    <footer>
-        <p>© 2025 <span>HoneyBee Shop</span> — All Rights Reserved 🐝</p>
+    <footer style="background-color: #1a1a1a; color: #aaa; padding: 40px; margin-top: 60px;">
+      <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 30px; max-width: 1100px; margin: 0 auto;">
+        
+        <div>
+            <img src="{{ asset('images/logo.png') }}" alt="HoneyBee" style="height: 60px; margin-bottom: 15px;">
+            <p style="color: #aaa; font-size: 14px;">Your one stop shop for Gifts,<br>Laser Work and Events 🐝</p>
+        </div>
+
+        <div>
+            <h3 style="color: #f5a623; margin-bottom: 15px;">Quick Links</h3>
+            <ul style="list-style: none;">
+                <li style="margin-bottom: 8px;"><a href="/" style="color: #aaa; text-decoration: none;">Home</a></li>
+                <li style="margin-bottom: 8px;"><a href="/gift-design" style="color: #aaa; text-decoration: none;">Gift & Design</a></li>
+                <li style="margin-bottom: 8px;"><a href="/laser-work" style="color: #aaa; text-decoration: none;">Laser Work</a></li>
+                <li style="margin-bottom: 8px;"><a href="/events" style="color: #aaa; text-decoration: none;">Events</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 style="color: #f5a623; margin-bottom: 15px;">Contact Us</h3>
+            <ul style="list-style: none;">
+              <li style="margin-bottom: 8px;"><a href="/" style="color: #aaa; text-decoration: none;">Home</a></li>
+              <li style="margin-bottom: 8px;"><a href="/gift-design" style="color: #aaa; text-decoration: none;">Gift & Design</a></li>
+              <li style="margin-bottom: 8px;"><a href="/laser-work" style="color: #aaa; text-decoration: none;">Laser Work</a></li>
+              <li style="margin-bottom: 8px;"><a href="/events" style="color: #aaa; text-decoration: none;">Events</a></li>
+              <li style="margin-bottom: 8px;"><a href="/about" style="color: #aaa; text-decoration: none;">About Us</a></li>
+              <li style="margin-bottom: 8px;"><a href="/contact" style="color: #aaa; text-decoration: none;">Contact Us</a></li>
+            </ul>
+        </div>
+
+      </div>
+
+      <div style="text-align: center; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
+        <p>© 2025 <span style="color: #f5a623;">HoneyBee Shop</span> — All Rights Reserved 🐝</p>
+      </div>
     </footer>
 </body>
 </html>
