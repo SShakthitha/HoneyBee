@@ -46,21 +46,18 @@
                     style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
             </div>
 
+            <!-- PRICE -->
             <div>
                 <label style="display: block; margin-bottom: 8px; font-weight: bold;">Price (Rs.) *</label>
                 <input type="number" name="price" step="0.01" required
                     style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
             </div>
 
+            <!-- OFFER PRICE (FIXED PART) -->
             <div>
-                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Service *</label>
-                <select name="service_id" required
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Offer Price (Optional)</label>
+                <input type="number" name="offer_price" step="0.01"
                     style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                    <option value="">Select Service</option>
-                    @foreach($services as $service)
-                        <option value="{{ $service->service_id }}">{{ $service->service_name }}</option>
-                    @endforeach
-                </select>
             </div>
 
         </div>

@@ -9,7 +9,6 @@ class Event extends Model
     protected $primaryKey = 'event_id';
 
     protected $fillable = [
-        'service_id',
         'event_name',
         'event_type',
         'decoration_type',
@@ -24,8 +23,4 @@ class Event extends Model
         'description'
     ];
 
-    public function service()
-    {
-        return $this->belongsTo(Service::class, 'service_id');
-    }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('business_name');
             $table->string('business_type');
             $table->text('description')->nullable();
-            $table->string('contact_email')->unique();
+            $table->string('contact_email');
             $table->string('phone');
             $table->timestamps();
         });

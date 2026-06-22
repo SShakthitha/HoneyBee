@@ -10,9 +10,6 @@ return new class extends Migration
     {
         Schema::create('laser_works', function (Blueprint $table) {
             $table->id('laser_id');
-            $table->foreignId('service_id')
-                  ->constrained('services', 'service_id')
-                  ->onDelete('cascade');
             $table->string('product_name');
             $table->string('laser_type');
             $table->string('material_type')->nullable();
@@ -21,6 +18,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->text('engraving_text')->nullable();
             $table->text('description')->nullable();
+            $table->decimal('offer_price', 10, 2)->nullable();
             $table->timestamps();
         });
     }

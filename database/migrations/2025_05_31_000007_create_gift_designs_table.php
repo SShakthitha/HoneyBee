@@ -10,9 +10,6 @@ return new class extends Migration
     {
         Schema::create('gift_designs', function (Blueprint $table) {
             $table->id('gift_design_id');
-            $table->foreignId('service_id')
-                  ->constrained('services', 'service_id')
-                  ->onDelete('cascade');
             $table->string('item_name');
             $table->string('category');
             $table->string('material')->nullable();
@@ -21,6 +18,7 @@ return new class extends Migration
             $table->string('customization_option')->nullable();
             $table->text('description')->nullable();
             $table->string('image')->nullable();
+            $table->decimal('offer_price', 10, 2)->nullable();
             $table->timestamps();
         });
     }

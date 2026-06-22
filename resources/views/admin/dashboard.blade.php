@@ -6,18 +6,6 @@
 
 <div style="display: flex; min-height: 80vh;">
 
-    <!-- SIDEBAR -->
-    <div style="background: #1a1a1a; width: 250px; padding: 30px 20px;">
-        <h2 style="color: #f5a623; margin-bottom: 30px; font-size: 18px;">🐝 Admin Panel</h2>
-        <ul style="list-style: none;">
-            <li style="margin-bottom: 15px;"><a href="/admin" style="color: #fff; text-decoration: none; font-size: 15px;">📊 Dashboard</a></li>
-            <li style="margin-bottom: 15px;"><a href="/admin/services" style="color: #aaa; text-decoration: none; font-size: 15px;">🛍️ Services</a></li>
-            <li style="margin-bottom: 15px;"><a href="/admin/orders" style="color: #aaa; text-decoration: none; font-size: 15px;">📦 Orders</a></li>
-            <li style="margin-bottom: 15px;"><a href="/admin/customers" style="color: #aaa; text-decoration: none; font-size: 15px;">👥 Customers</a></li>
-            <li style="margin-bottom: 15px;"><a href="/admin/staff" style="color: #aaa; text-decoration: none; font-size: 15px;">👨‍💼 Staff</a></li>
-        </ul>
-    </div>
-
     <!-- MAIN CONTENT -->
     <div style="flex: 1; padding: 40px;">
         <h1 style="font-size: 28px; margin-bottom: 30px;">Dashboard <span style="color: #f5a623;">Overview</span></h1>

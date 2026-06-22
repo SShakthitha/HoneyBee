@@ -9,7 +9,6 @@ class LaserWork extends Model
     protected $primaryKey = 'laser_id';
 
     protected $fillable = [
-        'service_id',
         'product_name',
         'laser_type',
         'material_type',
@@ -20,8 +19,4 @@ class LaserWork extends Model
         'description'
     ];
 
-    public function service()
-    {
-        return $this->belongsTo(Service::class, 'service_id');
-    }
 }

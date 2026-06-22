@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Models\Customer;
 
 class RegisteredUserController extends Controller
 {
@@ -40,6 +41,15 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        Customer::create([
+            'full_name' => $request->name,
+            'email' => $request->email,
+            'phone' => 'Not Provided',
+            'address' => null,
+            'total_spent' => 0,
+            'registered_date' => now(),
         ]);
 
         event(new Registered($user));

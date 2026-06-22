@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Staff extends Model
 {
     protected $primaryKey = 'staff_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'business_id',
@@ -19,7 +21,7 @@ class Staff extends Model
 
     public function business()
     {
-        return $this->belongsTo(Business::class, 'business_id');
+        return $this->belongsTo(Business::class, 'business_id')->withDefault();
     }
 
     public function handles()

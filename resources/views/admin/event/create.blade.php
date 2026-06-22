@@ -11,7 +11,7 @@
 
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
 
-    <form action="/admin/event/store" method="POST">
+    <form action="/admin/event/store" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -53,11 +53,15 @@
             </div>
 
             <div>
-                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Service *</label>
-                <select name="service_id" required
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Offer Price (Rs.)</label>
+                <input type="number" name="offer_price" step="0.01"
                     style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                    <option value="">Select Service</option>
-                </select>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Image</label>
+                <input type="file" name="image"
+                    style="width: 100%; padding: 10px;">
             </div>
 
         </div>

@@ -10,9 +10,6 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id('event_id');
-            $table->foreignId('service_id')
-                  ->constrained('services', 'service_id')
-                  ->onDelete('cascade');
             $table->string('event_name');
             $table->string('event_type');
             $table->string('decoration_type')->nullable();
@@ -25,6 +22,7 @@ return new class extends Migration
             $table->string('event_location')->nullable();
             $table->decimal('price', 10, 2);
             $table->text('description')->nullable();
+            $table->decimal('offer_price', 10, 2)->nullable();
             $table->timestamps();
         });
     }

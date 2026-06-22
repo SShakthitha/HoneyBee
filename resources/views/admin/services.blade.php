@@ -6,12 +6,16 @@
 
 <div class="topbar">
     <h1>All <span>Services</span></h1>
-    <a href="/admin/services/create">+ Add Service</a>
+    <div style="display: flex; gap: 10px;">
+      <a href="/admin/gift/create" style="background: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Gift Item</a>
+      <a href="/admin/laser/create" style="background: #1a1a1a; color: #f5a623; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Laser Work</a>
+      <a href="/admin/event/create" style="background: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Event</a>
+    </div>
 </div>
 
 <!-- GIFT & DESIGN -->
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 30px;">
-    <h2 style="margin-bottom: 20px;">🎁 Gift & Design</h2>
+    <h2 style="margin-bottom: 20px;">Gift & Design</h2>
     @if($gifts->isEmpty())
         <p style="color: #777;">No gift items yet!</p>
     @else
@@ -42,7 +46,7 @@
 
 <!-- LASER WORK -->
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 30px;">
-    <h2 style="margin-bottom: 20px;">⚡ Laser Work</h2>
+    <h2 style="margin-bottom: 20px;">Laser Work</h2>
     @if($laserWorks->isEmpty())
         <p style="color: #777;">No laser work items yet!</p>
     @else
@@ -73,7 +77,7 @@
 
 <!-- EVENTS -->
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
-    <h2 style="margin-bottom: 20px;">🎉 Events</h2>
+    <h2 style="margin-bottom: 20px;">Events</h2>
     @if($events->isEmpty())
         <p style="color: #777;">No events yet!</p>
     @else

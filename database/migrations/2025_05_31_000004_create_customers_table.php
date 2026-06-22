@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('customer_id');
             $table->string('full_name');
             $table->string('email')->unique();
-            $table->string('phone');
+            $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->decimal('total_spent', 10, 2)->default(0);
             $table->timestamp('registered_date')->useCurrent();

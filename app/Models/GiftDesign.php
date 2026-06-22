@@ -9,7 +9,6 @@ class GiftDesign extends Model
     protected $primaryKey = 'gift_design_id';
 
     protected $fillable = [
-        'service_id',
         'item_name',
         'category',
         'material',
@@ -20,8 +19,4 @@ class GiftDesign extends Model
         'image'
     ];
 
-    public function service()
-    {
-        return $this->belongsTo(Service::class, 'service_id');
-    }
 }
