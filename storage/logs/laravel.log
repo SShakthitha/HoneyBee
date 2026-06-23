@@ -919,3 +919,78 @@
 #63 C:/xampp/htdocs/HoneyBeeshop/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('C://xampp//htdocs...')
 #64 {main}
 "} 
+[2026-06-23 17:19:02] production.ERROR: __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\pacB55F.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache/packages.php): Access is denied (code: 5) {"exception":"[object] (Error(code: 0): __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\pacB55F.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache/packages.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-ec2e9975ebf5755f76a162b3dce99361.php:33)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-ec2e9975ebf5755f76a162b3dce99361.php(62): LaravelVsCode::startupError(Object(ErrorException))
+#1 {main}
+"} 
+[2026-06-23 17:19:02] production.ERROR: __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\serB6B6.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\services.php): Access is denied (code: 5) {"exception":"[object] (Error(code: 0): __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\serB6B6.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\services.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-7563160ca998bde672640aa1e68dfd08.php:33)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-7563160ca998bde672640aa1e68dfd08.php(62): LaravelVsCode::startupError(Object(ErrorException))
+#1 {main}
+"} 
+[2026-06-23 17:19:02] production.ERROR: __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\serB697.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\services.php): Access is denied (code: 5) {"exception":"[object] (Error(code: 0): __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\serB697.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\services.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-43419e1773d5590e98dcbfc1b7903297.php:33)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-43419e1773d5590e98dcbfc1b7903297.php(62): LaravelVsCode::startupError(Object(ErrorException))
+#1 {main}
+"} 
+[2026-06-23 17:19:02] production.ERROR: __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\serB6B7.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\services.php): Access is denied (code: 5) {"exception":"[object] (Error(code: 0): __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\serB6B7.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\services.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-19804082b122017c46bdac205a3a1912.php:33)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-19804082b122017c46bdac205a3a1912.php(62): LaravelVsCode::startupError(Object(ErrorException))
+#1 {main}
+"} 
+[2026-06-23 17:19:02] production.ERROR: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\serB6A7.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\services.php): Access is denied (code: 5) {"exception":"[object] (ErrorException(code: 0): rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\serB6A7.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\services.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:233)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError(2, 'rename(C://Users...', 'C://Users//adsha//...', 233)
+#1 [internal function]: Illuminate/Foundation/Bootstrap/HandleExceptions->{closure:Illuminate/Foundation/Bootstrap/HandleExceptions::forwardsTo():257}(2, 'rename(C://Users...', 'C://Users//adsha//...', 233)
+#2 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(233): rename('C://Users//adsha//...', 'C://Users//adsha//...')
+#3 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php(191): Illuminate/Filesystem/Filesystem->replace('C://Users//adsha//...', '<?php return ar...')
+#4 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php(163): Illuminate/Foundation/ProviderRepository->writeManifest(Array)
+#5 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php(61): Illuminate/Foundation/ProviderRepository->compileManifest(Array)
+#6 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(871): Illuminate/Foundation/ProviderRepository->load(Array)
+#7 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterProviders.php(37): Illuminate/Foundation/Application->registerConfiguredProviders()
+#8 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate/Foundation/Bootstrap/RegisterProviders->bootstrap(Object(Illuminate/Foundation/Application))
+#9 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(474): Illuminate/Foundation/Application->bootstrapWith(Array)
+#10 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(196): Illuminate/Foundation/Console/Kernel->bootstrap()
+#11 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#12 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/artisan(13): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#13 {main}
+"} 
+[2026-06-23 17:19:02] production.ERROR: __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\serB6D6.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\services.php): Access is denied (code: 5) {"exception":"[object] (Error(code: 0): __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\serB6D6.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\services.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-5c3cbe5e47b16e6c5fd1967f09c399da.php:33)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-5c3cbe5e47b16e6c5fd1967f09c399da.php(62): LaravelVsCode::startupError(Object(ErrorException))
+#1 {main}
+"} 
+[2026-06-23 17:19:02] production.ERROR: __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\serB6F5.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\services.php): Access is denied (code: 5) {"exception":"[object] (Error(code: 0): __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\serB6F5.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\services.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-f5442aeac73a6a9021bd7ce113d6a606.php:33)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-f5442aeac73a6a9021bd7ce113d6a606.php(62): LaravelVsCode::startupError(Object(ErrorException))
+#1 {main}
+"} 
+[2026-06-23 17:19:02] production.ERROR: __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\serB6C6.tmp,C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\bootstrap\cache\services.php): Access is denied (code: 5) {"exception":"[object] (Error(code: 0): __VSCODE_LARAVEL_STARTUP_ERROR__: rename(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\serB6C6.tmp,C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\bootstrap\\cache\\services.php): Access is denied (code: 5) at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-80bc781b69500326630e3fef7a4fdfeb.php:33)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/_laravel_ide/discover-80bc781b69500326630e3fef7a4fdfeb.php(62): LaravelVsCode::startupError(Object(ErrorException))
+#1 {main}
+"} 
+[2026-06-23 17:24:10] production.ERROR: file_get_contents(C:\Users\adsha\OneDrive\Desktop\Project\HoneyBee\.env): Failed to open stream: No such file or directory {"exception":"[object] (ErrorException(code: 0): file_get_contents(C:\\Users\\adsha\\OneDrive\\Desktop\\Project\\HoneyBee\\.env): Failed to open stream: No such file or directory at C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php:100)
+[stacktrace]
+#0 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError(2, 'file_get_conten...', 'C://Users//adsha//...', 100)
+#1 [internal function]: Illuminate/Foundation/Bootstrap/HandleExceptions->{closure:Illuminate/Foundation/Bootstrap/HandleExceptions::forwardsTo():257}(2, 'file_get_conten...', 'C://Users//adsha//...', 100)
+#2 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php(100): file_get_contents('C://Users//adsha//...')
+#3 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php(82): Illuminate/Foundation/Console/KeyGenerateCommand->writeNewEnvironmentFileWith('base64:WBFGI5ZX...')
+#4 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php(47): Illuminate/Foundation/Console/KeyGenerateCommand->setKeyInEnvironmentFile('base64:WBFGI5ZX...')
+#5 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Foundation/Console/KeyGenerateCommand->handle()
+#6 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#7 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure(Object(Closure))
+#8 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod(Object(Illuminate/Foundation/Application), Array, Object(Closure))
+#9 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call(Object(Illuminate/Foundation/Application), Array, Array, NULL)
+#10 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate/Container/Container->call(Array)
+#11 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#12 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony/Component/Console/Command/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#13 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#14 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand(Object(Illuminate/Foundation/Console/KeyGenerateCommand), Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#15 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#16 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#17 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#18 C:/Users/adsha/OneDrive/Desktop/Project/HoneyBee/artisan(13): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#19 {main}
+"} 
