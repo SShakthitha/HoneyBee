@@ -1,0 +1,1 @@
+<img src="<?php echo e(asset('images/logo.png')); ?>" alt="HoneyBee Shop" style="height: 120px; width: auto;"><?php /**PATH C:\xampp\htdocs\HoneyBeeshop\resources\views/components/application-logo.blade.php ENDPATH**/ ?>
