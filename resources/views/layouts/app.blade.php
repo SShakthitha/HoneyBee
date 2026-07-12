@@ -11,7 +11,13 @@
         nav ul { list-style: none; display: flex; gap: 30px; }
         nav ul li a { color: #fff; text-decoration: none; font-size: 15px; transition: color 0.3s; }
         nav ul li a:hover { color: #f5a623; }
-        nav .nav-buttons a { background-color: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        nav .site-logo { height: 80px; width: auto; display: block; }
+        nav .nav-buttons { display: flex; align-items: center; gap: 12px; }
+        nav .nav-buttons a, nav .nav-buttons button, .btn-login { background-color: transparent; color: #FFD166; border: 1px solid rgba(245,166,35,.65); padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; transition: all 0.3s; cursor: pointer; }
+        nav .nav-buttons a:hover, nav .nav-buttons button:hover, .btn-login:hover { background-color: #f5a623; color: #1a1a1a; }
+        nav .nav-buttons button { border: 1px solid rgba(245,166,35,.65); }
+        .btn-cart-home { background: transparent; border: none; color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 20px; }
+        .btn-cart-home:hover { color: #f5a623; }
         footer { background-color: #1a1a1a; color: #aaa; text-align: center; padding: 30px; margin-top: 60px; }
         footer span { color: #f5a623; }
         main { min-height: 80vh; }
@@ -20,28 +26,29 @@
 <body>
     <nav>
         <a href="/">
-            <img src="{{ asset('images/logo.png') }}" alt="HoneyBee Shop" style="height: 50px; width: auto;">
+            <img src="{{ asset('images/logo.png') }}" alt="HoneyBee Shop" class="site-logo">
         </a>
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/gift-design">Gift & Design</a></li>
-            <li><a href="/laser-work">Laser Work</a></li>
-            <li><a href="/events">Events</a></li>
+            <li><a href="{{ route('home') }}">Home</a></li>
+            <li><a href="{{ route('gift.design') }}">Gift & Design</a></li>
+            <li><a href="{{ route('laser.work') }}">Laser Work</a></li>
+            <li><a href="{{ route('events') }}">Events</a></li>
             @auth
-              <li><a href="/orders">My Orders</a></li>
+              <li><a href="{{ route('orders.index') }}">My Orders</a></li>
             @endauth
         </ul>
         <div class="nav-buttons">
+          <a href="{{ route('gift.design') }}" title="View Cart" class="btn-cart-home">🛒</a>
           @auth
-          <a href="/dashboard">{{ Auth::user()->name }}</a>
+          <a href="{{ route('dashboard') }}">{{ Auth::user()->name }}</a>
           <form method="POST" action="{{ route('logout') }}" style="display: inline;">
             @csrf
-            <button type="submit" style="background-color: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; margin-left: 10px;">
+            <button type="submit" style="background-color: transparent; color: #FFD166; border: 1px solid rgba(245,166,35,.65); padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-left: 10px; transition: all 0.3s;" onmouseover="this.style.backgroundColor='#f5a623'; this.style.color='#1a1a1a';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#FFD166';">
                 Logout
             </button>
           </form>
           @else
-            <a href="/login">Login</a>
+            <a href="{{ route('login') }}">Login</a>
           @endauth
         </div>
     </nav>
@@ -49,6 +56,8 @@
     <main>
         @yield('content')
     </main>
+
+    @stack('scripts')
 
     <footer style="background-color: #1a1a1a; color: #aaa; padding: 40px; margin-top: 60px;">
       <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 30px; max-width: 1100px; margin: 0 auto;">

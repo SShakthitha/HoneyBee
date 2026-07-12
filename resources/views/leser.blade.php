@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laser Works — HoneyBee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="{{ asset('css/leser.css') }}" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="header">
+    <div class="header-inner container">
+      <a href="#home" class="brand">
+        <img src="{{ asset('images/logo.png') }}" alt="Laser Works Logo" class="brand-logo" />
+        <span class="brand-name">Laser<span class="accent"> Works</span></span>
+      </a>
+      <nav class="nav" id="nav">
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#products" class="nav-link">Laser Products</a></li>
+          <li><a href="#gallery" class="nav-link">Gallery</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-cart" onclick="toggleCart()">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="20" r="1"></circle>
+              <circle cx="18" cy="20" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39A2 2 0 0 0 9.64 16H19a2 2 0 0 0 2-1.64L23 6H6"></path>
+          </svg>
+          <span id="cart-count">0</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="home">
+    <div class="hero-bg-overlay"></div>
+    <div class="laser-lines" aria-hidden="true">
+      <span class="laser-line l1"></span>
+      <span class="laser-line l2"></span>
+      <span class="laser-line l3"></span>
+    </div>
+    <div class="hero-content container">
+      <p class="hero-eyebrow">✦ Available for All Island✦</p>
+      <h1 class="hero-heading">Creative Laser Designs<br/><span class="accent">for Every Occasion</span></h1>
+      <p class="hero-eyebrow">— Custom laser engraving &amp; cutting delivered to your door.</p>
+    </div>
+    <div class="hero-scroll-hint" aria-hidden="true">
+      <i class="fas fa-chevron-down">↓</i>
+    </div>
+  </section>
+
+  <!-- ===== SEARCH ===== -->
+  <section class="search-section" id="search">
+    <div class="container">
+      <div class="search-wrap">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input"
+          placeholder="Search laser products — e.g. trophy, wedding, keychain…"
+          autocomplete="off" oninput="liveSearch(this.value)" onkeydown="if(event.key==='Enter')performSearch()" />
+        <button class="btn btn-primary search-btn" onclick="performSearch()">Search</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </section>
+
+  <!-- ===== PRODUCT CATEGORIES ===== -->
+  <section class="section products-section" id="products">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">What We Create</p>
+        <h2 class="section-title">Laser Product Categories</h2>
+        <p class="section-sub">Every piece is precision-cut and lovingly engraved. Browse our full range below.</p>
+      </div>
+      <div class="products-grid" id="productsGrid">
+
+        <div class="product-card" data-name="Laser Photo Frames">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder frame-img"><i class="fas fa-image"></i></div>
+            <span class="card-badge">Popular</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Laser Photo Frames</h3>
+            <p class="card-desc">Beautifully etched wooden &amp; acrylic frames that preserve your most precious memories.</p>
+             <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Laser Photo Frames','Beautifully etched wooden and acrylic frames that preserve your most precious memories with precision laser engraving.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Laser Photo Frames')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Customized Name Boards">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder board-img"><i class="fas fa-sign-hanging"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Customized Name Boards</h3>
+            <p class="card-desc">Bold, durable name boards laser-cut to any shape, size, or font style you choose.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Customized Name Boards','Bold, durable name boards laser-cut to any shape, size, or font style you choose — perfect for homes, shops, and offices.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Customized Name Boards')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Wooden Name Plates">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder wood-img"><i class="fas fa-tree"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Wooden Name Plates</h3>
+            <p class="card-desc">Natural wood grain meets precise laser engraving — timeless plates for homes &amp; offices.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Wooden Name Plates','Natural wood grain meets precise laser engraving — timeless plates for homes and offices that age beautifully.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Wooden Name Plates')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Acrylic Name Boards">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder acrylic-img"><i class="fas fa-gem"></i></div>
+            <span class="card-badge badge-new">New</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Acrylic Name Boards</h3>
+            <p class="card-desc">Glossy, backlit-ready acrylic boards with stunning edge-lit effects for modern interiors.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Acrylic Name Boards','Glossy, backlit-ready acrylic boards with stunning edge-lit effects — modern, minimal, and unmistakably elegant.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Acrylic Name Boards')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Customized Key Tags">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder key-img"><i class="fas fa-key"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Customized Key Tags</h3>
+            <p class="card-desc">Compact, personalized key fobs engraved with names, logos, or QR codes — perfect gifts.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Customized Key Tags','Compact, personalized key fobs engraved with names, logos, or QR codes. Perfect as gifts and brand merchandise.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Customized Key Tags')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Laser Engraved Gifts">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder gift-img"><i class="fas fa-gift"></i></div>
+            <span class="card-badge">Popular</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Laser Engraved Gifts</h3>
+            <p class="card-desc">Thoughtful, one-of-a-kind gifts engraved with personal messages, portraits, or artwork.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Laser Engraved Gifts','Thoughtful, one-of-a-kind gifts engraved with personal messages, portraits, or artwork. Every gift tells a story.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Laser Engraved Gifts')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Wedding Name Boards">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder wedding-img"><i class="fas fa-heart"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Wedding Name Boards</h3>
+            <p class="card-desc">Elegant couple name boards, welcome signs &amp; table accents that set the perfect romantic tone.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Wedding Name Boards','Elegant couple name boards, welcome signs and table accents that set the perfect romantic tone for your special day.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Wedding Name Boards')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Birthday Decorations">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder bday-img"><i class="fas fa-cake-candles"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Birthday Decorations</h3>
+            <p class="card-desc">Custom laser-cut banners, cake toppers, number cutouts &amp; centrepieces for every age.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Birthday Decorations','Custom laser-cut banners, cake toppers, number cutouts and centrepieces for every age and every theme.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Birthday Decorations')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Wall Art Designs">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder wall-img"><i class="fas fa-palette"></i></div>
+            <span class="card-badge badge-new">Trending</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Wall Art Designs</h3>
+            <p class="card-desc">Statement wall pieces — geometric patterns, family trees &amp; scenic art in wood or acrylic.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Wall Art Designs','Statement wall pieces — geometric patterns, family trees and scenic art in wood or acrylic that transform any room.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Wall Art Designs')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Corporate Laser Products">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder corp-img"><i class="fas fa-briefcase"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Corporate Laser Products</h3>
+            <p class="card-desc">Branded nameplates, desk accessories &amp; corporate gifts that elevate your business identity.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Corporate Laser Products','Branded nameplates, desk accessories and corporate gifts that elevate your business identity. Bulk orders welcome.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Corporate Laser Products')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Trophy Award Engraving">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder trophy-img"><i class="fas fa-trophy"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Trophy &amp; Award Engraving</h3>
+            <p class="card-desc">Precision-engraved trophies, plaques &amp; medals that honour achievement with lasting dignity.</p>
+            <p class="price">From <strong>Rs 3,500</strong></p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Trophy & Award Engraving','Precision-engraved trophies, plaques and medals that honour achievement with lasting dignity and craftsmanship.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Trophy & Award Engraving')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-name="Customized Laser Cut Designs">
+          <div class="card-img-wrap">
+            <div class="card-img-placeholder custom-img"><i class="fas fa-drafting-compass"></i></div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Customized Laser Cut Designs</h3>
+            <p class="card-desc">Bring any idea to life — send us your design and we'll cut it into reality with laser precision.</p>
+            <div class="card-actions">
+              <button class="btn btn-ghost" onclick="openModal('Customized Laser Cut Designs','Bring any idea to life. Send us your design and we will cut it into reality with laser precision. Any shape, any material.')">View Details</button>
+              <button class="btn btn-primary" onclick="openOrderForm('Customized Laser Cut Designs')">Order Now</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== OUR SERVICES ===== -->
+  <section class="section services-section" id="services">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Why Choose Us</p>
+        <h2 class="section-title">Our Services</h2>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-pen-nib"></i></div>
+          <h3>Custom Design Creation</h3>
+          <p>Our in-house designers turn your vision into a precise laser-ready file — no experience required from you.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-cut"></i></div>
+          <h3>Precision Laser Cutting</h3>
+          <p>±0.1 mm accuracy on every cut. Complex shapes, fine lettering, and intricate patterns done flawlessly.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-layer-group"></i></div>
+          <h3>Laser Engraving</h3>
+          <p>Deep, permanent engraving on wood, acrylic, leather, slate, and metal. Zero fade. Zero compromise.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-star"></i></div>
+          <h3>Personalized Products</h3>
+          <p>Names, dates, photos, quotes — every order is unique to you. No two pieces are ever the same.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-truck-fast"></i></div>
+          <h3>Fast Delivery</h3>
+          <p>Express turnaround options across the Jaffna District. Order today, receive in 2–5 business days.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-shield-halved"></i></div>
+          <h3>Quality Materials</h3>
+          <p>Premium-grade wood, acrylic, and specialty substrates sourced for long-lasting, beautiful results.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GALLERY ===== -->
+  <section class="section gallery-section" id="gallery">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Our Portfolio</p>
+        <h2 class="section-title">Gallery</h2>
+        <p class="section-sub">A glimpse of what leaves our workshop every week.</p>
+      </div>
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-item gi-tall"><div class="gallery-placeholder gp1"><i class="fas fa-image"></i><span>Wedding Board</span></div></div>
+        <div class="gallery-item"><div class="gallery-placeholder gp2"><i class="fas fa-image"></i><span>Trophy Plaque</span></div></div>
+        <div class="gallery-item"><div class="gallery-placeholder gp3"><i class="fas fa-image"></i><span>Name Plate</span></div></div>
+        <div class="gallery-item gi-wide"><div class="gallery-placeholder gp4"><i class="fas fa-image"></i><span>Wall Art Panel</span></div></div>
+        <div class="gallery-item"><div class="gallery-placeholder gp5"><i class="fas fa-image"></i><span>Key Tags Set</span></div></div>
+        <div class="gallery-item"><div class="gallery-placeholder gp6"><i class="fas fa-image"></i><span>Birthday Decor</span></div></div>
+        <div class="gallery-item gi-tall"><div class="gallery-placeholder gp7"><i class="fas fa-image"></i><span>Acrylic Board</span></div></div>
+        <div class="gallery-item"><div class="gallery-placeholder gp8"><i class="fas fa-image"></i><span>Photo Frame</span></div></div>
+        <div class="gallery-item gi-wide"><div class="gallery-placeholder gp9"><i class="fas fa-image"></i><span>Corporate Gift Set</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CUSTOMER INQUIRY ===== -->
+  <section class="section inquiry-section" id="inquiry">
+    <div class="container">
+      <div class="inquiry-layout">
+        <div class="inquiry-cta-col">
+          <p class="section-eyebrow">Ready to Order?</p>
+          <h2 class="section-title">Let's Create<br/>Something Special</h2>
+          <p class="inquiry-intro">We engrave your memories, milestones, and brand with the precision they deserve. Reach us however suits you best.</p>
+          <div class="inquiry-btns">
+            <button class="btn btn-primary" onclick="scrollToForm()">
+              <i class="fas fa-file-alt"></i> Order Now
+            </button>
+            <a href="https://wa.me/94771234567?text=Hello%2C%20I%27m%20interested%20in%20Laser%20Works%20products!" target="_blank" class="btn btn-whatsapp">
+              <i class="fab fa-whatsapp"></i> WhatsApp Inquiry
+            </a>
+          </div>
+        </div>
+        <div class="inquiry-form-col" id="contactForm">
+          <div class="form-card">
+            <h3 class="form-title">Send an Inquiry</h3>
+            <div class="form-group">
+              <label for="fname">Full Name</label>
+              <input type="text" id="fname" placeholder="Your full name" />
+            </div>
+            <div class="form-group">
+              <label for="fphone">Phone Number</label>
+              <input type="tel" id="fphone" placeholder="+94 77 XXX XXXX" />
+            </div>
+            <div class="form-group">
+              <label for="femail">Email Address</label>
+              <input type="email" id="femail" placeholder="you@example.com" />
+            </div>
+            <div class="form-group">
+              <label for="fproduct">Product Interest</label>
+              <select id="fproduct">
+                <option value="">Select a product…</option>
+                <option>Laser Photo Frames</option>
+                <option>Customized Name Boards</option>
+                <option>Wooden Name Plates</option>
+                <option>Acrylic Name Boards</option>
+                <option>Customized Key Tags</option>
+                <option>Laser Engraved Gifts</option>
+                <option>Wedding Name Boards</option>
+                <option>Birthday Decorations</option>
+                <option>Wall Art Designs</option>
+                <option>Corporate Laser Products</option>
+                <option>Trophy Award Engraving</option>
+                <option>Customized Laser Cut Designs</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="fmessage">Message / Requirements</label>
+              <textarea id="fmessage" rows="4" placeholder="Describe your design needs, size, material preference…"></textarea>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="submitInquiry()">
+              <i class="fas fa-paper-plane"></i> Send Inquiry
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="section contact-section" id="contact">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Find Us</p>
+        <h2 class="section-title">Contact Laser Works</h2>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+          <h4>Phone</h4>
+          <p>+94 0766199881</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+          <h4>Email</h4>
+          <p>Honey beelaserworks @gmail.com.</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <h4>Address</h4>
+          <p>190, Sir. Pom Ramanathan Road,<br/>Thirunelvely,Jaffna</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-share-alt"></i></div>
+          <h4>Social Media</h4>
+          <div class="social-links">
+            <a href="#" class="social-icon fb" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon ig" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon wa" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="social-icon yt" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-name footer-brand-name">Laser<span class="accent">Works</span></span>
+        <p>Precision laser engraving &amp; cutting for<br/>every occasion — proudly serving Jaffna.</p>
+        <div class="social-links mt-1">
+          <a href="#" class="social-icon fb" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon ig" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-icon wa" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Quick Links</h5>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#products">Laser Products</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#inquiry">Order Now</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Products</h5>
+        <ul>
+          <li><a href="#products">Photo Frames</a></li>
+          <li><a href="#products">Name Boards</a></li>
+          <li><a href="#products">Wedding Boards</a></li>
+          <li><a href="#products">Wall Art</a></li>
+          <li><a href="#products">Trophies &amp; Awards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contact Info</h5>
+        <ul class="footer-contact">
+          <li><i class="fas fa-phone-alt"></i> +94 0766199881</li>
+          <li><i class="fas fa-envelope"></i> Honey beelaserworks @gmail.com.</li>
+          <li><i class="fas fa-map-marker-alt"></i> 190, Sir. Pom Ramanathan Road,Thirunelvely,Jaffna</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2025 Laser Works. All rights reserved. Crafted with <i class="fas fa-heart accent"></i> for the people of Jaffna.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <script src="{{ asset('js/leser.js') }}"></script>
+</body>
+</html>

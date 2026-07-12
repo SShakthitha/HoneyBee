@@ -5,60 +5,89 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class CustomerController extends Controller
 {
     public function index()
     {
-        $customers = Customer::all();
-        return view('admin.customers.index', compact('customers'));
+        return view('admin.customers.index');
+    }
+
+    public function data()
+    {
+        $customers = Customer::select('customer_id', 'full_name', 'email', 'phone', 'address');
+
+        return DataTables::of($customers)
+            ->addColumn('action', function ($customer) {
+                return '
+                    <div class="d-flex justify-content-end gap-1">
+                        <button type="button"
+                            class="btn btn-honey btn-sm editBtn"
+                            data-id="' . $customer->customer_id . '">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button type="button"
+                            class="btn btn-outline-danger btn-sm deleteBtn"
+                            data-id="' . $customer->customer_id . '">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                ';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'full_name' => 'required|string|max:255',
-            'email'     => 'required|email|unique:customers,email',
+            'email'     => 'required|email|max:255',
             'phone'     => 'nullable|string|max:20',
             'address'   => 'nullable|string',
         ]);
 
-        Customer::create([
-            'full_name'       => $request->full_name,
-            'email'           => $request->email,
-            'phone'           => $request->phone,
-            'address'         => $request->address,
-            'total_spent'     => 0,
-            'registered_date' => now(),
-        ]);
+        Customer::create($validated);
 
-        return back()->with('success', 'Customer added successfully.');
+        return redirect()
+            ->route('admin.customers.index')
+            ->with('success', 'Customer added successfully.');
     }
 
+    // AJAX GET — returns JSON to populate the edit modal
+    public function edit($id)
+    {
+        $customer = Customer::where('customer_id', $id)->firstOrFail();
+
+        return response()->json($customer);
+    }
+
+    // Normal PUT form submission — full page redirect, same as store()
     public function update(Request $request, $id)
     {
-        $customer = Customer::findOrFail($id);
+        $customer = Customer::where('customer_id', $id)->firstOrFail();
 
-        $request->validate([
+        $validated = $request->validate([
             'full_name' => 'required|string|max:255',
-            'email'     => 'required|email|unique:customers,email,' . $id . ',customer_id',
+            'email'     => 'required|email|max:255',
             'phone'     => 'nullable|string|max:20',
             'address'   => 'nullable|string',
         ]);
 
-        $customer->update([
-            'full_name' => $request->full_name,
-            'email'     => $request->email,
-            'phone'     => $request->phone,
-            'address'   => $request->address,
-        ]);
+        $customer->update($validated);
 
-        return back()->with('success', 'Customer updated successfully.');
+        return redirect()
+            ->route('admin.customers.index')
+            ->with('success', 'Customer updated successfully.');
     }
 
     public function destroy($id)
     {
-        Customer::findOrFail($id)->delete();
-        return back()->with('success', 'Customer deleted.');
+        Customer::where('customer_id', $id)->delete();
+
+        return redirect()
+            ->route('admin.customers.index')
+            ->with('success', 'Customer deleted successfully.');
     }
 }

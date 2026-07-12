@@ -11,6 +11,7 @@ use App\Models\GiftDesign;
 use App\Models\LaserWork;
 use App\Models\Event;
 use App\Models\Business;
+use Yajra\DataTables\Facades\DataTables;
 
 class AdminController extends Controller
 {
@@ -29,59 +30,84 @@ class AdminController extends Controller
     }
 
     // ─── Businesses ───────────────────────────────────────────
-    public function businesses()
-    {
-        $businesses = Business::all();
-        return view('admin.businesses.index', compact('businesses'));
-    }
+public function businesses()
+{
+    return view('admin.businesses.index');
+}
 
-    public function createBusiness()
-    {
-        return view('admin.businesses.create');
-    }
+public function businessesData()
+{
+    $businesses = Business::select('business_id', 'business_name', 'contact_email', 'phone', 'description');
 
-    public function storeBusiness(Request $request)
-    {
-        $request->validate([
-            'business_name' => 'required',
-            'contact_email' => 'required|email|unique:businesses,contact_email',
-            'phone'         => 'required',
-        ]);
+    return DataTables::of($businesses)
+        ->addColumn('action', function ($b) {
+            return '
+                <div class="d-flex justify-content-end gap-1">
+                    <button type="button"
+                        class="btn btn-honey btn-sm editBtn"
+                        data-id="' . $b->business_id . '">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button type="button"
+                        class="btn btn-outline-danger btn-sm deleteBtn"
+                        data-id="' . $b->business_id . '">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            ';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+}
 
-        Business::create([
-            'business_name' => $request->business_name,
-            'contact_email' => $request->contact_email,
-            'phone'         => $request->phone,
-            'description'   => $request->description,
-        ]);
+public function createBusiness()
+{
+    return view('admin.businesses.create');
+}
 
-        return redirect()->route('admin.businesses')->with('success', 'Business added successfully!');
-    }
+public function storeBusiness(Request $request)
+{
+    $request->validate([
+        'business_name' => 'required',
+        'contact_email' => 'required|email|unique:businesses,contact_email',
+        'phone'         => 'required',
+    ]);
 
-    public function editBusiness($id)
-    {
-        $business = Business::findOrFail($id);
-        return view('admin.businesses.edit', compact('business'));
-    }
+    Business::create([
+        'business_name' => $request->business_name,
+        'contact_email' => $request->contact_email,
+        'phone'         => $request->phone,
+        'description'   => $request->description,
+    ]);
 
-    public function updateBusiness(Request $request, $id)
-    {
-        $business = Business::findOrFail($id);
-        $business->update([
-            'business_name' => $request->business_name,
-            'contact_email' => $request->contact_email,
-            'phone'         => $request->phone,
-            'description'   => $request->description,
-        ]);
+    return redirect()->route('admin.businesses')->with('success', 'Business added successfully!');
+}
 
-        return redirect()->route('admin.businesses')->with('success', 'Business updated successfully!');
-    }
+// AJAX GET — returns JSON to populate the edit modal
+public function editBusiness($id)
+{
+    $business = Business::where('business_id', $id)->firstOrFail();
+    return response()->json($business);
+}
 
-    public function deleteBusiness($id)
-    {
-        Business::where('business_id', $id)->delete();
-        return redirect()->back()->with('success', 'Business deleted!');
-    }
+public function updateBusiness(Request $request, $id)
+{
+    $business = Business::findOrFail($id);
+    $business->update([
+        'business_name' => $request->business_name,
+        'contact_email' => $request->contact_email,
+        'phone'         => $request->phone,
+        'description'   => $request->description,
+    ]);
+
+    return redirect()->route('admin.businesses')->with('success', 'Business updated successfully!');
+}
+
+public function deleteBusiness($id)
+{
+    Business::where('business_id', $id)->delete();
+    return redirect()->back()->with('success', 'Business deleted!');
+}
 
     // ─── Services ─────────────────────────────────────────────
     public function services()

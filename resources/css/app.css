@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.auth-bg {
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(245,166,35,.12) 0%, transparent 70%),
+        #1a1a1a;
+}
+
+.auth-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 50% 40%, rgba(245,166,35,0.13) 0%, transparent 60%),
+        radial-gradient(circle at 10% 80%, rgba(245,166,35,0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(245,166,35,0.06) 0%, transparent 40%);
+}
+
+.auth-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(245,166,35,0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+.auth-bg > * {
+    position: relative;
+    z-index: 1;
+}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use Yajra\DataTables\Facades\DataTables;
 
 class EventController extends Controller
 {

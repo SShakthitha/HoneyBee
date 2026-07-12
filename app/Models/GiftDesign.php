@@ -14,6 +14,7 @@ class GiftDesign extends Model
         'material',
         'size',
         'price',
+        'offer_price',
         'customization_option',
         'description',
         'image'

@@ -5,9 +5,44 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class StaffController extends Controller
 {
+  public function data()
+{
+    $staff = Staff::select('staff_id', 'full_name', 'role', 'email', 'phone', 'hire_date');
+
+    return DataTables::of($staff)
+        ->editColumn('hire_date', function ($s) {
+            return $s->hire_date ? \Carbon\Carbon::parse($s->hire_date)->format('Y-m-d') : '—';
+        })
+        ->addColumn('action', function ($s) {
+            return '
+                <div class="d-flex justify-content-end gap-1">
+                    <button type="button"
+                        class="btn btn-honey btn-sm editBtn"
+                        data-id="' . $s->staff_id . '">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button type="button"
+                        class="btn btn-outline-danger btn-sm deleteBtn"
+                        data-id="' . $s->staff_id . '">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            ';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+}
+
+// AJAX GET — returns JSON to populate the edit modal
+public function edit($id)
+{
+    $member = Staff::where('staff_id', $id)->firstOrFail();
+    return response()->json($member);
+}
     public function index()
     {
         $staff = Staff::all();

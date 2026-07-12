@@ -20,6 +20,7 @@ class Event extends Model
         'event_date',
         'event_location',
         'price',
+        'offer_price',
         'description'
     ];
 

@@ -15,6 +15,7 @@ class LaserWork extends Model
         'product_category',
         'size',
         'price',
+        'offer_price',
         'engraving_text',
         'description'
     ];

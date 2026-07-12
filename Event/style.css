@@ -159,11 +159,9 @@ input, select, textarea { font-family: inherit; }
 
 .logo-img,
 .brand-logo {
-  width: 46px;
-  height: 46px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid var(--amber);
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
 }
 
 .logo-text,
@@ -234,28 +232,16 @@ input, select, textarea { font-family: inherit; }
 /* ===== Cart Button ===== */
 
 .btn-cart {
+  background: var(--amber);
+  color: var(--white);
+  padding: .5rem 1rem;
+  font-size: .85rem;
   position: relative;
-  background: transparent;
-  border: none;
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  transition: all .3s ease;
-  cursor: pointer;
 }
 
 .btn-cart:hover {
-  color: var(--amber);
-  background: rgba(245,166,35,.1);
-}
-
-.btn-cart i {
-  font-size: 24px;
-  color: inherit;
-}
-
-.btn-cart span {
-  color: inherit;
+  background: var(--honey);
+  color: var(--jet);
 }
 
 

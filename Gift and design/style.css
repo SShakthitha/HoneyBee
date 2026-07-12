@@ -44,29 +44,69 @@ h3 { font-size: 1.2rem; font-weight: 700; }
 .mt-1 { margin-top: .75rem; }
 
 /* ══════════════════════ BUTTONS ══════════════════════ */
-.btn {
-  display: inline-flex; align-items: center; gap: .45rem;
-  font-family: 'Inter', sans-serif; font-weight: 600; font-size: .9rem;
-  padding: .7rem 1.5rem; border-radius: 50px; border: 2px solid transparent;
-  cursor: pointer; transition: all var(--transition); white-space: nowrap;
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--amber);
+  color: var(--jet);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 13px 28px;
+  border-radius: 50px;
+  border: 2px solid var(--amber);
+  cursor: pointer;
+  transition: var(--trans);
+  white-space: nowrap;
 }
-.btn-primary { background: var(--amber); color: var(--white); border-color: var(--amber); }
-.btn-primary:hover { background: var(--honey); color: var(--jet); border-color: var(--honey); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,166,35,.35); }
-.btn-outline-light { background: transparent; color: var(--white); border-color: rgba(255,255,255,.6); }
-.btn-outline-light:hover { background: var(--white); color: var(--jet); }
-.btn-admin { background: var(--jet); color: var(--honey); font-size: .8rem; padding: .5rem 1rem; }
-.btn-admin:hover { background: var(--amber); color: var(--white); }
-.btn-cart { background: var(--amber); color: var(--white); padding: .5rem 1rem; font-size: .85rem; position: relative; }
-.btn-cart:hover { background: var(--honey); color: var(--jet); }
-.btn-cart-add { background: var(--amber); color: var(--white); font-size: .8rem; padding: .5rem 1rem; flex: 1; }
-.btn-cart-add:hover { background: var(--honey); color: var(--jet); }
-.btn-details { background: transparent; color: var(--amber); border-color: var(--amber); font-size: .8rem; padding: .5rem 1rem; }
-.btn-details:hover { background: var(--amber); color: var(--white); }
-.btn-wa { background: var(--wa); color: var(--white); font-size: .8rem; padding: .5rem 1rem; }
-.btn-wa:hover { opacity: .88; transform: translateY(-1px); }
-.btn-whatsapp { background: var(--wa); color: var(--white); font-size: .9rem; }
-.btn-whatsapp:hover { opacity: .88; }
-.btn-full { width: 100%; justify-content: center; }
+.btn-primary:hover {
+  background: transparent;
+  color: var(--amber);
+  transform: translateY(-2px);
+}
+.btn-primary.full-width { width: 100%; justify-content: center; }
+
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 13px 28px;
+  border-radius: 50px;
+  border: 2px solid rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: var(--trans);
+}
+.btn-outline:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--white);
+}
+
+.btn-whatsapp {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #25D366;
+  color: var(--white);
+  font-weight: 700;
+  padding: 13px 28px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: var(--trans);
+  font-size: 0.9rem;
+}
+.btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-2px); }
+
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #e74c3c;
+  color: var(--white);
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: var(--trans);
+}
+.btn-danger:hover { background: #c0392b; }
 
 /* ══════════════════════ HEADER ══════════════════════ */
 #header {
