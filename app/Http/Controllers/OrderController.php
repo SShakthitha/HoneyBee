@@ -5,32 +5,35 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Service;
+use App\Models\Customer;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('customer_id', auth()->id())->get();
+        $customer = Customer::where('email', auth()->user()->email)->firstOrFail();
+        $orders = Order::with('service')->where('customer_id', $customer->customer_id)->latest('order_date')->get();
         return view('orders', compact('orders'));
     }
 
-    public function create($service_id)
+    public function create(Service $service)
     {
-        $service = Service::findOrFail($service_id);
         return view('order-create', compact('service'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'service_id' => 'required',
+        $validated = $request->validate([
+            'service_id' => 'required|exists:services,service_id',
             'payment_method' => 'required',
             'paid_amount' => 'required|numeric',
         ]);
 
+        $customer = Customer::where('email', $request->user()->email)->firstOrFail();
+
         Order::create([
-            'customer_id' => auth()->id(),
-            'service_id' => $request->service_id,
+            'customer_id' => $customer->customer_id,
+            'service_id' => $validated['service_id'],
             'order_date' => now(),
             'paid_amount' => $request->paid_amount,
             'advanced_paid' => $request->advanced_paid ?? 0,

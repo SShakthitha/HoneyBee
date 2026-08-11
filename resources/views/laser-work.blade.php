@@ -150,9 +150,13 @@
   <div class="container">
     <div class="section-header"><p class="section-eyebrow">Our Portfolio</p><h2 class="section-title">Gallery</h2><p class="section-sub">A glimpse of what leaves our workshop every week.</p></div>
     <div class="gallery-grid" id="galleryGrid">
-      @foreach(['Wedding Board','Trophy Plaque','Name Plate','Wall Art Panel','Key Tags Set','Birthday Decor','Acrylic Board','Photo Frame'] as $item)
-        <div class="gallery-item"><div class="gallery-placeholder gp1"><i class="fas fa-image"></i><span>{{ $item }}</span></div></div>
-      @endforeach
+      @forelse($galleryImages as $galleryImage)
+        <figure class="gallery-item m-0">
+          <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Laser Work gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;">
+        </figure>
+      @empty
+        <p class="mb-0">Our latest laser work will be added here soon.</p>
+      @endforelse
     </div>
   </div>
 </section>

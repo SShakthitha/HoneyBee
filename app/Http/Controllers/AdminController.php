@@ -12,6 +12,8 @@ use App\Models\LaserWork;
 use App\Models\Event;
 use App\Models\Business;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -93,12 +95,13 @@ public function editBusiness($id)
 public function updateBusiness(Request $request, $id)
 {
     $business = Business::findOrFail($id);
-    $business->update([
-        'business_name' => $request->business_name,
-        'contact_email' => $request->contact_email,
-        'phone'         => $request->phone,
-        'description'   => $request->description,
+    $validated = $request->validate([
+        'business_name' => ['required', 'string', 'max:255'],
+        'contact_email' => ['required', 'email', Rule::unique('businesses')->ignore($business->business_id, 'business_id')],
+        'phone' => ['required', 'string', 'max:30'],
+        'description' => ['nullable', 'string'],
     ]);
+    $business->update($validated);
 
     return redirect()->route('admin.businesses')->with('success', 'Business updated successfully!');
 }
@@ -121,15 +124,16 @@ public function deleteBusiness($id)
     // ─── Orders ───────────────────────────────────────────────
     public function orders()
     {
-        $orders = Order::all();
+        $orders = Order::with(['customer', 'service'])->latest('order_date')->get();
         return view('admin.orders', compact('orders'));
     }
 
     public function updateOrderStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        $order->update(['status' => $request->status]);
-        return redirect('/admin/orders')->with('success', 'Order status updated!');
+        $validated = $request->validate(['status' => ['required', Rule::in(['pending', 'processing', 'completed', 'cancelled'])]]);
+        $order->update($validated);
+        return redirect()->route('admin.orders')->with('success', 'Order status updated!');
     }
 
     // ─── Customers ────────────────────────────────────────────
@@ -270,24 +274,21 @@ public function deleteBusiness($id)
 
     public function storeGift(Request $request)
     {
-        $request->validate([
-            'item_name' => 'required',
-            'category'  => 'required',
-            'price'     => 'required|numeric',
+        $validated = $request->validate([
+            'item_name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'in:Gift,Frame'],
+            'price' => ['required', 'numeric', 'min:0'], 'offer_price' => ['nullable', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image', 'max:10240'],
         ]);
-
-        $imageName = null;
-        if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images/gifts'), $imageName);
-        }
+        $imageName = $request->file('image')?->store('gifts', 'public');
 
         GiftDesign::create([
-            'item_name'            => $request->item_name,
-            'category'             => $request->category,
+            'item_name'            => $validated['item_name'],
+            'category'             => $validated['category'],
             'material'             => $request->material,
             'size'                 => $request->size,
-            'price'                => $request->price,
+            'price'                => $validated['price'],
+            'offer_price'          => $validated['offer_price'] ?? null,
             'customization_option' => $request->customization_option,
             'description'          => $request->description,
             'image'                => $imageName,
@@ -308,17 +309,27 @@ public function deleteBusiness($id)
         $gift      = GiftDesign::findOrFail($id);
         $imageName = $gift->image;
 
+        $validated = $request->validate([
+            'item_name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'in:Gift,Frame'],
+            'price' => ['required', 'numeric', 'min:0'], 'offer_price' => ['nullable', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image', 'max:10240'],
+        ]);
+
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images/gifts'), $imageName);
+            if ($imageName && Storage::disk('public')->exists($imageName)) {
+                Storage::disk('public')->delete($imageName);
+            }
+            $imageName = $request->file('image')->store('gifts', 'public');
         }
 
         $gift->update([
-            'item_name'            => $request->item_name,
-            'category'             => $request->category,
+            'item_name'            => $validated['item_name'],
+            'category'             => $validated['category'],
             'material'             => $request->material,
             'size'                 => $request->size,
-            'price'                => $request->price,
+            'price'                => $validated['price'],
+            'offer_price'          => $validated['offer_price'] ?? null,
             'customization_option' => $request->customization_option,
             'description'          => $request->description,
             'image'                => $imageName,
@@ -342,19 +353,21 @@ public function deleteBusiness($id)
 
     public function storeLaser(Request $request)
     {
-        $request->validate([
-            'product_name' => 'required',
-            'laser_type'   => 'required',
-            'price'        => 'required|numeric',
+        $validated = $request->validate([
+            'product_name' => 'required|string|max:255',
+            'laser_type'   => 'required|string|max:255',
+            'price'        => 'required|numeric|min:0',
+            'offer_price'  => 'nullable|numeric|min:0',
         ]);
 
         LaserWork::create([
-            'product_name'     => $request->product_name,
-            'laser_type'       => $request->laser_type,
+            'product_name'     => $validated['product_name'],
+            'laser_type'       => $validated['laser_type'],
             'material_type'    => $request->material_type,
             'product_category' => $request->product_category,
             'size'             => $request->size,
-            'price'            => $request->price,
+            'price'            => $validated['price'],
+            'offer_price'      => $validated['offer_price'] ?? null,
             'engraving_text'   => $request->engraving_text,
             'description'      => $request->description,
         ]);
@@ -371,7 +384,13 @@ public function deleteBusiness($id)
     public function updateLaser(Request $request, $id)
     {
         $laserWork = LaserWork::findOrFail($id);
-        $laserWork->update($request->all());
+        $validated = $request->validate([
+            'product_name' => 'required|string|max:255', 'laser_type' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0', 'offer_price' => 'nullable|numeric|min:0',
+            'material_type' => 'nullable|string|max:255', 'product_category' => 'nullable|string|max:255',
+            'size' => 'nullable|string|max:255', 'engraving_text' => 'nullable|string', 'description' => 'nullable|string',
+        ]);
+        $laserWork->update($validated);
         return redirect('/admin/services')->with('success', 'Laser work updated successfully!');
     }
 
@@ -423,7 +442,16 @@ public function deleteBusiness($id)
     public function updateEvent(Request $request, $id)
     {
         $event = Event::findOrFail($id);
-        $event->update($request->all());
+        $validated = $request->validate([
+            'event_name' => 'required|string|max:255', 'event_type' => 'required|string|max:255',
+            'event_date' => 'required|date', 'price' => 'required|numeric|min:0', 'offer_price' => 'nullable|numeric|min:0',
+            'decoration_type' => 'nullable|string|max:255', 'event_location' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+        foreach (['lighting_service', 'sound_service', 'dj_service', 'photography_service', 'cake_service'] as $field) {
+            $validated[$field] = $request->boolean($field);
+        }
+        $event->update($validated);
         return redirect('/admin/services')->with('success', 'Event updated successfully!');
     }
 

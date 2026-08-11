@@ -51,4 +51,24 @@
         </div>
     </section>
 
+    <section style="padding: 60px 40px; background: #fffaf0;">
+        <h2 style="text-align: center; font-size: 32px; margin-bottom: 10px;">Our <span style="color: #f5a623;">Gallery</span></h2>
+        <p style="text-align: center; color: #777; margin-bottom: 40px;">A selection of our latest creations</p>
+
+        @if($galleryImages->isNotEmpty())
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto;">
+                @foreach($galleryImages as $galleryImage)
+                    <figure style="margin: 0; overflow: hidden; border-radius: 15px; background: #fff; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+                        <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? $galleryImage->category . ' gallery image' }}" style="display: block; width: 100%; height: 220px; object-fit: cover;">
+                        @if($galleryImage->title)
+                            <figcaption style="padding: 14px 16px; color: #333; font-weight: 600;">{{ $galleryImage->title }}</figcaption>
+                        @endif
+                    </figure>
+                @endforeach
+            </div>
+        @else
+            <p style="text-align: center; color: #777;">Our latest work will be added here soon.</p>
+        @endif
+    </section>
+
 @endsection

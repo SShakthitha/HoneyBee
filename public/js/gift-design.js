@@ -71,6 +71,12 @@ function whatsappOrder(name) {
   window.open('https://wa.me/94767158873?text=' + text, '_blank');
 }
 
+function requestCustomFrame() {
+  const product = document.getElementById('inquiry-product');
+  if (product) product.value = 'Custom Frame Work';
+  document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' });
+}
+
 function viewDetails(name) {
   const modal = document.getElementById('detail-modal');
   const overlay = document.getElementById('detail-overlay');

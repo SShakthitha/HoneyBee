@@ -13,9 +13,13 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\CustomerProfileController;
+use App\Http\Controllers\Admin\GalleryImageController;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::view('/about', 'about')->name('about');
+Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+Route::post('/contact', [HomeController::class, 'sendContact'])->name('contact.send');
 
 // Services
 Route::get('/services', [ServiceController::class, 'index'])->name('services');
@@ -25,22 +29,22 @@ Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services
 Route::get('/gift-design', [GiftDesignController::class, 'index'])->name('gift.design');
 Route::get('/gift-and-design', [GiftDesignController::class, 'index'])->name('gift.and.design');
 Route::get('/gift', [GiftDesignController::class, 'index'])->name('gift');
-Route::get('/gift-design/{id}', [GiftDesignController::class, 'show'])->name('gift.design.show');
 
 // Laser Work (frontend)
 Route::get('/laser-work', [LaserWorkController::class, 'index'])->name('laser.work');
 Route::get('/lesar-work', [LaserWorkController::class, 'index'])->name('lesar.work');
 Route::get('/laser', [LaserWorkController::class, 'index'])->name('laser');
-Route::get('/laser-work/{id}', [LaserWorkController::class, 'show'])->name('laser.work.show');
 
 // Events (frontend)
 Route::get('/events', [EventController::class, 'index'])->name('events');
 Route::get('/event', [EventController::class, 'index'])->name('event');
-Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
 
 // Orders (frontend)
-Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::middleware('auth')->group(function () {
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/create/{service}', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+});
 
 // Dashboard
 Route::get('/dashboard', [CustomerDashboardController::class, 'index'])
@@ -69,11 +73,17 @@ require __DIR__.'/auth.php';
 
 Route::prefix('admin')->group(function () {
 
-    // Dashboard
-    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+   // Dashboard
+   Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
 
+   //Gallery
+   Route::get('/gallery', [GalleryImageController::class, 'index'])->name('admin.gallery.index');
+   Route::get('/gallery/create', [GalleryImageController::class, 'create'])->name('admin.gallery.create');
+   Route::post('/gallery', [GalleryImageController::class, 'store'])->name('admin.gallery.store');
+   Route::delete('/gallery/{id}', [GalleryImageController::class, 'destroy'])->name('admin.gallery.delete');
    // Businesses
    Route::get('/businesses', [AdminController::class, 'businesses'])->name('admin.businesses');
+   Route::get('/businesses/create', [AdminController::class, 'createBusiness'])->name('admin.businesses.create');
    Route::get('/businesses/data', [AdminController::class, 'businessesData'])->name('admin.businesses.data');
    Route::post('/businesses/store', [AdminController::class, 'storeBusiness'])->name('admin.businesses.store');
    Route::get('/businesses/{id}/edit', [AdminController::class, 'editBusiness'])->name('admin.businesses.edit');
@@ -82,9 +92,13 @@ Route::prefix('admin')->group(function () {
 
     // Services
     Route::get('/services', [AdminController::class, 'services'])->name('admin.services');
+    Route::get('/gift/create', [AdminController::class, 'createGift'])->name('admin.gift.create');
+    Route::get('/laser/create', [AdminController::class, 'createLaser'])->name('admin.laser.create');
+    Route::get('/event/create', [AdminController::class, 'createEvent'])->name('admin.event.create');
 
     // Orders
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
+    Route::put('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');
 
    // Customers
    Route::get('/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
@@ -95,21 +109,18 @@ Route::prefix('admin')->group(function () {
    Route::get('/customers/{id}/edit', [CustomerController::class, 'edit'])->name('admin.customers.edit');
 
     // Gift
-    Route::get('/gift/data', [AdminController::class, 'giftData'])->name('admin.gift.data');
     Route::post('/gift/store', [AdminController::class, 'storeGift'])->name('admin.gift.store');
     Route::get('/gift/{id}/edit', [AdminController::class, 'editGift'])->name('admin.gift.edit');
     Route::put('/gift/{id}', [AdminController::class, 'updateGift'])->name('admin.gift.update');
     Route::delete('/gift/{id}', [AdminController::class, 'destroyGift'])->name('admin.gift.destroy');
 
     // Laser
-    Route::get('/laser/data', [AdminController::class, 'laserData'])->name('admin.laser.data');
     Route::post('/laser/store', [AdminController::class, 'storeLaser'])->name('admin.laser.store');
     Route::get('/laser/{id}/edit', [AdminController::class, 'editLaser'])->name('admin.laser.edit');
     Route::put('/laser/{id}', [AdminController::class, 'updateLaser'])->name('admin.laser.update');
     Route::delete('/laser/{id}', [AdminController::class, 'destroyLaser'])->name('admin.laser.destroy');
 
     // Events
-    Route::get('/event/data', [AdminController::class, 'eventData'])->name('admin.event.data');
     Route::post('/event/store', [AdminController::class, 'storeEvent'])->name('admin.event.store');
     Route::get('/event/{id}/edit', [AdminController::class, 'editEvent'])->name('admin.event.edit');
     Route::put('/event/{id}', [AdminController::class, 'updateEvent'])->name('admin.event.update');

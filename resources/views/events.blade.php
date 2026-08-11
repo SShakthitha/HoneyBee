@@ -146,9 +146,16 @@
   <div class="container">
     <div class="section-header"><span class="section-eyebrow">Our Work</span><h2 class="section-title">Gallery</h2><p class="section-desc">A glimpse into the moments we create across Jaffna.</p></div>
     <div class="gallery-grid" id="galleryGrid">
-      @foreach(['Wedding Moments','Birthday Magic','Baby Shower Bliss','Corporate Elegance','Graduation Pride','Cultural Festivities','Outdoor Events','Religious Ceremonies'] as $item)
-        <div class="gallery-item"><div class="gallery-overlay"><span>{{ $item }}</span></div></div>
-      @endforeach
+      @forelse($galleryImages as $galleryImage)
+        <figure class="gallery-item m-0">
+          <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Events gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;">
+          @if($galleryImage->title)
+            <figcaption class="gallery-overlay"><span>{{ $galleryImage->title }}</span></figcaption>
+          @endif
+        </figure>
+      @empty
+        <p class="mb-0">Our latest event work will be added here soon.</p>
+      @endforelse
     </div>
   </div>
 </section>

@@ -6,13 +6,29 @@ use Illuminate\Http\Request;
 use App\Models\GiftDesign;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use App\Models\GalleryImage;
 
 class GiftDesignController extends Controller
 {
     public function index()
     {
-        $gifts = GiftDesign::all();
-        return view('gift-design', compact('gifts'));
+        $gifts = GiftDesign::query()
+            ->whereRaw('LOWER(category) NOT IN (?, ?)', ['frame', 'frames'])
+            ->get();
+        $frames = GiftDesign::query()
+            ->whereRaw('LOWER(category) IN (?, ?)', ['frame', 'frames'])
+            ->get();
+        // Keep the existing Gift & Design gallery as the gifts gallery so that
+        // images uploaded before the category split remain visible.
+        $giftGalleryImages = GalleryImage::where('category', 'Gift & Design')->get();
+        $frameDesignImages = GalleryImage::where('category', 'Frame Designs')->get();
+
+        return view('gift-design', compact(
+            'gifts',
+            'frames',
+            'giftGalleryImages',
+            'frameDesignImages'
+        ));
     }
 
     public function show($id)

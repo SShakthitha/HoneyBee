@@ -24,4 +24,16 @@ class Event extends Model
         'description'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'event_date' => 'date',
+            'lighting_service' => 'boolean',
+            'sound_service' => 'boolean',
+            'dj_service' => 'boolean',
+            'photography_service' => 'boolean',
+            'cake_service' => 'boolean',
+        ];
+    }
+
 }

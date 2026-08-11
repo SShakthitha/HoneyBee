@@ -7,9 +7,9 @@
 <div class="topbar">
     <h1>All <span>Services</span></h1>
     <div style="display: flex; gap: 10px;">
-      <a href="/admin/gift/create" style="background: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Gift Item</a>
-      <a href="/admin/laser/create" style="background: #1a1a1a; color: #f5a623; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Laser Work</a>
-      <a href="/admin/event/create" style="background: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Event</a>
+      <a href="{{ route('admin.gift.create') }}" class="btn btn-honey">+ Add Gift Item</a>
+      <a href="{{ route('admin.laser.create') }}" class="btn btn-dark">+ Add Laser Work</a>
+      <a href="{{ route('admin.event.create') }}" class="btn btn-honey">+ Add Event</a>
     </div>
 </div>
 
@@ -35,7 +35,7 @@
                     <td style="padding: 12px;">{{ $gift->category }}</td>
                     <td style="padding: 12px;">Rs. {{ number_format($gift->price, 2) }}</td>
                     <td style="padding: 12px;">
-                        <a href="/admin/gift/{{ $gift->gift_design_id }}/edit" style="color: #f5a623;">Edit</a>
+                        <a href="{{ route('admin.gift.edit', $gift->gift_design_id) }}" class="btn btn-sm btn-honey">Edit</a>
                     </td>
                 </tr>
                 @endforeach
@@ -66,7 +66,7 @@
                     <td style="padding: 12px;">{{ $laserWork->product_category }}</td>
                     <td style="padding: 12px;">Rs. {{ number_format($laserWork->price, 2) }}</td>
                     <td style="padding: 12px;">
-                        <a href="/admin/laser/{{ $laserWork->laser_id }}/edit" style="color: #f5a623;">Edit</a>
+                        <a href="{{ route('admin.laser.edit', $laserWork->laser_id) }}" class="btn btn-sm btn-honey">Edit</a>
                     </td>
                 </tr>
                 @endforeach
@@ -99,7 +99,7 @@
                     <td style="padding: 12px;">{{ $event->event_date }}</td>
                     <td style="padding: 12px;">Rs. {{ number_format($event->price, 2) }}</td>
                     <td style="padding: 12px;">
-                        <a href="/admin/event/{{ $event->event_id }}/edit" style="color: #f5a623;">Edit</a>
+                        <a href="{{ route('admin.event.edit', $event->event_id) }}" class="btn btn-sm btn-honey">Edit</a>
                     </td>
                 </tr>
                 @endforeach

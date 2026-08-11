@@ -31,8 +31,9 @@
                     <td style="padding: 12px;">{{ $order->service->service_name ?? 'N/A' }}</td>
                     <td style="padding: 12px;">Rs. {{ number_format($order->paid_amount, 2) }}</td>
                     <td style="padding: 12px;">
-                      <form action="/admin/orders/{{ $order->order_id }}/status" method="POST">
+                      <form action="{{ route('admin.orders.status', $order->order_id) }}" method="POST">
                         @csrf
+                        @method('PUT')
                         <select name="status" onchange="this.form.submit()"
                           style="padding: 5px 10px; border-radius: 20px; border: 1px solid #ddd; background: #f5a623; font-weight: bold; cursor: pointer;">
                           <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>

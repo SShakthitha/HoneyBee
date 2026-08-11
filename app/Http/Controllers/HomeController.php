@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Service;
+use App\Models\GalleryImage;
 
 class HomeController extends Controller
 {
     public function index()
     {
         $services = Service::take(6)->get();
-        return view('home', compact('services'));
+        $galleryImages = GalleryImage::latest()->get();
+
+        return view('home', compact(
+            'services',
+            'galleryImages'
+        ));
     }
     public function contact()
     {

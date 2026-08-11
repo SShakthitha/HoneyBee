@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LaserWork;
+use App\Models\GalleryImage;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -12,7 +13,8 @@ class LaserWorkController extends Controller
     public function index()
     {
         $laserWorks = LaserWork::all();
-        return view('laser-work', compact('laserWorks'));
+        $galleryImages = GalleryImage::where('category','Laser Work')->get();
+        return view('laser-work', compact('laserWorks', 'galleryImages'));
     }
 
     public function show($id)

@@ -11,6 +11,17 @@
 
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
 
+    @if($errors->any())
+        <div style="background: #f8d7da; color: #842029; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <strong>Please correct the following:</strong>
+            <ul style="margin: 8px 0 0; padding-left: 20px;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if(session('success'))
         <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
             {{ session('success') }}
@@ -29,7 +40,11 @@
 
             <div>
                 <label>Category *</label>
-                <input type="text" name="category" required style="width:100%;padding:10px;">
+                <select name="category" required style="width:100%;padding:10px;">
+                    <option value="">Select a category</option>
+                    <option value="Gift" @selected(old('category') === 'Gift')>Gift</option>
+                    <option value="Frame" @selected(old('category') === 'Frame')>Frame</option>
+                </select>
             </div>
 
             <div>
@@ -59,7 +74,8 @@
 
             <div>
                 <label>Image</label>
-                <input type="file" name="image" style="width:100%;padding:10px;">
+                <input type="file" name="image" accept="image/jpeg,image/png,image/webp" style="width:100%;padding:10px;">
+                <small style="color:#666;">JPG, PNG, or WebP — maximum 10 MB.</small>
             </div>
 
         </div>

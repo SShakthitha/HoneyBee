@@ -203,11 +203,29 @@
             <li><a href="/admin/orders" class="{{ request()->is('admin/orders') ? 'active' : '' }}"><i class="fa-solid fa-receipt"></i> Orders</a></li>
             <li><a href="/admin/customers" class="{{ request()->is('admin/customers*') ? 'active' : '' }}"><i class="fa-solid fa-users"></i> Customers</a></li>
             <li><a href="/admin/staff" class="{{ request()->is('admin/staff*') ? 'active' : '' }}"><i class="fa-solid fa-user-tie"></i> Staff</a></li>
+            <li>
+                <a href="{{ route('admin.gallery.index') }}"
+                    class="{{ request()->is('admin/gallery*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-images"></i>
+                    Gallery
+                </a>
+            </li>
             <li style="margin-top: 30px;"><a href="/" style="color: #f5a623;"><i class="fa-solid fa-globe"></i> View Website</a></li>
         </ul>
     </div>
 
     <main class="main-content">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+            </div>
+        @endif
         @yield('content')
     </main>
 
