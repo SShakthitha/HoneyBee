@@ -82,7 +82,12 @@
               @endif
             </p>
             <div class="product-actions">
-              <button class="btn btn-cart-add" onclick="addToCart('{{ addslashes($gift->item_name) }}', {{ (float) $price }})" type="button">Add</button>
+              <button
+                  class="btn btn-cart-add"
+                  onclick="addToCart('{{ addslashes($gift->item_name) }}', {{ (float) $price }}, {{ $gift->gift_design_id }}, 'gift')"
+                  type="button">
+                  Add
+              </button>
               <button class="btn btn-details" onclick="viewDetails('{{ addslashes($gift->item_name) }}')" type="button">Details</button>
               <a class="btn btn-wa" href="https://wa.me/94767158873?text={{ $message }}" target="_blank" rel="noopener">WhatsApp</a>
             </div>
@@ -130,7 +135,12 @@
               @endif
             </p>
             <div class="product-actions">
-              <button class="btn btn-cart-add" onclick="addToCart('{{ addslashes($frame->item_name) }}', {{ (float) $price }})" type="button">Add</button>
+              <button
+                  class="btn btn-cart-add"
+                  onclick="addToCart('{{ addslashes($frame->item_name) }}', {{ (float) $price }}, {{ $frame->gift_design_id }}, 'frame')"
+                  type="button">
+                  Add
+              </button>
               <button class="btn btn-details" onclick="viewDetails('{{ addslashes($frame->item_name) }}')" type="button">Details</button>
               <a class="btn btn-wa" href="https://wa.me/94767158873?text={{ $message }}" target="_blank" rel="noopener">WhatsApp</a>
             </div>
@@ -247,7 +257,7 @@
 <aside class="cart-sidebar" id="cart-sidebar">
   <div class="cart-header"><h3>Your Cart</h3><button onclick="toggleCart()" class="cart-close" type="button">Close</button></div>
   <div class="cart-items" id="cart-items"><p class="cart-empty">Your cart is empty.</p></div>
-  <div class="cart-footer"><p class="cart-total">Total: <strong id="cart-total">Rs 0</strong></p><button class="btn btn-whatsapp btn-full" onclick="checkoutWhatsapp()" type="button">Order via WhatsApp</button></div>
+  <div class="cart-footer"><p class="cart-total">Total: <strong id="cart-total">Rs 0</strong></p><button class="btn btn-primary btn-full" onclick="proceedToCheckout()" type="button">Proceed to Checkout</button></div>
 </aside>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="modal-overlay" id="detail-overlay" onclick="closeDetail()"></div>
@@ -255,7 +265,8 @@
 <div class="toast" id="toast"></div>
 
 @push('scripts')
-<script src="{{ asset('js/gift-design.js') }}"></script>
+<script>window.honeyBeeCheckoutUrl = @json(request()->getBaseUrl() . '/checkout');</script>
+<script src="{{ request()->getBaseUrl() }}/js/gift-design.js"></script>
 @endpush
 
 @endsection

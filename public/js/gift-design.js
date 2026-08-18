@@ -1,4 +1,21 @@
-const cart = [];
+const CART_STORAGE_KEY = 'honeybee-gift-design-cart';
+
+function loadCart() {
+  try {
+    const storedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+    return Array.isArray(storedCart)
+      ? storedCart.filter(item => item && typeof item.name === 'string' && Number.isFinite(Number(item.price)))
+      : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+const cart = loadCart();
+
+function saveCart() {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+}
 
 function showToast(message, duration = 3000) {
   const toast = document.getElementById('toast');
@@ -38,14 +55,21 @@ function updateCart() {
   `).join('');
 }
 
-function addToCart(name, price) {
-  cart.push({ name, price: Number(price || 0) });
+function addToCart(name, price, itemId, itemType) {
+  cart.push({
+    name: name,
+    price: Number(price || 0),
+    item_id: itemId,
+    item_type: itemType,
+  });
+  saveCart();
   updateCart();
   showToast(name + ' added to cart.');
 }
 
 function removeFromCart(index) {
   cart.splice(index, 1);
+  saveCart();
   updateCart();
 }
 
@@ -54,16 +78,13 @@ function toggleCart() {
   document.getElementById('cart-overlay')?.classList.toggle('visible');
 }
 
-function checkoutWhatsapp() {
+function proceedToCheckout() {
   if (!cart.length) {
     showToast('Your cart is empty.');
     return;
   }
 
-  const lines = cart.map((item, index) => `${index + 1}. ${item.name} - ${formatPrice(item.price)}`);
-  const total = cart.reduce((acc, item) => acc + item.price, 0);
-  const text = encodeURIComponent(`Hello HoneyBee Gift and Design, I want to order:\n${lines.join('\n')}\nTotal: ${formatPrice(total)}`);
-  window.open('https://wa.me/94767158873?text=' + text, '_blank');
+  window.location.href = window.honeyBeeCheckoutUrl;
 }
 
 function whatsappOrder(name) {

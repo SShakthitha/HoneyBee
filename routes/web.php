@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\CustomerProfileController;
 use App\Http\Controllers\Admin\GalleryImageController;
+use App\Models\Customer;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -44,6 +45,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/create/{service}', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+    // Gift & Design cart checkout. The cart itself remains in the browser so it
+    // can be kept while the customer signs in and navigates to this page.
+    Route::get('/checkout', function () {
+        $customer = Customer::where('email', auth()->user()->email)->first();
+
+        return view('checkout', compact('customer'));
+    })->name('checkout');
+
+    Route::post('/checkout', [OrderController::class, 'storeCartOrder'])->name('checkout.store');
 });
 
 // Dashboard

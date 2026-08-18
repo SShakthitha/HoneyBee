@@ -4,52 +4,294 @@
 
 @section('content')
 
-    <section style="padding: 60px 40px;">
-        <h1 style="font-size: 32px; margin-bottom: 30px;">My <span style="color: #f5a623;">Orders</span></h1>
+<style>
+    .orders-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem;
+    }
 
-        @if(session('success'))
-            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                {{ session('success') }}
-            </div>
-        @endif
+    .orders-header {
+        background: linear-gradient(135deg, #1A1A1A, #34302a);
+        border-left: 6px solid #F5A623;
+        border-radius: 18px;
+        color: #fff;
+        padding: 2rem 2.25rem;
+        margin-bottom: 1.75rem;
+    }
 
-        @if($orders->isEmpty())
-            <div style="text-align: center; padding: 60px;">
-                <p style="font-size: 20px; color: #777;">No orders yet! 🐝</p>
-                <a href="/" style="background: #f5a623; color: #1a1a1a; padding: 10px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 20px; display: inline-block;">
-                    Browse Services
-                </a>
-            </div>
-        @else
-            <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
-                <table style="width: 100%; border-collapse: collapse;">
+    .orders-header h1 {
+        font-family: 'Playfair Display', serif;
+        color: #FFD166;
+        margin: 0 0 .4rem;
+        font-size: 2.3rem;
+    }
+
+    .orders-header p {
+        margin: 0;
+        color: rgba(255,255,255,.78);
+    }
+
+    .orders-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 6px 22px rgba(26,26,26,.08);
+        overflow: hidden;
+    }
+
+    .orders-card-header {
+        padding: 1.4rem 1.5rem;
+        border-bottom: 1px solid #f0ede6;
+    }
+
+    .orders-card-header h2 {
+        font-family: 'Playfair Display', serif;
+        color: #1A1A1A;
+        margin: 0;
+        font-size: 1.4rem;
+    }
+
+    .orders-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .orders-table th {
+        background: #FFFDF5;
+        color: #4A4A4A;
+        font-size: .85rem;
+        text-align: left;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f0ede6;
+        white-space: nowrap;
+    }
+
+    .orders-table td {
+        padding: 1.1rem 1.25rem;
+        color: #333;
+        border-bottom: 1px solid #f0ede6;
+        vertical-align: middle;
+    }
+
+    .orders-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .order-number {
+        font-weight: 700;
+        color: #1A1A1A;
+    }
+
+    .service-name {
+        font-weight: 600;
+        color: #1A1A1A;
+    }
+
+    .order-date {
+        color: #777;
+        font-size: .9rem;
+    }
+
+    .amount {
+        font-weight: 700;
+        color: #1A1A1A;
+        white-space: nowrap;
+    }
+
+    .status {
+        display: inline-block;
+        padding: .3rem .75rem;
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 600;
+        text-transform: capitalize;
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status.completed {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status.cancelled {
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .status.processing {
+        background: #cfe2ff;
+        color: #084298;
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 4rem 1.5rem;
+    }
+
+    .empty-orders .bee {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-orders h3 {
+        color: #1A1A1A;
+        margin-bottom: .5rem;
+    }
+
+    .empty-orders p {
+        color: #777;
+        margin-bottom: 1.5rem;
+    }
+
+    .browse-button {
+        display: inline-block;
+        background: #F5A623;
+        color: #1A1A1A;
+        padding: .75rem 1.5rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .browse-button:hover {
+        background: #FFD166;
+        color: #1A1A1A;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 700px) {
+        .orders-page {
+            padding: 2rem 1rem;
+        }
+
+        .orders-header {
+            padding: 1.6rem;
+        }
+
+        .orders-header h1 {
+            font-size: 1.9rem;
+        }
+    }
+</style>
+
+<div class="orders-page">
+
+    <section class="orders-header">
+        <h1>My Orders 🐝</h1>
+        <p>View and track all your HoneyBee orders.</p>
+    </section>
+
+    <section class="orders-card">
+
+        <div class="orders-card-header">
+            <h2>Order History</h2>
+        </div>
+
+        @if($orders->isNotEmpty())
+
+            <div class="orders-table-wrapper">
+
+                <table class="orders-table">
+
                     <thead>
-                        <tr style="background: #f5a623; color: #1a1a1a;">
-                            <th style="padding: 12px; text-align: left;">Order ID</th>
-                            <th style="padding: 12px; text-align: left;">Service</th>
-                            <th style="padding: 12px; text-align: left;">Amount</th>
-                            <th style="padding: 12px; text-align: left;">Status</th>
-                            <th style="padding: 12px; text-align: left;">Date</th>
+                        <tr>
+                            <th>Order</th>
+                            <th>Service</th>
+                            <th>Order Date</th>
+                            <th>Amount Paid</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Delivery Date</th>
                         </tr>
                     </thead>
+
                     <tbody>
+
                         @foreach($orders as $order)
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px;">#{{ $order->order_id }}</td>
-                            <td style="padding: 12px;">{{ $order->service->service_name ?? 'N/A' }}</td>
-                            <td style="padding: 12px;">Rs. {{ number_format($order->paid_amount, 2) }}</td>
-                            <td style="padding: 12px;">
-                                <span style="background: #f5a623; padding: 4px 12px; border-radius: 20px; font-size: 12px;">
-                                    {{ $order->status }}
-                                </span>
-                            </td>
-                            <td style="padding: 12px;">{{ $order->order_date }}</td>
-                        </tr>
+
+                            <tr>
+
+                                <td>
+                                    <span class="order-number">
+                                        #{{ $order->order_id }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="service-name">
+                                        {{ $order->service?->service_name ?? 'Service #' . $order->service_id }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="order-date">
+                                        {{ \Carbon\Carbon::parse($order->order_date)->format('d M Y') }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="amount">
+                                        Rs. {{ number_format($order->paid_amount, 2) }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ ucfirst($order->payment_method) }}
+                                </td>
+
+                                <td>
+                                    <span class="status {{ strtolower($order->status) }}">
+                                        {{ $order->status }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if($order->delivery_date)
+                                        {{ \Carbon\Carbon::parse($order->delivery_date)->format('d M Y') }}
+                                    @else
+                                        <span class="order-date">Not set</span>
+                                    @endif
+                                </td>
+
+                            </tr>
+
                         @endforeach
+
                     </tbody>
+
                 </table>
+
             </div>
+
+        @else
+
+            <div class="empty-orders">
+
+                <div class="bee">📦</div>
+
+                <h3>No Orders Yet</h3>
+
+                <p>
+                    You haven't placed any orders yet.
+                    Explore our services and start your first order.
+                </p>
+
+                <a href="{{ route('services') }}" class="browse-button">
+                    Browse Services
+                </a>
+
+            </div>
+
         @endif
+
     </section>
+
+</div>
 
 @endsection

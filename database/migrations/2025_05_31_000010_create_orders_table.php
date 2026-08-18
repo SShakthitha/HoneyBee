@@ -10,22 +10,31 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id('order_id');
+
+            // Customer who placed the order
             $table->foreignId('customer_id')
                   ->constrained('customers', 'customer_id')
                   ->onDelete('cascade');
-            $table->foreignId('service_id')
-                  ->constrained('services', 'service_id')
-                  ->onDelete('cascade');
+
             $table->date('order_date');
+
+            // Payment information
             $table->date('payment_date')->nullable();
-            $table->decimal('paid_amount', 10, 2);
+            $table->decimal('paid_amount', 10, 2)->default(0);
             $table->decimal('advanced_paid', 10, 2)->default(0);
             $table->decimal('discount', 10, 2)->default(0);
-            $table->string('payment_method');
+            $table->string('payment_method')->nullable();
+
+            // Order status
             $table->string('status')->default('pending');
+
+            // Delivery
             $table->date('delivery_date')->nullable();
+
+            // Additional information
             $table->text('attribute')->nullable();
             $table->text('feedback')->nullable();
+
             $table->timestamps();
         });
     }

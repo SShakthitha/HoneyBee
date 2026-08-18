@@ -3,20 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\GalleryImage;
 
 class ServiceController extends Controller
 {
     public function index()
     {
-        $services = Service::query()->where('availability_status', 'available')->paginate(12);
+        $services = Service::where('availability_status', 'available')
+            ->paginate(12);
 
-        return view('home', compact('services'));
-    }
+        $galleryImages = GalleryImage::latest()->get();
 
-    public function show(int $id)
-    {
-        $service = Service::findOrFail($id);
-
-        return view('order-create', compact('service'));
+        return view('home', compact('services', 'galleryImages'));
     }
 }

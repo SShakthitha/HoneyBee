@@ -83,10 +83,21 @@
                 </button>
 
                 @auth
-                    <a class="btn btn-login" href="{{ route('dashboard') }}">Dashboard</a>
+                    <a class="btn btn-login" href="{{ route('dashboard') }}">
+                        Dashboard
+                    </a>
+
+                    <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-login">
+                            Logout
+                        </button>
+                    </form>
                 @else
-                    <a class="btn btn-login" href="{{ route('login') }}">Login</a>
-                @endauth
+                    <a class="btn btn-login" href="{{ route('login') }}">
+                        Login
+                    </a>
+              @endauth
 
                 <button class="hamburger" id="hamburger" aria-label="Open menu" type="button">Menu</button>
             </div>

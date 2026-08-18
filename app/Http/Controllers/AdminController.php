@@ -124,7 +124,10 @@ public function deleteBusiness($id)
     // ─── Orders ───────────────────────────────────────────────
     public function orders()
     {
-        $orders = Order::with(['customer', 'service'])->latest('order_date')->get();
+        $orders = Order::with(['customer', 'items'])
+            ->latest('order_date')
+            ->get();
+
         return view('admin.orders', compact('orders'));
     }
 
