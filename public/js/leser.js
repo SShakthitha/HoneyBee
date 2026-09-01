@@ -272,13 +272,16 @@ function submitInquiry() {
   if (!product) { showToast('Please select a product.'); return; }
   if (!message) { showToast('Please describe your requirements.'); return; }
 
-  showToast('✓ Inquiry sent! We will contact you within 24 hours.');
+  const details = [
+    'Hello HoneyBee Laser Works, I would like to discuss a customization.',
+    'Name: ' + name,
+    'Phone: ' + phone,
+    email ? 'Email: ' + email : null,
+    'Product: ' + product,
+    'Customization requirement: ' + message,
+  ].filter(Boolean).join('\n');
 
-  document.getElementById('fname').value    = '';
-  document.getElementById('fphone').value   = '';
-  document.getElementById('femail').value   = '';
-  document.getElementById('fproduct').value = '';
-  document.getElementById('fmessage').value = '';
+  window.open('https://wa.me/94766199881?text=' + encodeURIComponent(details), '_blank', 'noopener');
 }
 
 /* ─── CLOSE MODALS ON OVERLAY CLICK ────────────────────── */

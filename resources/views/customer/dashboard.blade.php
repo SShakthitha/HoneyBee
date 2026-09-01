@@ -170,7 +170,7 @@
 
         {{-- Welcome --}}
         <div class="welcome-card">
-            <h1>Welcome back, {{ $customer->full_name }}! 🐝</h1>
+            <h1>Welcome back, {{ $customer->full_name }}!</h1>
             <p>
                 Welcome to your HoneyBee Shop dashboard.
                 Manage your orders and profile from here.

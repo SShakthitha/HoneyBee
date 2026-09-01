@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\GiftDesign;
+use App\Models\Staff;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -37,6 +39,16 @@ class GiftAndFrameCatalogTest extends TestCase
 
     public function test_the_admin_gift_form_offers_gift_and_frame_categories(): void
     {
+        $email = 'admin@example.com';
+        Staff::create([
+            'full_name' => 'Test Admin',
+            'role' => 'manager',
+            'email' => $email,
+            'phone' => '0771234567',
+            'hire_date' => now()->toDateString(),
+        ]);
+        $this->actingAs(User::factory()->create(['email' => $email]));
+
         $this->get(route('admin.gift.create'))
             ->assertOk()
             ->assertSee('value="Gift"', false)

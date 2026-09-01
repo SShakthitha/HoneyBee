@@ -57,6 +57,55 @@ class GalleryImageController extends Controller
             ->with('success', 'Image uploaded successfully.');
     }
 
+    public function edit($id)
+    {
+       $image = GalleryImage::findOrFail($id);
+
+       return view('admin.gallery.edit', compact('image'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $image = GalleryImage::findOrFail($id);
+
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+
+            'category' => [
+                'required',
+                'in:Gift & Design,Frame Designs,Laser Work,Events'
+            ],
+
+            'image' => [
+                'nullable',
+                'image',
+                'max:2048'
+            ]
+        ]);
+
+        $imagePath = $image->image;
+
+        if ($request->hasFile('image')) {
+
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+
+            $imagePath = $request->file('image')
+                                ->store('gallery', 'public');
+        }
+
+        $image->update([
+            'title' => $request->title,
+            'category' => $request->category,
+            'image' => $imagePath,
+        ]);
+
+        return redirect()
+            ->route('admin.gallery.index')
+            ->with('success', 'Gallery image updated successfully.');
+    }
+
     public function destroy($id)
     {
         $image = GalleryImage::findOrFail($id);

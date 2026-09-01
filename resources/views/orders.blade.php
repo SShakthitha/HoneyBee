@@ -183,7 +183,7 @@
 <div class="orders-page">
 
     <section class="orders-header">
-        <h1>My Orders 🐝</h1>
+        <h1>My Orders</h1>
         <p>View and track all your HoneyBee orders.</p>
     </section>
 
@@ -202,12 +202,13 @@
                     <thead>
                         <tr>
                             <th>Order</th>
-                            <th>Service</th>
+                            <th>Products / Services</th>
                             <th>Order Date</th>
                             <th>Amount Paid</th>
                             <th>Payment Method</th>
                             <th>Status</th>
                             <th>Delivery Date</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
 
@@ -224,9 +225,35 @@
                                 </td>
 
                                 <td>
-                                    <span class="service-name">
-                                        {{ $order->service?->service_name ?? 'Service #' . $order->service_id }}
-                                    </span>
+                                    @if($order->items->isNotEmpty())
+
+                                        @foreach($order->items as $item)
+
+                                            <div style="margin-bottom: 8px;">
+
+                                                <span class="service-name">
+                                                    {{ $item->item_name }}
+                                                </span>
+
+                                                <br>
+
+                                                <small style="color:#777;">
+                                                    Qty: {{ $item->quantity }}
+                                                    ×
+                                                    Rs. {{ number_format($item->price, 2) }}
+                                                </small>
+
+                                            </div>
+
+                                        @endforeach
+
+                                    @else
+
+                                        <span style="color:#999;">
+                                            No items
+                                        </span>
+
+                                    @endif
                                 </td>
 
                                 <td>
@@ -259,6 +286,13 @@
                                     @endif
                                 </td>
 
+                                <td>
+                                    <a href="{{ route('orders.show', $order->order_id) }}"
+                                      class="browse-button"
+                                      style="padding: .5rem 1rem; font-size: .85rem;">
+                                        View
+                                    </a>
+                                </td>
                             </tr>
 
                         @endforeach

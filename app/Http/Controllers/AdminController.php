@@ -14,17 +14,29 @@ use App\Models\Business;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        $totalServices = Service::count();
+        // Count products/services from each actual service table
+        $totalGifts = GiftDesign::count();
+        $totalLaserWorks = LaserWork::count();
+        $totalEvents = Event::count();
+
+        // Total services = all products from the 3 service categories
+        $totalServices = $totalGifts + $totalLaserWorks + $totalEvents;
+
         $totalOrders = Order::count();
         $totalCustomers = Customer::count();
         $totalStaff = Staff::count();
+
         return view('admin.dashboard', compact(
             'totalServices',
+            'totalGifts',
+            'totalLaserWorks',
+            'totalEvents',
             'totalOrders',
             'totalCustomers',
             'totalStaff'
@@ -32,85 +44,85 @@ class AdminController extends Controller
     }
 
     // ─── Businesses ───────────────────────────────────────────
-public function businesses()
-{
-    return view('admin.businesses.index');
-}
+    public function businesses()
+    {
+        return view('admin.businesses.index');
+    }
 
-public function businessesData()
-{
-    $businesses = Business::select('business_id', 'business_name', 'contact_email', 'phone', 'description');
+    public function businessesData()
+    {
+        $businesses = Business::select('business_id', 'business_name', 'contact_email', 'phone', 'description');
 
-    return DataTables::of($businesses)
-        ->addColumn('action', function ($b) {
-            return '
-                <div class="d-flex justify-content-end gap-1">
-                    <button type="button"
-                        class="btn btn-honey btn-sm editBtn"
-                        data-id="' . $b->business_id . '">
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button type="button"
-                        class="btn btn-outline-danger btn-sm deleteBtn"
-                        data-id="' . $b->business_id . '">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            ';
-        })
-        ->rawColumns(['action'])
-        ->make(true);
-}
+        return DataTables::of($businesses)
+            ->addColumn('action', function ($b) {
+                return '
+                    <div class="d-flex justify-content-end gap-1">
+                        <button type="button"
+                            class="btn btn-honey btn-sm editBtn"
+                            data-id="' . $b->business_id . '">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button type="button"
+                            class="btn btn-outline-danger btn-sm deleteBtn"
+                            data-id="' . $b->business_id . '">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                ';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
 
-public function createBusiness()
-{
-    return view('admin.businesses.create');
-}
+    public function createBusiness()
+    {
+        return view('admin.businesses.create');
+    }
 
-public function storeBusiness(Request $request)
-{
-    $request->validate([
-        'business_name' => 'required',
-        'contact_email' => 'required|email|unique:businesses,contact_email',
-        'phone'         => 'required',
-    ]);
+    public function storeBusiness(Request $request)
+    {
+        $request->validate([
+            'business_name' => 'required',
+            'contact_email' => 'required|email|unique:businesses,contact_email',
+            'phone'         => 'required',
+        ]);
 
-    Business::create([
-        'business_name' => $request->business_name,
-        'contact_email' => $request->contact_email,
-        'phone'         => $request->phone,
-        'description'   => $request->description,
-    ]);
+        Business::create([
+            'business_name' => $request->business_name,
+            'contact_email' => $request->contact_email,
+            'phone'         => $request->phone,
+            'description'   => $request->description,
+        ]);
 
-    return redirect()->route('admin.businesses')->with('success', 'Business added successfully!');
-}
+        return redirect()->route('admin.businesses')->with('success', 'Business added successfully!');
+    }
 
-// AJAX GET — returns JSON to populate the edit modal
-public function editBusiness($id)
-{
-    $business = Business::where('business_id', $id)->firstOrFail();
-    return response()->json($business);
-}
+    // AJAX GET — returns JSON to populate the edit modal
+    public function editBusiness($id)
+    {
+        $business = Business::where('business_id', $id)->firstOrFail();
+        return response()->json($business);
+    }
 
-public function updateBusiness(Request $request, $id)
-{
-    $business = Business::findOrFail($id);
-    $validated = $request->validate([
-        'business_name' => ['required', 'string', 'max:255'],
-        'contact_email' => ['required', 'email', Rule::unique('businesses')->ignore($business->business_id, 'business_id')],
-        'phone' => ['required', 'string', 'max:30'],
-        'description' => ['nullable', 'string'],
-    ]);
-    $business->update($validated);
+    public function updateBusiness(Request $request, $id)
+    {
+        $business = Business::findOrFail($id);
+        $validated = $request->validate([
+            'business_name' => ['required', 'string', 'max:255'],
+            'contact_email' => ['required', 'email', Rule::unique('businesses')->ignore($business->business_id, 'business_id')],
+            'phone' => ['required', 'string', 'max:30'],
+            'description' => ['nullable', 'string'],
+        ]);
+        $business->update($validated);
 
-    return redirect()->route('admin.businesses')->with('success', 'Business updated successfully!');
-}
+        return redirect()->route('admin.businesses')->with('success', 'Business updated successfully!');
+    }
 
-public function deleteBusiness($id)
-{
-    Business::where('business_id', $id)->delete();
-    return redirect()->back()->with('success', 'Business deleted!');
-}
+    public function deleteBusiness($id)
+    {
+        Business::where('business_id', $id)->delete();
+        return redirect()->back()->with('success', 'Business deleted!');
+    }
 
     // ─── Services ─────────────────────────────────────────────
     public function services()
@@ -131,12 +143,219 @@ public function deleteBusiness($id)
         return view('admin.orders', compact('orders'));
     }
 
+    public function showOrder($id)
+    {
+        $order = Order::with(['customer', 'items'])
+            ->where('order_id', $id)
+            ->firstOrFail();
+
+        return view('admin.order-show', compact('order'));
+    }
+
+    public function downloadOrderPdf($id)
+    {
+        $order = Order::with(['customer', 'items'])
+            ->where('order_id', $id)
+            ->firstOrFail();
+
+        $logoPath = public_path('images/logo.png');
+        $logo = is_file($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        return Pdf::loadView('pdf.order-summary', compact('order', 'logo'))
+            ->setPaper('a4')
+            ->download('honeybee-order-' . $order->order_id . '.pdf');
+    }
+
     public function updateOrderStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        $validated = $request->validate(['status' => ['required', Rule::in(['pending', 'processing', 'completed', 'cancelled'])]]);
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(['pending', 'processing', 'completed', 'cancelled'])],
+        ]);
+
         $order->update($validated);
+
         return redirect()->route('admin.orders')->with('success', 'Order status updated!');
+    }
+
+    public function ordersData(Request $request)
+    {
+        $orders = Order::with(['customer', 'items'])
+            ->select('orders.*');
+
+        $categoryItemTypes = [
+            'gift-design' => ['gift', 'frame'],
+            'laser-work' => ['laser'],
+            'events' => ['event'],
+        ];
+
+        $category = $request->query('category');
+
+        if (isset($categoryItemTypes[$category])) {
+            $orders->whereHas('items', function ($query) use ($categoryItemTypes, $category) {
+                $query->whereIn('item_type', $categoryItemTypes[$category]);
+            });
+        }
+
+        return DataTables::of($orders)
+
+            ->addColumn('customer', function ($order) {
+                if (!$order->customer) {
+                    return '<span class="text-muted">Unknown Customer</span>';
+                }
+
+                $html = '<strong>' . e($order->customer->full_name) . '</strong>';
+
+                if ($order->customer->email) {
+                    $html .= '<br><small class="text-muted">'
+                        . e($order->customer->email)
+                        . '</small>';
+                }
+
+                if ($order->customer->phone) {
+                    $html .= '<br><small class="text-muted">'
+                        . e($order->customer->phone)
+                        . '</small>';
+                }
+
+                return $html;
+            })
+
+            ->addColumn('date', function ($order) {
+                return $order->order_date
+                    ? $order->order_date->format('Y-m-d')
+                    : '-';
+            })
+
+            ->addColumn('items', function ($order) {
+                if (!$order->items || $order->items->isEmpty()) {
+                    return '<span class="text-muted">No items</span>';
+                }
+
+                $html = '';
+
+                foreach ($order->items as $item) {
+                    $html .= '<div class="mb-2">';
+                    $html .= '<strong>' . e($item->item_name) . '</strong>';
+                    $html .= '<br>';
+                    $html .= '<small class="text-muted">';
+                    $html .= 'Qty: ' . (int) $item->quantity;
+                    $html .= ' × Rs ' . number_format((float) $item->price, 2);
+                    $html .= '</small>';
+                    $html .= '</div>';
+                }
+
+                return $html;
+            })
+
+            ->addColumn('total', function ($order) {
+                $total = $order->items->sum(function ($item) {
+                    return (float) $item->subtotal;
+                });
+
+                return '<strong>Rs ' . number_format($total, 2) . '</strong>';
+            })
+
+            ->addColumn('status', function ($order) {
+
+                $statusColors = [
+                    'pending' => '#fff3cd',
+                    'processing' => '#cfe2ff',
+                    'completed' => '#d4edda',
+                    'cancelled' => '#f8d7da',
+                ];
+
+                $statusTextColors = [
+                    'pending' => '#856404',
+                    'processing' => '#084298',
+                    'completed' => '#155724',
+                    'cancelled' => '#721c24',
+                ];
+
+                $background = $statusColors[$order->status] ?? '#eee';
+                $color = $statusTextColors[$order->status] ?? '#333';
+
+                return '
+                    <span style="
+                        display:inline-block;
+                        padding:6px 12px;
+                        border-radius:20px;
+                        background:' . $background . ';
+                        color:' . $color . ';
+                        font-size:13px;
+                        font-weight:bold;
+                    ">
+                        ' . ucfirst(e($order->status)) . '
+                    </span>
+                ';
+            })
+
+            ->addColumn('action', function ($order) {
+
+                $statuses = [
+                    'pending' => 'Pending',
+                    'processing' => 'Processing',
+                    'completed' => 'Completed',
+                    'cancelled' => 'Cancelled',
+                ];
+
+                $viewUrl = route('admin.orders.show', $order->order_id);
+
+                $html = '
+                    <div class="d-flex align-items-center gap-2">
+
+                        <a
+                            href="' . $viewUrl . '"
+                            class="btn btn-sm btn-outline-primary"
+                            title="View Order"
+                        >
+                            <i class="fa-solid fa-eye"></i>
+                            View
+                        </a>
+
+                        <form
+                            method="POST"
+                            action="' . route('admin.orders.status', $order->order_id) . '"
+                            style="margin:0;"
+                        >
+                            ' . csrf_field() . '
+                            <input type="hidden" name="_method" value="PUT">
+
+                            <select
+                                name="status"
+                                onchange="this.form.submit()"
+                                class="form-select form-select-sm"
+                                style="min-width:130px;"
+                            >
+                ';
+
+                foreach ($statuses as $value => $label) {
+
+                    $selected = $order->status === $value
+                        ? 'selected'
+                        : '';
+
+                    $html .= '
+                        <option value="' . $value . '" ' . $selected . '>
+                            ' . $label . '
+                        </option>
+                    ';
+                }
+
+                $html .= '
+                            </select>
+                        </form>
+
+                    </div>
+                ';
+
+                return $html;
+            })
+            ->rawColumns(['customer', 'items', 'total', 'status', 'action'])
+
+            ->make(true);
     }
 
     // ─── Customers ────────────────────────────────────────────

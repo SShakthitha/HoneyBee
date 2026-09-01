@@ -148,6 +148,9 @@ h3 { font-size: 1.2rem; font-weight: 700; }
 .price strong { font-size: 1rem; }
 .product-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; }
 .product-actions .btn { flex: 1; min-width: 0; justify-content: center; }
+.customization-prompt { color: var(--slate) !important; font-size: .8rem !important; margin: .35rem 0 0 !important; }
+.customization-prompt a { color: var(--amber); font-weight: 700; text-decoration: underline; }
+.customization-prompt a:hover { color: var(--jet); }
 .services-section { padding: 6rem 0; background: var(--jet); }
 .services-section .section-eyebrow { color: var(--honey); }
 .services-section .section-title { color: var(--white); }

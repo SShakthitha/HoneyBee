@@ -7,7 +7,7 @@
     <!-- HERO -->
     <section style="background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 60px 40px; text-align: center;">
         <h1 style="font-size: 40px; margin-bottom: 15px;">📞 Contact <span style="color: #f5a623;">Us</span></h1>
-        <p style="color: #ccc; font-size: 16px;">We'd love to hear from you! 🐝</p>
+        <p style="color: #ccc; font-size: 16px;">We'd love to hear from you!</p>
     </section>
 
     <section style="padding: 60px 40px; max-width: 1100px; margin: 0 auto;">
@@ -110,7 +110,7 @@
 
                 <!-- WHATSAPP DIRECT -->
                 <div style="background: #25D366; border-radius: 15px; padding: 30px; text-align: center;">
-                    <p style="color: #fff; font-size: 18px; font-weight: bold; margin-bottom: 15px;">Chat with us directly! 🐝</p>
+                    <p style="color: #fff; font-size: 18px; font-weight: bold; margin-bottom: 15px;">Chat with us directly!</p>
                     <a href="https://wa.me/94717714267" target="_blank"
                         style="background: #fff; color: #25D366; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">
                         Open WhatsApp

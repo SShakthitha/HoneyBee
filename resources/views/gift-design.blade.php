@@ -58,6 +58,7 @@
           $price = $gift->offer_price ?? $gift->price;
           $image = $gift->image ? asset('storage/' . $gift->image) : null;
           $message = rawurlencode('Hi! I want to order ' . $gift->item_name . ' - Rs.' . $price);
+          $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$gift->item_name}\nCategory: Gift\nPrice: Rs. {$price}\nI would like to customize: ");
         @endphp
         <div class="product-card" data-name="{{ e($gift->item_name) }}" data-category="{{ e($gift->category) }}">
           <div class="product-img-wrap">
@@ -91,6 +92,7 @@
               <button class="btn btn-details" onclick="viewDetails('{{ addslashes($gift->item_name) }}')" type="button">Details</button>
               <a class="btn btn-wa" href="https://wa.me/94767158873?text={{ $message }}" target="_blank" rel="noopener">WhatsApp</a>
             </div>
+            <p class="customization-prompt">Need Customization? <a href="https://wa.me/94767158873?text={{ $customizationMessage }}" target="_blank" rel="noopener">Discuss with Admin</a></p>
           </div>
         </div>
       @empty
@@ -113,6 +115,7 @@
           $price = $frame->offer_price ?? $frame->price;
           $image = $frame->image ? asset('storage/' . $frame->image) : null;
           $message = rawurlencode('Hi! I want to order ' . $frame->item_name . ' - Rs.' . $price);
+          $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$frame->item_name}\nCategory: Frame\nPrice: Rs. {$price}\nI would like to customize: ");
         @endphp
         <div class="product-card" data-name="{{ e($frame->item_name) }}" data-category="frame">
           <div class="product-img-wrap">
@@ -144,6 +147,7 @@
               <button class="btn btn-details" onclick="viewDetails('{{ addslashes($frame->item_name) }}')" type="button">Details</button>
               <a class="btn btn-wa" href="https://wa.me/94767158873?text={{ $message }}" target="_blank" rel="noopener">WhatsApp</a>
             </div>
+            <p class="customization-prompt">Need Customization? <a href="https://wa.me/94767158873?text={{ $customizationMessage }}" target="_blank" rel="noopener">Discuss with Admin</a></p>
           </div>
         </div>
       @empty
@@ -164,7 +168,7 @@
       <div class="gallery-grid">
         @foreach($frameDesignImages as $frameDesignImage)
           <figure class="gallery-item m-0">
-            <img src="{{ asset('storage/' . $frameDesignImage->image) }}" alt="{{ $frameDesignImage->title ?? 'Frame design' }}" class="w-100 h-100" style="object-fit: cover;">
+            <img src="{{ asset('storage/' . $frameDesignImage->image) }}" alt="{{ $frameDesignImage->title ?? 'Frame design' }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.closest('figure').style.display='none'">
             @if($frameDesignImage->title)
               <figcaption class="gallery-overlay">{{ $frameDesignImage->title }}</figcaption>
             @endif
@@ -203,7 +207,7 @@
       <div class="gallery-grid">
         @foreach($giftGalleryImages as $galleryImage)
           <figure class="gallery-item m-0">
-            <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Gift and Design gallery image' }}" class="w-100 h-100" style="object-fit: cover;">
+            <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Gift and Design gallery image' }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.closest('figure').style.display='none'">
             @if($galleryImage->title)
               <figcaption class="gallery-overlay">{{ $galleryImage->title }}</figcaption>
             @endif

@@ -83,7 +83,8 @@
           $desc = $laserWork->description ?: 'Precision laser-crafted product made just for you. Contact us to discuss sizes, materials, and pricing.';
           $safeName = addslashes($laserWork->product_name);
           $safeDesc = addslashes($desc);
-          $message = rawurlencode('Hello, I am interested in ' . $laserWork->product_name . ' - Rs.' . $price);
+          $message = rawurlencode('Hello HoneyBee Laser Works, I am interested in ' . $laserWork->product_name . ' - Rs. ' . $price);
+          $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$laserWork->product_name}\nLaser type: {$laserWork->laser_type}\nMaterial: " . ($laserWork->material_type ?: 'Not specified') . "\nPrice: Rs. {$price}\nMy customization requirement: ");
         @endphp
         <div class="product-card" data-name="{{ e($laserWork->product_name) }}">
           <div class="card-img-wrap">
@@ -105,6 +106,7 @@
               <button class="btn btn-ghost" onclick="openModal('{{ $safeName }}','{{ $safeDesc }}')" type="button">View Details</button>
               <a class="btn btn-primary" href="https://wa.me/94766199881?text={{ $message }}" target="_blank" rel="noopener">Order Now</a>
             </div>
+            <p class="customization-prompt">Need Customization? <a href="https://wa.me/94766199881?text={{ $customizationMessage }}" target="_blank" rel="noopener">Discuss with Admin</a></p>
           </div>
         </div>
       @empty
@@ -152,7 +154,7 @@
     <div class="gallery-grid" id="galleryGrid">
       @forelse($galleryImages as $galleryImage)
         <figure class="gallery-item m-0">
-          <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Laser Work gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;">
+          <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Laser Work gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;" onerror="this.closest('figure').style.display='none'">
         </figure>
       @empty
         <p class="mb-0">Our latest laser work will be added here soon.</p>

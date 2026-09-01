@@ -78,7 +78,25 @@
         @php
           $price = $event->offer_price ?? $event->price;
           $desc = $event->description ?: 'Custom event planning and decoration for your special day.';
-          $message = rawurlencode('Hello HoneyBee Events! I would like to book ' . $event->event_name . ' - Rs.' . $price);
+          $services = array_filter([
+            $event->decoration_type ? 'Decoration: ' . $event->decoration_type : null,
+            $event->lighting_service ? 'Lighting' : null,
+            $event->sound_service ? 'Sound' : null,
+            $event->dj_service ? 'DJ' : null,
+            $event->photography_service ? 'Photography' : null,
+            $event->cake_service ? 'Cake' : null,
+          ]);
+          $message = rawurlencode(implode("\n", array_filter([
+            'Hello HoneyBee Events, I would like to book/discuss this event:',
+            'Event: ' . $event->event_name,
+            'Type: ' . $event->event_type,
+            $event->event_date ? 'Event date: ' . $event->event_date->format('d M Y') : null,
+            $event->event_location ? 'Location: ' . $event->event_location : null,
+            'Price: Rs. ' . $price,
+            $services ? 'Included options: ' . implode(', ', $services) : null,
+            'My requirements: ',
+          ])));
+          $whatsappUrl = 'https://wa.me/94766975438?text=' . $message;
         @endphp
         <div class="event-card reveal visible" data-name="{{ strtolower($event->event_name . ' ' . $event->event_type . ' ' . $desc) }}">
           <div class="event-card-img" style="background:linear-gradient(135deg,#f5a623,#ff6b6b)"><span><i class="fas fa-calendar-star"></i></span></div>
@@ -98,8 +116,8 @@
               <p class="event-card-desc"><i class="fas fa-calendar"></i> {{ \Illuminate\Support\Carbon::parse($event->event_date)->format('d M Y') }}</p>
             @endif
             <div class="event-card-actions">
-              <button class="btn-sm btn-sm-outline" onclick="openDetail(this)" type="button" data-title="{{ e($event->event_name) }}" data-tag="{{ e($event->event_type) }}" data-price="Rs {{ number_format($price, 2) }}" data-desc="{{ e($desc) }}">View Details</button>
-              <a class="btn-sm btn-sm-fill" href="https://wa.me/94766975438?text={{ $message }}" target="_blank" rel="noopener">Book Now</a>
+              <button class="btn-sm btn-sm-outline" onclick="openDetail(this)" type="button" data-title="{{ e($event->event_name) }}" data-tag="{{ e($event->event_type) }}" data-price="Rs {{ number_format($price, 2) }}" data-desc="{{ e($desc) }}" data-whatsapp="{{ $whatsappUrl }}">View Details</button>
+              <a class="btn-sm btn-sm-fill" href="{{ $whatsappUrl }}" target="_blank" rel="noopener">Book / Discuss</a>
             </div>
           </div>
         </div>
@@ -148,7 +166,7 @@
     <div class="gallery-grid" id="galleryGrid">
       @forelse($galleryImages as $galleryImage)
         <figure class="gallery-item m-0">
-          <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Events gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;">
+          <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Events gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;" onerror="this.closest('figure').style.display='none'">
           @if($galleryImage->title)
             <figcaption class="gallery-overlay"><span>{{ $galleryImage->title }}</span></figcaption>
           @endif
@@ -171,11 +189,12 @@
       </div>
       <form class="inquiry-form" id="inquiryForm" onsubmit="submitInquiry(event)">
         <h3>Send an Inquiry</h3>
-        <div class="form-row"><div class="form-group"><label>Your Name</label><input type="text" required></div><div class="form-group"><label>Phone Number</label><input type="tel" required></div></div>
-        <div class="form-group"><label>Email Address</label><input type="email"></div>
-        <div class="form-row"><div class="form-group"><label>Event Type</label><select required><option value="">Select category</option>@foreach($events as $event)<option>{{ $event->event_name }}</option>@endforeach<option>Birthday Party</option><option>Wedding</option><option>Corporate Event</option><option>Customized Event</option></select></div><div class="form-group"><label>Event Date</label><input type="date" required></div></div>
-        <div class="form-group"><label>Message</label><textarea rows="4" placeholder="Tell us about your vision..."></textarea></div>
-        <button type="submit" class="btn-primary full-width">Send Inquiry <i class="fas fa-paper-plane"></i></button>
+        <div class="form-row"><div class="form-group"><label for="eventInquiryName">Your Name</label><input id="eventInquiryName" type="text" required></div><div class="form-group"><label for="eventInquiryPhone">Phone Number</label><input id="eventInquiryPhone" type="tel" required></div></div>
+        <div class="form-group"><label for="eventInquiryEmail">Email Address</label><input id="eventInquiryEmail" type="email"></div>
+        <div class="form-row"><div class="form-group"><label for="eventInquiryType">Event Type</label><select id="eventInquiryType" required><option value="">Select category</option>@foreach($events as $event)<option>{{ $event->event_name }}</option>@endforeach<option>Birthday Party</option><option>Wedding</option><option>Corporate Event</option><option>Customized Event</option></select></div><div class="form-group"><label for="eventInquiryDate">Event Date</label><input id="eventInquiryDate" type="date" required></div></div>
+        <div class="form-group"><label for="eventInquiryLocation">Event Location</label><input id="eventInquiryLocation" type="text" placeholder="Where will the event be held?"></div>
+        <div class="form-group"><label for="eventInquiryMessage">Message</label><textarea id="eventInquiryMessage" rows="4" placeholder="Tell us about your vision..."></textarea></div>
+        <button type="submit" class="btn-primary full-width">Send via WhatsApp <i class="fab fa-whatsapp"></i></button>
       </form>
     </div>
   </div>
@@ -213,7 +232,7 @@
       <h2 id="detailName"></h2>
       <p class="detail-price" id="detailPrice"></p>
       <p id="detailDesc"></p>
-      <div class="detail-actions"><a href="https://wa.me/94766975438" target="_blank" rel="noopener" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> Book via WhatsApp</a><button class="btn-primary" onclick="closeDetail(); document.getElementById('inquiry').scrollIntoView({behavior:'smooth'})" type="button">Book Now</button></div>
+      <div class="detail-actions"><a id="detailWhatsApp" href="https://wa.me/94766975438" target="_blank" rel="noopener" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> Book via WhatsApp</a><button class="btn-primary" onclick="closeDetail(); document.getElementById('inquiry').scrollIntoView({behavior:'smooth'})" type="button">Book Now</button></div>
     </div>
   </div>
 </div>
@@ -245,6 +264,7 @@ function openDetail(button) {
   document.getElementById('detailName').textContent = button.dataset.title;
   document.getElementById('detailPrice').textContent = button.dataset.price;
   document.getElementById('detailDesc').textContent = button.dataset.desc;
+  document.getElementById('detailWhatsApp').href = button.dataset.whatsapp || 'https://wa.me/94766975438';
   document.getElementById('detailOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -257,8 +277,25 @@ function closeDetailIfOutside(e) {
 }
 function submitInquiry(e) {
   e.preventDefault();
-  showToast('Inquiry sent. We will contact you soon.');
-  e.target.reset();
+  const name = document.getElementById('eventInquiryName').value.trim();
+  const phone = document.getElementById('eventInquiryPhone').value.trim();
+  const email = document.getElementById('eventInquiryEmail').value.trim();
+  const eventType = document.getElementById('eventInquiryType').value;
+  const eventDate = document.getElementById('eventInquiryDate').value;
+  const location = document.getElementById('eventInquiryLocation').value.trim();
+  const requirements = document.getElementById('eventInquiryMessage').value.trim();
+  const message = [
+    'Hello HoneyBee Events, I would like to send an event inquiry.',
+    'Name: ' + name,
+    'Phone: ' + phone,
+    email ? 'Email: ' + email : null,
+    'Event: ' + eventType,
+    'Preferred date: ' + eventDate,
+    location ? 'Location: ' + location : null,
+    requirements ? 'Requirements: ' + requirements : null,
+  ].filter(Boolean).join('\n');
+
+  window.open('https://wa.me/94766975438?text=' + encodeURIComponent(message), '_blank', 'noopener');
 }
 function showToast(message) {
   const toast = document.getElementById('toast');

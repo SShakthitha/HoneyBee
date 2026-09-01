@@ -6,12 +6,12 @@
 
 <div class="topbar">
     <h1>Edit <span>Gift & Design</span> Item</h1>
-    <a href="/admin/gift">← Back</a>
+    <a href="{{ route('admin.gift.index') }}">← Back</a>
 </div>
 
 <div style="background: #fff; border-radius: 15px; padding: 30px;">
 
-    <form action="/admin/gift/{{ $gift->gift_design_id }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.gift.update', $gift->gift_design_id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 

@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Service;
 use App\Models\Customer;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -22,6 +23,43 @@ class OrderController extends Controller
             ->get();
 
         return view('orders', compact('orders'));
+    }
+
+    public function show($id)
+    {
+        $customer = Customer::where('email', auth()->user()->email)
+            ->firstOrFail();
+
+        $order = Order::with('items')
+            ->where('customer_id', $customer->customer_id)
+            ->where('order_id', $id)
+            ->firstOrFail();
+
+        return view('order-show', compact('order'));
+    }
+
+    public function downloadPdf(Request $request, $id)
+    {
+        $customer = Customer::where('email', $request->user()->email)->firstOrFail();
+
+        $order = Order::with(['customer', 'items'])
+            ->where('customer_id', $customer->customer_id)
+            ->where('order_id', $id)
+            ->firstOrFail();
+
+        return $this->orderPdf($order);
+    }
+
+    private function orderPdf(Order $order)
+    {
+        $logoPath = public_path('images/logo.png');
+        $logo = is_file($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        return Pdf::loadView('pdf.order-summary', compact('order', 'logo'))
+            ->setPaper('a4')
+            ->download('honeybee-order-' . $order->order_id . '.pdf');
     }
 
     public function create(Service $service)
@@ -48,6 +86,7 @@ class OrderController extends Controller
 
         $order = Order::create([
             'customer_id' => $customer->customer_id,
+            'service_id' => $validated['service_id'],
             'order_date' => now(),
             'paid_amount' => $validated['paid_amount'],
             'advanced_paid' => $request->advanced_paid ?? 0,
@@ -97,7 +136,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'customer_id' => $customer->customer_id,
                 'order_date' => now(),
-                'paid_amount' => 0,
+                'paid_amount' => $total,
                 'advanced_paid' => 0,
                 'discount' => 0,
                 'payment_method' => 'WhatsApp',

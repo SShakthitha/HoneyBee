@@ -6,7 +6,7 @@
 
 <div class="topbar">
     <h1>Edit <span>Laser Work</span> Item</h1>
-    <a href="/admin/laser">← Back</a>
+    <a href="{{ route('admin.services') }}">← Back</a>
 </div>
 
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
@@ -73,11 +73,20 @@
                 ✅ Update Item
             </button>
 
-            <a href="/admin/laser/{{ $laserWork->laser_id }}/delete"
-                onclick="return confirm('Are you sure you want to delete this item?')"
-                style="background: #dc3545; color: #fff; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold;">
-                🗑️ Delete Item
-            </a>
+            <form action="{{ route('admin.laser.destroy', $laserWork->laser_id) }}"
+                  method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this item?');"
+                  style="display: inline;">
+
+                @csrf
+                @method('DELETE')
+
+                <button type="submit"
+                    style="background: #dc3545; color: #fff; padding: 12px 30px; border: none; border-radius: 25px; font-weight: bold; font-size: 16px; cursor: pointer;">
+                    🗑 Delete Item
+                </button>
+
+            </form>
         </div>
 
     </form>

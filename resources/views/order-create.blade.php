@@ -66,7 +66,7 @@
 
                 <button type="submit"
                     style="background: #f5a623; color: #1a1a1a; padding: 12px 30px; border: none; border-radius: 25px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%;">
-                    🐝 Place Order
+                    Place Order
                 </button>
 
             </form>

@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function () {
     })->name('checkout');
 
     Route::post('/checkout', [OrderController::class, 'storeCartOrder'])->name('checkout.store');
+    Route::get('/orders/{id}/pdf', [OrderController::class, 'downloadPdf'])->name('orders.pdf');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 });
 
 // Dashboard
@@ -82,7 +84,7 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
    // Dashboard
    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -92,6 +94,7 @@ Route::prefix('admin')->group(function () {
    Route::get('/gallery/create', [GalleryImageController::class, 'create'])->name('admin.gallery.create');
    Route::post('/gallery', [GalleryImageController::class, 'store'])->name('admin.gallery.store');
    Route::delete('/gallery/{id}', [GalleryImageController::class, 'destroy'])->name('admin.gallery.delete');
+
    // Businesses
    Route::get('/businesses', [AdminController::class, 'businesses'])->name('admin.businesses');
    Route::get('/businesses/create', [AdminController::class, 'createBusiness'])->name('admin.businesses.create');
@@ -99,6 +102,8 @@ Route::prefix('admin')->group(function () {
    Route::post('/businesses/store', [AdminController::class, 'storeBusiness'])->name('admin.businesses.store');
    Route::get('/businesses/{id}/edit', [AdminController::class, 'editBusiness'])->name('admin.businesses.edit');
    Route::put('/businesses/{id}', [AdminController::class, 'updateBusiness'])->name('admin.businesses.update');
+   Route::get('/gallery/{id}/edit', [GalleryImageController::class, 'edit'])->name('admin.gallery.edit');
+   Route::put('/gallery/{id}', [GalleryImageController::class, 'update'])->name('admin.gallery.update');
    Route::delete('/businesses/{id}', [AdminController::class, 'deleteBusiness'])->name('admin.businesses.delete');
 
     // Services
@@ -109,15 +114,19 @@ Route::prefix('admin')->group(function () {
 
     // Orders
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
+    Route::get('/orders/data', [AdminController::class, 'ordersData'])->name('admin.orders.data');
     Route::put('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');
+    Route::get('/orders/{id}/pdf', [AdminController::class, 'downloadOrderPdf'])->name('admin.orders.pdf');
+    Route::get('/orders/{id}', [AdminController::class, 'showOrder'])
+        ->name('admin.orders.show');
 
-   // Customers
-   Route::get('/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
-   Route::get('/customers/data', [CustomerController::class, 'data'])->name('admin.customers.data');
-   Route::post('/customers', [CustomerController::class, 'store'])->name('admin.customers.store');
-   Route::put('/customers/{id}', [CustomerController::class, 'update'])->name('admin.customers.update');
-   Route::delete('/customers/{id}', [CustomerController::class, 'destroy'])->name('admin.customers.delete');
-   Route::get('/customers/{id}/edit', [CustomerController::class, 'edit'])->name('admin.customers.edit');
+    // Customers
+    Route::get('/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
+    Route::get('/customers/data', [CustomerController::class, 'data'])->name('admin.customers.data');
+    Route::post('/customers', [CustomerController::class, 'store'])->name('admin.customers.store');
+    Route::put('/customers/{id}', [CustomerController::class, 'update'])->name('admin.customers.update');
+    Route::delete('/customers/{id}', [CustomerController::class, 'destroy'])->name('admin.customers.delete');
+    Route::get('/customers/{id}/edit', [CustomerController::class, 'edit'])->name('admin.customers.edit');
 
     // Gift
     Route::post('/gift/store', [AdminController::class, 'storeGift'])->name('admin.gift.store');
@@ -137,7 +146,7 @@ Route::prefix('admin')->group(function () {
     Route::put('/event/{id}', [AdminController::class, 'updateEvent'])->name('admin.event.update');
     Route::delete('/event/{id}', [AdminController::class, 'destroyEvent'])->name('admin.event.destroy');
     
-   // Staff
+    // Staff
     Route::get('/staff', [StaffController::class, 'index'])->name('admin.staff');
     Route::get('/staff/data', [StaffController::class, 'data'])->name('admin.staff.data');
     Route::post('/staff', [StaffController::class, 'store'])->name('admin.staff.store');

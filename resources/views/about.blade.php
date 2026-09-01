@@ -6,7 +6,7 @@
 
     <!-- HERO -->
     <section style="background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 80px 40px; text-align: center;">
-        <h1 style="font-size: 40px; margin-bottom: 15px;">About <span style="color: #f5a623;">HoneyBee</span> 🐝</h1>
+        <h1 style="font-size: 40px; margin-bottom: 15px;">About <span style="color: #f5a623;">HoneyBee</span></h1>
         <p style="color: #ccc; font-size: 16px; max-width: 600px; margin: 0 auto;">We are a creative shop offering unique gifts, precision laser work and unforgettable events!</p>
     </section>
 
@@ -23,7 +23,7 @@
                     HoneyBee Shop is a creative business based in Sri Lanka, dedicated to bringing joy and creativity to every occasion. We specialize in three main areas — Gifts & Design, Laser Work, and Events.
                 </p>
                 <p style="color: #777; font-size: 16px; line-height: 1.8;">
-                    Our mission is to provide high quality, personalized products and services that make every moment special and memorable for our customers. 🐝
+                    Our mission is to provide high quality, personalized products and services that make every moment special and memorable for our customers.
                 </p>
             </div>
         </div>
@@ -87,7 +87,7 @@
 
         <!-- CTA -->
         <div style="text-align: center;">
-            <h2 style="font-size: 28px; margin-bottom: 20px;">Ready to get started? 🐝</h2>
+            <h2 style="font-size: 28px; margin-bottom: 20px;">Ready to get started?</h2>
             <a href="/contact" style="background: #f5a623; color: #1a1a1a; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 16px; margin-right: 15px;">Contact Us</a>
             <a href="https://wa.me/94717714267" target="_blank" style="background: #25D366; color: #fff; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 16px;">WhatsApp Us</a>
         </div>

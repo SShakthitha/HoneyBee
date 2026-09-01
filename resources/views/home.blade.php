@@ -7,7 +7,7 @@
     <!-- HERO SECTION -->
     <section style="background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 100px 40px; text-align: center;">
         <h1 style="font-size: 48px; margin-bottom: 20px;">
-            Welcome to <span style="color: #f5a623;">HoneyBee Shop</span> 🐝
+            Welcome to <span style="color: #f5a623;">HoneyBee Shop</span>
         </h1>
         <p style="font-size: 18px; color: #ccc; margin-bottom: 40px;">
             Your one stop shop for Gift & Design, Laser Work and Events

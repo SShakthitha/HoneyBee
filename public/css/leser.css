@@ -583,6 +583,9 @@ ul { list-style: none; }
   flex-wrap: wrap;
 }
 .card-actions .btn { flex: 1; min-width: 100px; justify-content: center; }
+.customization-prompt { color: var(--slate); font-size: .82rem; margin: 12px 0 0; }
+.customization-prompt a { color: var(--amber); font-weight: 700; text-decoration: underline; }
+.customization-prompt a:hover { color: var(--jet); }
 
 /* ─── SERVICES ──────────────────────────────────────────── */
 .services-section {

@@ -33,7 +33,7 @@
 
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
     @if($customers->isEmpty())
-        <p style="text-align: center; color: #777; padding: 40px;">No customers yet! 🐝</p>
+        <p style="text-align: center; color: #777; padding: 40px;">No customers yet!</p>
     @else
         <table style="width: 100%; border-collapse: collapse;">
             <thead>

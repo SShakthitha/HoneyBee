@@ -39,17 +39,28 @@
                                 {{ $image->category }}
                             </span>
 
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+
+                            <a href="{{ route('admin.gallery.edit', $image->id) }}"
+                              class="btn btn-sm btn-outline-primary"
+                              title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+
                             <form action="{{ route('admin.gallery.delete', $image->id) }}"
                                   method="POST"
-                                  class="mt-3"
                                   onsubmit="return confirm('Delete this gallery image?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="Delete">
                                     <i class="fa-solid fa-trash"></i>
-                                    Delete
                                 </button>
                             </form>
+
+                        </div>
 
                         </div>
 
