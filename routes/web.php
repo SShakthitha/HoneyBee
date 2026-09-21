@@ -1,20 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\GiftDesignController;
-use App\Http\Controllers\LaserWorkController;
+use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\BulkOfferController;
+use App\Http\Controllers\Admin\ExportController;
+use App\Http\Controllers\Admin\GalleryImageController;
+use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CustomerDashboardController;
+use App\Http\Controllers\CheckoutConfirmationController;
+use App\Http\Controllers\Admin\WhatsAppSettingsController;
+use App\Http\Controllers\CustomerProfileController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\GiftDesignController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LaserWorkController;
+use App\Http\Controllers\ManagerStaffController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\StaffController;
-use App\Http\Controllers\CustomerDashboardController;
-use App\Http\Controllers\CustomerProfileController;
-use App\Http\Controllers\Admin\GalleryImageController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\StaffDashboardController;
 use App\Models\Customer;
+use Illuminate\Support\Facades\Route;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -55,6 +62,7 @@ Route::middleware('auth')->group(function () {
     })->name('checkout');
 
     Route::post('/checkout', [OrderController::class, 'storeCartOrder'])->name('checkout.store');
+    Route::get('/orders/{order}/confirmation', [CheckoutConfirmationController::class, 'show'])->name('checkout.confirmation');
     Route::get('/orders/{id}/pdf', [OrderController::class, 'downloadPdf'])->name('orders.pdf');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 });
@@ -83,31 +91,97 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+/*
+ | Operational workspace.  This is intentionally separate from /admin:
+ | staff can fulfil orders and maintain the catalogue/gallery, but cannot
+ | reach customer or staff administration routes.
+ */
+Route::prefix('staff')->middleware(['auth', 'staff'])->name('staff.')->group(function () {
+    Route::get('/dashboard', [StaffDashboardController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/orders', [StaffDashboardController::class, 'orders'])->name('orders.index');
+    Route::get('/orders/{id}', [StaffDashboardController::class, 'showOrder'])->name('orders.show');
+    Route::put('/orders/{id}/status', [StaffDashboardController::class, 'updateOrderStatus'])->name('orders.status');
+
+    Route::get('/products', [StaffDashboardController::class, 'products'])->name('products.index');
+    Route::get('/products/{type}/create', [StaffDashboardController::class, 'productForm'])->name('products.create');
+    Route::post('/products/{type}', [StaffDashboardController::class, 'saveProduct'])->name('products.store');
+    Route::get('/products/{type}/{id}/edit', [StaffDashboardController::class, 'productForm'])->name('products.edit');
+    Route::put('/products/{type}/{id}', [StaffDashboardController::class, 'saveProduct'])->name('products.update');
+    Route::delete('/products/{type}/{id}', [StaffDashboardController::class, 'deleteProduct'])->name('products.destroy');
+
+    Route::get('/gallery', [StaffDashboardController::class, 'gallery'])->name('gallery.index');
+    Route::get('/gallery/create', [StaffDashboardController::class, 'galleryForm'])->name('gallery.create');
+    Route::post('/gallery', [StaffDashboardController::class, 'saveGallery'])->name('gallery.store');
+    Route::get('/gallery/{id}/edit', [StaffDashboardController::class, 'galleryForm'])->name('gallery.edit');
+    Route::put('/gallery/{id}', [StaffDashboardController::class, 'saveGallery'])->name('gallery.update');
+    Route::delete('/gallery/{id}', [StaffDashboardController::class, 'deleteGallery'])->name('gallery.destroy');
+
+    Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');
+    Route::get('/promotions/create', [PromotionController::class, 'create'])->name('promotions.create');
+    Route::post('/promotions', [PromotionController::class, 'store'])->name('promotions.store');
+    Route::get('/promotions/{promotion}/edit', [PromotionController::class, 'edit'])->name('promotions.edit');
+    Route::put('/promotions/{promotion}', [PromotionController::class, 'update'])->name('promotions.update');
+    Route::delete('/promotions/{promotion}', [PromotionController::class, 'destroy'])->name('promotions.destroy');
+
+    Route::get('/profile', [StaffDashboardController::class, 'profile'])->name('profile');
+    Route::put('/profile', [StaffDashboardController::class, 'updateProfile'])->name('profile.update');
+
+    Route::middleware('manager')->prefix('staff')->name('staff.')->group(function () {
+        Route::get('/', [ManagerStaffController::class, 'index'])->name('index');
+        Route::get('/create', [ManagerStaffController::class, 'create'])->name('create');
+        Route::post('/', [ManagerStaffController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ManagerStaffController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ManagerStaffController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ManagerStaffController::class, 'destroy'])->name('destroy');
+    });
+});
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
-   // Dashboard
-   Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+   Route::get('/settings/whatsapp', [WhatsAppSettingsController::class, 'edit'])->name('admin.settings.whatsapp.edit');
+   Route::put('/settings/whatsapp', [WhatsAppSettingsController::class, 'update'])->name('admin.settings.whatsapp.update');
 
-   //Gallery
-   Route::get('/gallery', [GalleryImageController::class, 'index'])->name('admin.gallery.index');
-   Route::get('/gallery/create', [GalleryImageController::class, 'create'])->name('admin.gallery.create');
-   Route::post('/gallery', [GalleryImageController::class, 'store'])->name('admin.gallery.store');
-   Route::delete('/gallery/{id}', [GalleryImageController::class, 'destroy'])->name('admin.gallery.delete');
+   Route::get('/exports/customers', [ExportController::class, 'customers'])->name('admin.exports.customers');
+   Route::get('/exports/products', [ExportController::class, 'products'])->name('admin.exports.products');
+   Route::get('/exports/orders', [ExportController::class, 'orders'])->name('admin.exports.orders');
+   Route::get('/exports/staff', [ExportController::class, 'staff'])->name('admin.exports.staff');
+   Route::post('/bulk-offers', [BulkOfferController::class, 'apply'])->name('admin.bulk-offers.apply');
+   Route::delete('/bulk-offers', [BulkOfferController::class, 'remove'])->name('admin.bulk-offers.remove');
 
-   // Businesses
-   Route::get('/businesses', [AdminController::class, 'businesses'])->name('admin.businesses');
-   Route::get('/businesses/create', [AdminController::class, 'createBusiness'])->name('admin.businesses.create');
-   Route::get('/businesses/data', [AdminController::class, 'businessesData'])->name('admin.businesses.data');
-   Route::post('/businesses/store', [AdminController::class, 'storeBusiness'])->name('admin.businesses.store');
-   Route::get('/businesses/{id}/edit', [AdminController::class, 'editBusiness'])->name('admin.businesses.edit');
-   Route::put('/businesses/{id}', [AdminController::class, 'updateBusiness'])->name('admin.businesses.update');
-   Route::get('/gallery/{id}/edit', [GalleryImageController::class, 'edit'])->name('admin.gallery.edit');
-   Route::put('/gallery/{id}', [GalleryImageController::class, 'update'])->name('admin.gallery.update');
-   Route::delete('/businesses/{id}', [AdminController::class, 'deleteBusiness'])->name('admin.businesses.delete');
+    // Dashboard
+    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    // Gallery
+    Route::get('/gallery', [GalleryImageController::class, 'index'])->name('admin.gallery.index');
+    Route::get('/gallery/create', [GalleryImageController::class, 'create'])->name('admin.gallery.create');
+    Route::post('/gallery', [GalleryImageController::class, 'store'])->name('admin.gallery.store');
+    Route::delete('/gallery/{id}', [GalleryImageController::class, 'destroy'])->name('admin.gallery.delete');
+
+    // Businesses
+    Route::get('/businesses', [AdminController::class, 'businesses'])->name('admin.businesses');
+    Route::get('/businesses/create', [AdminController::class, 'createBusiness'])->name('admin.businesses.create');
+    Route::get('/businesses/data', [AdminController::class, 'businessesData'])->name('admin.businesses.data');
+    Route::post('/businesses/store', [AdminController::class, 'storeBusiness'])->name('admin.businesses.store');
+    Route::get('/businesses/{id}/edit', [AdminController::class, 'editBusiness'])->name('admin.businesses.edit');
+    Route::put('/businesses/{id}', [AdminController::class, 'updateBusiness'])->name('admin.businesses.update');
+    Route::get('/gallery/{id}/edit', [GalleryImageController::class, 'edit'])->name('admin.gallery.edit');
+    Route::put('/gallery/{id}', [GalleryImageController::class, 'update'])->name('admin.gallery.update');
+    Route::delete('/businesses/{id}', [AdminController::class, 'deleteBusiness'])->name('admin.businesses.delete');
+
+    // Promotions
+    Route::get('/promotions', [PromotionController::class, 'index'])->name('admin.promotions.index');
+    Route::get('/promotions/create', [PromotionController::class, 'create'])->name('admin.promotions.create');
+    Route::post('/promotions', [PromotionController::class, 'store'])->name('admin.promotions.store');
+    Route::get('/promotions/{promotion}/edit', [PromotionController::class, 'edit'])->name('admin.promotions.edit');
+    Route::put('/promotions/{promotion}', [PromotionController::class, 'update'])->name('admin.promotions.update');
+    Route::delete('/promotions/{promotion}', [PromotionController::class, 'destroy'])->name('admin.promotions.destroy');
 
     // Services
     Route::get('/services', [AdminController::class, 'services'])->name('admin.services');
+    Route::get('/services/gift-design', [AdminController::class, 'serviceSection'])->defaults('section', 'gift-design')->name('admin.services.gift');
+    Route::get('/services/events', [AdminController::class, 'serviceSection'])->defaults('section', 'events')->name('admin.services.events');
+    Route::get('/services/laser-work', [AdminController::class, 'serviceSection'])->defaults('section', 'laser-work')->name('admin.services.laser');
     Route::get('/gift/create', [AdminController::class, 'createGift'])->name('admin.gift.create');
     Route::get('/laser/create', [AdminController::class, 'createLaser'])->name('admin.laser.create');
     Route::get('/event/create', [AdminController::class, 'createEvent'])->name('admin.event.create');
@@ -145,7 +219,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/event/{id}/edit', [AdminController::class, 'editEvent'])->name('admin.event.edit');
     Route::put('/event/{id}', [AdminController::class, 'updateEvent'])->name('admin.event.update');
     Route::delete('/event/{id}', [AdminController::class, 'destroyEvent'])->name('admin.event.destroy');
-    
+
     // Staff
     Route::get('/staff', [StaffController::class, 'index'])->name('admin.staff');
     Route::get('/staff/data', [StaffController::class, 'data'])->name('admin.staff.data');

@@ -5,12 +5,12 @@
 @section('content')
 
     <!-- HERO -->
-    <section style="background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 60px 40px; text-align: center;">
+    <section class="content-page contact-page" style="background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 60px 40px; text-align: center;">
         <h1 style="font-size: 40px; margin-bottom: 15px;">📞 Contact <span style="color: #f5a623;">Us</span></h1>
         <p style="color: #ccc; font-size: 16px;">We'd love to hear from you!</p>
     </section>
 
-    <section style="padding: 60px 40px; max-width: 1100px; margin: 0 auto;">
+    <section class="content-page contact-page" style="padding: 60px 40px; max-width: 1100px; margin: 0 auto;">
 
         <div style="display: flex; gap: 40px; flex-wrap: wrap;">
 

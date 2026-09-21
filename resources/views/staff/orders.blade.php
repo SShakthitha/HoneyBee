@@ -1,0 +1,5 @@
+@extends('layouts.staff')
+@section('title', 'Orders')
+@section('content')
+<div class="page-head"><h1>Order <span>Handling</span></h1></div><section class="honey-card"><div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>@forelse($orders as $order)<tr><td>#{{ $order->order_id }}</td><td><strong>{{ $order->customer?->full_name ?? 'Unknown customer' }}</strong><br><small class="text-muted">{{ $order->customer?->phone ?? $order->customer?->email ?? 'No contact' }}</small></td><td>{{ $order->items->count() }}</td><td>{{ $order->order_date?->format('d M Y') ?? '-' }}</td><td><span class="badge-status status-{{ $order->status }}">{{ ucfirst($order->status) }}</span></td><td><a class="btn btn-sm btn-honey" href="{{ route('staff.orders.show',$order->order_id) }}">View</a></td></tr>@empty<tr><td colspan="6" class="text-center text-muted py-4">No orders are available.</td></tr>@endforelse</tbody></table></div>{{ $orders->links() }}</section>
+@endsection

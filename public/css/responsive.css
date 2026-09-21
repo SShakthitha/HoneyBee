@@ -1,0 +1,111 @@
+/* Shared responsive layer. Loaded after page-specific styles so it resolves
+   legacy fixed desktop layouts without masking page-level overflow. */
+:root { --mobile-gutter: 1rem; }
+img, svg, video, canvas { max-width: 100%; }
+img { height: auto; }
+input, select, textarea, button { max-width: 100%; }
+.table-responsive, .items-wrapper, .order-table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-responsive > table, .items-wrapper > table, .order-table-wrap > table { margin-bottom: 0; }
+.dataTables_wrapper { max-width: 100%; }
+.dataTables_wrapper .dataTables_scroll, .dataTables_wrapper .dataTables_scrollBody { max-width: 100%; }
+.dataTables_wrapper table { width: 100% !important; }
+.dataTables_wrapper .dataTables_filter input, .dataTables_wrapper .dataTables_length select { max-width: 100%; }
+.mobile-account-link { display: none; }
+
+@media (max-width: 991.98px) {
+  .container { width:100%; max-width:100%; }
+  .inquiry-inner { grid-template-columns:minmax(0, 1fr) !important; gap:2rem !important; }
+  .page-head, .topbar, .admin-toolbar { flex-wrap: wrap; }
+  .page-head > *, .topbar > *, .admin-toolbar > * { min-width: 0; }
+  .honey-card, .admin-card, .dashboard-section, .order-card { max-width:100%; }
+}
+
+@media (max-width: 575.98px) {
+  .container { padding-left: var(--mobile-gutter) !important; padding-right: var(--mobile-gutter) !important; }
+  .btn, button, .form-control, .form-select, input, select { min-height: 44px; }
+  .btn-group { display:flex; flex-wrap:wrap; gap:.5rem; }
+  .btn-group > .btn { flex:1 1 auto; border-radius:.375rem !important; }
+  .modal-dialog { margin:.75rem; }
+  .site-footer-grid { grid-template-columns:1fr !important; gap:1.5rem !important; }
+
+  /* Customer header: keep one primary brand, cart and menu control visible. */
+  .header-inner { min-height:64px !important; gap:.45rem !important; padding-top:.25rem; padding-bottom:.25rem; }
+  .brand { min-width:0; gap:.4rem !important; }
+  .brand-logo { width:42px !important; height:42px !important; flex:0 0 42px; }
+  .brand-name { min-width:0; font-size:.9rem !important; line-height:1.15; }
+  .header-actions { margin-left:auto; gap:.35rem !important; flex:0 0 auto; }
+  .header-actions > .btn-login, .header-actions > form { display:none !important; }
+  .btn-cart { min-width:44px; min-height:44px; padding:.45rem .55rem !important; }
+  .btn-cart svg { width:21px; height:21px; }
+  .hamburger { width:44px !important; height:44px !important; font-size:0 !important; }
+  .hamburger::before { content:'☰'; font-size:1.25rem; line-height:1; }
+  #main-nav { top:64px !important; padding:.75rem var(--mobile-gutter) !important; box-shadow:0 12px 25px rgba(0,0,0,.25); }
+  .nav-links { gap:.2rem !important; }
+  .nav-links a, .nav-links .mobile-account-link button { display:block; width:100%; padding:.75rem .9rem !important; border:0; border-radius:.45rem; background:transparent; color:rgba(255,255,255,.84); font:inherit; text-align:left; }
+  .mobile-account-link { display:block; }
+  main { padding-top:64px !important; }
+
+  /* Forms, cards and long content should shrink rather than force a page-wide scroll. */
+  .form-row, .inquiry-inner, .search-wrap, .detail-body, .product-detail, .product-detail-grid { min-width:0; }
+  .form-row, .inquiry-inner { grid-template-columns:1fr !important; }
+  .inquiry-form { padding:1.25rem !important; }
+  .product-actions, .inquiry-ctas, .detail-actions, .action-buttons { width:100%; flex-wrap:wrap !important; }
+  .product-actions .btn, .inquiry-ctas .btn, .detail-actions .btn, .action-buttons .btn { min-width:0; }
+  .product-card, .offer-card, .service-card { min-width:0; }
+  .product-card h3, .product-card h4, .product-card p, .offer-card h3, .service-card h3, td, th, .alert, .invalid-feedback { overflow-wrap:anywhere; }
+  .products-grid, .services-grid, .gallery-grid, .offers-grid, .contact-grid, .action-grid { grid-template-columns:minmax(0, 1fr) !important; }
+  .product-img-wrap { height:200px !important; }
+  .gallery-grid { grid-template-columns:repeat(2, minmax(0, 1fr)) !important; }
+
+  /* Legacy static content pages used desktop-only inline minimum widths. */
+  .content-page { padding-left:var(--mobile-gutter) !important; padding-right:var(--mobile-gutter) !important; }
+  .content-page [style*="min-width: 300px"] { min-width:0 !important; width:100%; }
+  .contact-page > div[style*="display: flex"] { flex-direction:column; gap:1.25rem !important; }
+  .contact-page > div[style*="display: flex"] > div { min-width:0 !important; width:100%; }
+  .content-page [style*="padding: 40px"] { padding:1.25rem !important; }
+  .content-page h1 { font-size:clamp(1.8rem, 9vw, 2.35rem) !important; overflow-wrap:anywhere; }
+  .content-page h2 { font-size:clamp(1.35rem, 7vw, 1.75rem) !important; overflow-wrap:anywhere; }
+
+  /* The Laser and Events pages predate the shared customer layout. */
+  .header-inner { max-width:100%; }
+  .header .nav { top:64px !important; }
+  .header .nav-list { padding:0; }
+  .header .nav-link { display:block; padding:.75rem .9rem; }
+  .header .logo-wrap { min-width:0; }
+  .header .logo-img { width:42px !important; height:42px !important; }
+  .header .logo-text { min-width:0; }
+  .header .logo-text .brand-name { font-size:.9rem !important; }
+  .cart-sidebar { right:0 !important; width:min(360px, 100vw) !important; transform:translateX(100%); transition:transform .35s ease; }
+  .cart-sidebar.open { right:0 !important; transform:translateX(0); }
+
+  /* Customer account and order views. */
+  .dashboard-wrapper, .order-details-page { padding:1.25rem var(--mobile-gutter) !important; }
+  .welcome-card, .order-header { padding:1.25rem !important; }
+  .welcome-card h1, .order-header h1 { font-size:clamp(1.55rem, 8vw, 2rem); overflow-wrap:anywhere; }
+  .stats-grid { grid-template-columns:repeat(2, minmax(0, 1fr)) !important; gap:.75rem !important; }
+  .stat-card { padding:1rem !important; }
+  .stat-card h3 { font-size:1.2rem !important; overflow-wrap:anywhere; }
+  .dashboard-section, .order-card { padding:1.1rem !important; }
+  .order-info { grid-template-columns:1fr !important; gap:.75rem !important; }
+  .items-table { min-width:520px !important; }
+  .confirmation-card .checkout-btn, .confirmation-link, .profile-save, .dashboard-btn, .back-button { width:100%; justify-content:center; text-align:center; }
+  .profile-page { margin:1.25rem var(--mobile-gutter) !important; padding:1rem !important; }
+  .profile-header, .profile-card { padding:1.1rem !important; }
+
+  /* Admin and staff controls: scroll only the table region, never the page. */
+  .main-content, .staff-main { padding:1.25rem var(--mobile-gutter) !important; overflow-x:clip; }
+  .admin-card-body, .honey-card { padding:1rem !important; }
+  .topbar h1, .page-head h1 { font-size:clamp(1.45rem, 7vw, 1.9rem) !important; overflow-wrap:anywhere; }
+  .admin-toolbar > .btn, .page-head > .btn, .topbar > .btn { width:100%; justify-content:center; }
+  .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_length { float:none; text-align:left; margin:0 0 .75rem; }
+  .dataTables_wrapper .dataTables_filter input, .dataTables_wrapper .dataTables_length select { display:block; width:100%; margin:.35rem 0 0; }
+  .dataTables_wrapper .dataTables_paginate { float:none; display:flex; flex-wrap:wrap; gap:.2rem; margin-top:.75rem; }
+  .dataTables_wrapper .dataTables_info { float:none; white-space:normal; margin:.5rem 0; }
+}
+
+@media (max-width: 359.98px) {
+  .brand-name { font-size:.8rem !important; }
+  .header-actions { gap:.2rem !important; }
+  .gallery-grid { grid-template-columns:1fr !important; }
+  .stats-grid { grid-template-columns:1fr !important; }
+}

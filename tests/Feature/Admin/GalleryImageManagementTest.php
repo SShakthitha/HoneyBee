@@ -20,7 +20,7 @@ class GalleryImageManagementTest extends TestCase
 
         Staff::create([
             'full_name' => 'Test Admin',
-            'role' => 'manager',
+            'role' => 'admin',
             'email' => $email,
             'phone' => '0771234567',
             'hire_date' => now()->toDateString(),

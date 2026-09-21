@@ -218,48 +218,6 @@
       });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | WhatsApp Checkout
-    |--------------------------------------------------------------------------
-    */
-
-    const whatsappButton =
-      document.getElementById('checkout-whatsapp');
-
-    if (whatsappButton) {
-
-      whatsappButton.addEventListener('click', () => {
-
-        const lines = items.map((item, index) =>
-          `${index + 1}. ${item.name} - Qty: ${item.quantity} x ${formatPrice(item.price)} = ${formatPrice(item.price * item.quantity)}`
-        );
-
-        const message = [
-          'Hello HoneyBee Gift and Design, I would like to place an order.',
-          '',
-          `Customer name: ${config.customer.name || 'Not provided'}`,
-          `Customer phone: ${config.customer.phone || 'Not provided'}`,
-          '',
-          'Order items:',
-          ...lines,
-          '',
-          `Total: ${formatPrice(total)}`,
-          `Special requirements: ${
-            notes && notes.value.trim()
-              ? notes.value.trim()
-              : 'None'
-          }`
-        ].join('\n');
-
-        window.open(
-          'https://wa.me/94767158873?text=' +
-          encodeURIComponent(message),
-          '_blank',
-          'noopener'
-        );
-      });
-    }
   });
 
   function addHiddenInput(form, name, value) {

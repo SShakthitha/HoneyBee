@@ -5,7 +5,7 @@
 @section('content')
 <div class="topbar">
     <h1>Edit <span>Event</span></h1>
-    <a href="{{ route('admin.services') }}">Back to services</a>
+    <a href="{{ route('admin.services.events') }}">Back to events</a>
 </div>
 
 <div class="admin-card form-box">

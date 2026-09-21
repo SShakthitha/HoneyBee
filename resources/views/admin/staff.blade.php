@@ -6,6 +6,7 @@
 
 <div class="topbar">
     <h1>All <span>Staff</span></h1>
+    <a class="btn btn-outline-dark" href="{{ route('admin.exports.staff') }}"><i class="fa-solid fa-file-excel me-1"></i> Export Staff</a>
 </div>
 
 <!-- TOP BAR -->

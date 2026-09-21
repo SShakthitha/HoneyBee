@@ -16,7 +16,7 @@
             --amber:#F5A623; --honey:#FFD166; --jet:#1A1A1A; --cream:#FFFDF5; --slate:#4A4A4A; --white:#FFFFFF; --transition:.25s cubic-bezier(.4,0,.2,1);
         }
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'Inter',sans-serif;font-size:16px;color:var(--slate);background:var(--cream);line-height:1.7;overflow-x:hidden}
+        body{font-family:'Inter',sans-serif;font-size:16px;color:var(--slate);background:var(--cream);line-height:1.7}
         a{text-decoration:none;color:inherit}
         ul{list-style:none}
         img{display:block;width:100%;height:100%;object-fit:cover}
@@ -54,6 +54,7 @@
     </style>
 
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
 </head>
 <body>
     <header class="header" id="header">
@@ -69,6 +70,12 @@
                     <li><a href="{{ route('gift.design') }}" class="{{ request()->routeIs('gift.*') ? 'active' : '' }}">Gift &amp; Design</a></li>
                     <li><a href="{{ route('laser.work') }}" class="{{ request()->routeIs('laser.*') ? 'active' : '' }}">Laser Work</a></li>
                     <li><a href="{{ route('events') }}" class="{{ request()->routeIs('events') ? 'active' : '' }}">Events</a></li>
+                    @auth
+                        <li class="mobile-account-link"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                        <li class="mobile-account-link"><form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Logout</button></form></li>
+                    @else
+                        <li class="mobile-account-link"><a href="{{ route('login') }}">Login</a></li>
+                    @endauth
                 </ul>
             </nav>
 
@@ -108,9 +115,12 @@
         @yield('content')
     </main>
 
+    @hasSection('homepage-footer')
+        @yield('homepage-footer')
+    @else
     <footer class="footer">
         <div class="container">
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
+            <div class="site-footer-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
                 <div>
                     <span class="brand-name" style="font-size:1.8rem;">HoneyBee <span class="amp">Shop</span></span>
                     <p style="margin-top:1rem;">Custom gifts, laser work, and memorable events.</p>
@@ -137,6 +147,7 @@
             </div>
         </div>
     </footer>
+    @endif
 
     @stack('scripts')
 

@@ -5,13 +5,13 @@
 @section('content')
 
     <!-- HERO -->
-    <section style="background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 80px 40px; text-align: center;">
+    <section class="content-page about-page" style="background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 80px 40px; text-align: center;">
         <h1 style="font-size: 40px; margin-bottom: 15px;">About <span style="color: #f5a623;">HoneyBee</span></h1>
         <p style="color: #ccc; font-size: 16px; max-width: 600px; margin: 0 auto;">We are a creative shop offering unique gifts, precision laser work and unforgettable events!</p>
     </section>
 
     <!-- ABOUT SECTION -->
-    <section style="padding: 60px 40px; max-width: 1100px; margin: 0 auto;">
+    <section class="content-page about-page" style="padding: 60px 40px; max-width: 1100px; margin: 0 auto;">
 
         <div style="display: flex; gap: 40px; flex-wrap: wrap; align-items: center; margin-bottom: 60px;">
             <div style="flex: 1; min-width: 300px;">

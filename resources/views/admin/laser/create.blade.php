@@ -6,7 +6,7 @@
 
 <div class="topbar">
     <h1>Add <span>Laser Work</span> Item</h1>
-    <a href="/admin/services">← Back</a>
+    <a href="{{ route('admin.services.laser') }}">← Back</a>
 </div>
 
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">

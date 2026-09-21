@@ -33,8 +33,8 @@ class GiftAndFrameCatalogTest extends TestCase
         $response->assertOk()
             ->assertSee($gift->item_name)
             ->assertSee($frame->item_name)
-            ->assertSee('storage/' . $gift->image)
-            ->assertSee('storage/' . $frame->image);
+            ->assertSee('storage/'.$gift->image)
+            ->assertSee('storage/'.$frame->image);
     }
 
     public function test_the_admin_gift_form_offers_gift_and_frame_categories(): void
@@ -42,7 +42,7 @@ class GiftAndFrameCatalogTest extends TestCase
         $email = 'admin@example.com';
         Staff::create([
             'full_name' => 'Test Admin',
-            'role' => 'manager',
+            'role' => 'admin',
             'email' => $email,
             'phone' => '0771234567',
             'hire_date' => now()->toDateString(),

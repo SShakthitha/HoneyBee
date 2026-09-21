@@ -55,7 +55,7 @@
     <div class="products-grid" id="gifts-grid">
       @forelse($gifts as $gift)
         @php
-          $price = $gift->offer_price ?? $gift->price;
+          $price = $gift->currentSellingPrice();
           $image = $gift->image ? asset('storage/' . $gift->image) : null;
           $message = rawurlencode('Hi! I want to order ' . $gift->item_name . ' - Rs.' . $price);
           $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$gift->item_name}\nCategory: Gift\nPrice: Rs. {$price}\nI would like to customize: ");
@@ -67,7 +67,7 @@
             @else
               <div class="h-100 d-flex align-items-center justify-content-center text-muted">Image coming soon</div>
             @endif
-            @if($gift->offer_price)
+            @if($gift->hasValidOfferPrice())
               <span class="badge badge-honey">Offer</span>
             @endif
           </div>
@@ -75,11 +75,12 @@
             <h3>{{ $gift->item_name }}</h3>
             <p>{{ $gift->description ?: $gift->category }}</p>
             <p class="price">
-              @if($gift->offer_price)
-                <del>Rs {{ number_format($gift->price, 2) }}</del>
-                <strong>Rs {{ number_format($gift->offer_price, 2) }}</strong>
+              @if($gift->hasValidOfferPrice())
+                <del>Rs {{ number_format((float) $gift->price, 2) }}</del>
+                <strong>Rs {{ number_format((float) $gift->offer_price, 2) }}</strong>
+                <span class="badge badge-honey">{{ $gift->discountPercentage() }}% OFF</span>
               @else
-                From <strong>Rs {{ number_format($gift->price, 2) }}</strong>
+                From <strong>Rs {{ number_format((float) $gift->price, 2) }}</strong>
               @endif
             </p>
             <div class="product-actions">
@@ -112,7 +113,7 @@
     <div class="products-grid" id="frames-grid">
       @forelse($frames as $frame)
         @php
-          $price = $frame->offer_price ?? $frame->price;
+          $price = $frame->currentSellingPrice();
           $image = $frame->image ? asset('storage/' . $frame->image) : null;
           $message = rawurlencode('Hi! I want to order ' . $frame->item_name . ' - Rs.' . $price);
           $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$frame->item_name}\nCategory: Frame\nPrice: Rs. {$price}\nI would like to customize: ");
@@ -124,17 +125,18 @@
             @else
               <div class="h-100 d-flex align-items-center justify-content-center text-muted">Image coming soon</div>
             @endif
-            @if($frame->offer_price)<span class="badge badge-honey">Offer</span>@endif
+            @if($frame->hasValidOfferPrice())<span class="badge badge-honey">Offer</span>@endif
           </div>
           <div class="product-body">
             <h3>{{ $frame->item_name }}</h3>
             <p>{{ $frame->description ?: $frame->category }}</p>
             <p class="price">
-              @if($frame->offer_price)
-                <del>Rs {{ number_format($frame->price, 2) }}</del>
-                <strong>Rs {{ number_format($frame->offer_price, 2) }}</strong>
+              @if($frame->hasValidOfferPrice())
+                <del>Rs {{ number_format((float) $frame->price, 2) }}</del>
+                <strong>Rs {{ number_format((float) $frame->offer_price, 2) }}</strong>
+                <span class="badge badge-honey">{{ $frame->discountPercentage() }}% OFF</span>
               @else
-                From <strong>Rs {{ number_format($frame->price, 2) }}</strong>
+                From <strong>Rs {{ number_format((float) $frame->price, 2) }}</strong>
               @endif
             </p>
             <div class="product-actions">

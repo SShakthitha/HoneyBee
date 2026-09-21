@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="{{ asset('vendor/bootstrap/bootstrap.min.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="{{ asset('css/event.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
 </head>
 <body>
 <header class="header" id="header">
@@ -76,7 +77,7 @@
     <div class="events-grid" id="eventsGrid">
       @forelse($events as $event)
         @php
-          $price = $event->offer_price ?? $event->price;
+          $price = $event->currentSellingPrice();
           $desc = $event->description ?: 'Custom event planning and decoration for your special day.';
           $services = array_filter([
             $event->decoration_type ? 'Decoration: ' . $event->decoration_type : null,
@@ -104,11 +105,12 @@
             <span class="event-card-tag">{{ $event->event_type }}</span>
             <h3 class="event-card-name">{{ $event->event_name }}</h3>
             <div class="event-card-price">
-              @if($event->offer_price)
-                <del>Rs {{ number_format($event->price, 2) }}</del>
-                Rs {{ number_format($event->offer_price, 2) }}
+              @if($event->hasValidOfferPrice())
+                <del>Rs {{ number_format((float) $event->price, 2) }}</del>
+                Rs {{ number_format((float) $event->offer_price, 2) }}
+                <span class="badge badge-honey">{{ $event->discountPercentage() }}% OFF</span>
               @else
-                Rs {{ number_format($event->price, 2) }}
+                Rs {{ number_format((float) $event->price, 2) }}
               @endif
             </div>
             <p class="event-card-desc">{{ $desc }}</p>

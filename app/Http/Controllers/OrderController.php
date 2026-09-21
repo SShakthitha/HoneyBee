@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Customer;
+use App\Models\GiftDesign;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Service;
-use App\Models\Customer;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -54,12 +55,12 @@ class OrderController extends Controller
     {
         $logoPath = public_path('images/logo.png');
         $logo = is_file($logoPath)
-            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath))
             : null;
 
         return Pdf::loadView('pdf.order-summary', compact('order', 'logo'))
             ->setPaper('a4')
-            ->download('honeybee-order-' . $order->order_id . '.pdf');
+            ->download('honeybee-order-'.$order->order_id.'.pdf');
     }
 
     public function create(Service $service)
@@ -111,27 +112,42 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.name' => 'required|string|max:255',
-            'items.*.price' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.item_id' => 'nullable|integer',
-            'items.*.item_type' => 'nullable|string|max:50',
+            'items.*.item_id' => 'required|integer',
+            'items.*.item_type' => 'required|in:gift,frame',
             'notes' => 'nullable|string',
         ]);
 
         $customer = Customer::where('email', $request->user()->email)
             ->firstOrFail();
 
-        $total = 0;
+        $items = collect($validated['items'])->map(function (array $item) {
+            $product = GiftDesign::findOrFail($item['item_id']);
 
-        foreach ($validated['items'] as $item) {
-            $total += (float) $item['price'] * (int) $item['quantity'];
-        }
+            abort_unless(strtolower($product->category) === $item['item_type'], 422);
+
+            // Prices from the browser are never trusted. Use the product's
+            // centralized offer-price rule so zero, equal, or higher offers
+            // cannot reduce (or increase) the order total.
+            $price = $product->currentSellingPrice();
+
+            return [
+                'item_id' => $product->gift_design_id,
+                'item_type' => $item['item_type'],
+                'item_name' => $product->item_name,
+                'price' => $price,
+                'quantity' => (int) $item['quantity'],
+                'subtotal' => $price * (int) $item['quantity'],
+            ];
+        });
+
+        $total = $items->sum('subtotal');
 
         $order = DB::transaction(function () use (
-            $validated,
+            $items,
             $customer,
-            $total
+            $total,
+            $validated
         ) {
             $order = Order::create([
                 'customer_id' => $customer->customer_id,
@@ -144,28 +160,24 @@ class OrderController extends Controller
                 'attribute' => $validated['notes'] ?? null,
             ]);
 
-            foreach ($validated['items'] as $item) {
-                $quantity = (int) $item['quantity'];
-                $price = (float) $item['price'];
-
+            foreach ($items as $item) {
                 OrderItem::create([
                     'order_id' => $order->order_id,
-                    'item_type' => $item['item_type'] ?? 'product',
-                    'item_id' => $item['item_id'] ?? null,
-                    'item_name' => $item['name'],
-                    'price' => $price,
-                    'quantity' => $quantity,
-                    'subtotal' => $price * $quantity,
+                    'item_type' => $item['item_type'],
+                    'item_id' => $item['item_id'],
+                    'item_name' => $item['item_name'],
+                    'price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $item['subtotal'],
                 ]);
             }
+
+            $customer->increment('total_spent', $total);
 
             return $order;
         });
 
         return redirect()
-            ->route('orders.index')
-            ->with('success', 'Your order has been placed successfully!');
+            ->route('checkout.confirmation', ['order' => $order->order_id]);
     }
-
-  
 }

@@ -9,6 +9,7 @@
 </div>
  
 <div class="admin-toolbar">
+    <a class="btn btn-outline-dark" href="{{ route('admin.exports.customers') }}"><i class="fa-solid fa-file-excel me-1"></i> Export Customers</a>
     <button type="button" class="btn btn-honey" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
         <i class="fa-solid fa-plus me-1"></i> Add Customer
     </button>

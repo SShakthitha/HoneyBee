@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Staff;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,17 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $staffRole = Staff::where('email', $request->user()->email)->value('role');
+
+        if ($staffRole === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if (in_array($staffRole, ['staff', 'manager'], true)) {
+            return redirect()->route('staff.dashboard');
+        }
+
+        return redirect()->route('customer.dashboard');
     }
 
     /**

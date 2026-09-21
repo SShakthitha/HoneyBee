@@ -33,4 +33,10 @@
 .checkout-empty { max-width: 560px; margin: 3rem auto; text-align: center; }
 .checkout-empty h2 { margin-bottom: .5rem; }
 .checkout-empty .checkout-btn { margin-top: 1.5rem; }
+.confirmation-card { max-width: 620px; }
+.confirmation-card h1 { color: #1a1a1a; font-family: 'Playfair Display', serif; font-size: clamp(1.9rem, 5vw, 2.8rem); }
+.confirmation-icon { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 1rem; border-radius: 50%; background: #e4f8eb; color: #188a42; font-size: 1.9rem; }
+.confirmation-note { margin: 1.4rem 0 0; padding: .8rem 1rem; border-radius: 8px; background: #fff5d8; color: #624700; }
+.confirmation-card .checkout-btn { max-width: 320px; margin-inline: auto; text-decoration: none; }
+.confirmation-link { display: inline-block; margin-top: 1.25rem; color: #8a5a00; font-weight: 700; }
 @media (max-width: 800px) { .checkout-page { padding: 2.5rem 0 3.5rem; } .checkout-grid { grid-template-columns: 1fr; } .order-card, .requirements-card { grid-column: auto; grid-row: auto; } }

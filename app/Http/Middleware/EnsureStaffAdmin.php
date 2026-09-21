@@ -21,9 +21,7 @@ class EnsureStaffAdmin
             return redirect()->route('login');
         }
 
-        $isStaff = Staff::where('email', $user->email)
-            ->whereIn('role', ['admin', 'manager'])
-            ->exists();
+        $isStaff = Staff::where('email', $user->email)->where('role', 'admin')->exists();
 
         abort_unless($isStaff, 403);
 

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasOfferPricing;
 use Illuminate\Database\Eloquent\Model;
 
 class GiftDesign extends Model
 {
+    use HasOfferPricing;
+
     protected $primaryKey = 'gift_design_id';
 
     protected $fillable = [
@@ -17,7 +20,6 @@ class GiftDesign extends Model
         'offer_price',
         'customization_option',
         'description',
-        'image'
+        'image',
     ];
-
 }

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasOfferPricing;
 use Illuminate\Database\Eloquent\Model;
 
 class LaserWork extends Model
 {
+    use HasOfferPricing;
+
     protected $primaryKey = 'laser_id';
 
     protected $fillable = [
@@ -17,7 +20,6 @@ class LaserWork extends Model
         'price',
         'offer_price',
         'engraving_text',
-        'description'
+        'description', 'image',
     ];
-
 }

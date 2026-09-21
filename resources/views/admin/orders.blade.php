@@ -6,6 +6,7 @@
 
 <div class="topbar">
     <h1>All <span>Orders</span></h1>
+    <a class="btn btn-outline-dark" href="{{ route('admin.exports.orders') }}"><i class="fa-solid fa-file-excel me-1"></i> Export Orders</a>
 </div>
 
 <div class="btn-group mb-3" role="tablist" aria-label="Order categories">

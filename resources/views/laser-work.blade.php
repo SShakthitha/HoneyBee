@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="{{ asset('vendor/bootstrap/bootstrap.min.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="{{ asset('css/leser.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
 </head>
 <body>
 <header class="header" id="header">
@@ -79,7 +80,7 @@
     <div class="products-grid" id="productsGrid">
       @forelse($laserWorks as $laserWork)
         @php
-          $price = $laserWork->offer_price ?? $laserWork->price;
+          $price = $laserWork->currentSellingPrice();
           $desc = $laserWork->description ?: 'Precision laser-crafted product made just for you. Contact us to discuss sizes, materials, and pricing.';
           $safeName = addslashes($laserWork->product_name);
           $safeDesc = addslashes($desc);
@@ -89,17 +90,18 @@
         <div class="product-card" data-name="{{ e($laserWork->product_name) }}">
           <div class="card-img-wrap">
             <div class="card-img-placeholder frame-img"><i class="fas fa-bolt"></i></div>
-            @if($laserWork->offer_price)<span class="card-badge badge-new">Offer</span>@endif
+            @if($laserWork->hasValidOfferPrice())<span class="card-badge badge-new">Offer</span>@endif
           </div>
           <div class="card-body">
             <h3 class="card-title">{{ $laserWork->product_name }}</h3>
             <p class="card-desc">{{ $desc }}</p>
             <p class="price">
-              @if($laserWork->offer_price)
-                <del>Rs {{ number_format($laserWork->price, 2) }}</del>
-                <strong>Rs {{ number_format($laserWork->offer_price, 2) }}</strong>
+              @if($laserWork->hasValidOfferPrice())
+                <del>Rs {{ number_format((float) $laserWork->price, 2) }}</del>
+                <strong>Rs {{ number_format((float) $laserWork->offer_price, 2) }}</strong>
+                <span class="badge badge-new">{{ $laserWork->discountPercentage() }}% OFF</span>
               @else
-                From <strong>Rs {{ number_format($laserWork->price, 2) }}</strong>
+                From <strong>Rs {{ number_format((float) $laserWork->price, 2) }}</strong>
               @endif
             </p>
             <div class="card-actions">

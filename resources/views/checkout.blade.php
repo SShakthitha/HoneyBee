@@ -12,7 +12,7 @@
     <div class="checkout-heading">
       <p class="checkout-eyebrow">Almost there</p>
       <h1>Checkout</h1>
-      <p>Review your selected gifts, add any special requirements, and send your order to us on WhatsApp.</p>
+      <p>Review your selected gifts and add any special requirements before placing your order.</p>
     </div>
 
     <div id="checkout-empty" class="checkout-empty" hidden>
@@ -60,7 +60,7 @@
               placeholder="For example: preferred colours, custom text, delivery details, or any questions."
           ></textarea>
 
-          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+          <div style="margin-top:20px;">
 
               <form
                   id="place-order-form"
@@ -78,16 +78,6 @@
                       Place Order
                   </button>
               </form>
-
-              <button
-                  id="checkout-whatsapp"
-                  class="checkout-btn checkout-btn--whatsapp"
-                  type="button"
-                  style="flex:1;"
-              >
-                  Order via WhatsApp
-              </button>
-
           </div>
 
       </section>

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasOfferPricing;
 use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
+    use HasOfferPricing;
+
     protected $primaryKey = 'event_id';
 
     protected $fillable = [
@@ -21,7 +24,8 @@ class Event extends Model
         'event_location',
         'price',
         'offer_price',
-        'description'
+        'description',
+        'image',
     ];
 
     protected function casts(): array
@@ -35,5 +39,4 @@ class Event extends Model
             'cake_service' => 'boolean',
         ];
     }
-
 }

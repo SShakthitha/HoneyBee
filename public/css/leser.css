@@ -37,7 +37,6 @@ body {
   color: var(--slate);
   background: var(--cream);
   line-height: 1.65;
-  overflow-x: hidden;
 }
 
 .accent { color: var(--amber); }
