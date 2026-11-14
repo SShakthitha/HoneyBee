@@ -8,6 +8,7 @@
     <h1>All <span>Services</span></h1>
     <div style="display: flex; gap: 10px;">
       <a href="/admin/gift/create" style="background: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Gift Item</a>
+      <a href="{{ route('admin.gallery.index') }}" style="background: #1a1a1a; color: #f5a623; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">Manage Gallery</a>
       <a href="/admin/laser/create" style="background: #1a1a1a; color: #f5a623; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Laser Work</a>
       <a href="/admin/event/create" style="background: #f5a623; color: #1a1a1a; padding: 8px 20px; border-radius: 25px; text-decoration: none; font-weight: bold;">+ Add Event</a>
     </div>

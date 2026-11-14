@@ -8,9 +8,13 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Staff;
 use App\Models\GiftDesign;
+use App\Models\GalleryImage;
 use App\Models\LaserWork;
 use App\Models\Event;
 use App\Models\Business;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -236,32 +240,66 @@ class AdminController extends Controller
     }
 
     // ─── Gift & Design ────────────────────────────────────────
-    public function createGift()
+    public function createGift(Request $request)
     {
         $services = Service::where('service_type', 'gift')->get();
-        return view('admin.gift.create', compact('services'));
+        $galleryImage = null;
+        $defaultCategory = 'Gift';
+
+        if ($request->filled('gallery_image_id')) {
+            $galleryImage = GalleryImage::query()
+                ->whereIn('category', ['Gift & Design', 'Frame Designs'])
+                ->findOrFail($request->input('gallery_image_id'));
+            $defaultCategory = $galleryImage->category === 'Frame Designs' ? 'Frame' : 'Gift';
+        }
+
+        return view('admin.gift.create', compact('services', 'galleryImage', 'defaultCategory'));
     }
 
     public function storeGift(Request $request)
     {
-        $request->validate([
-            'item_name' => 'required',
-            'category'  => 'required',
-            'price'     => 'required|numeric',
+        $validated = $request->validate([
+            'item_name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'in:Gift,Frame'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'offer_price' => ['nullable', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:10240'],
+            'gallery_image_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('gallery_images', 'id')->where(fn ($query) => $query->whereIn('category', ['Gift & Design', 'Frame Designs'])),
+            ],
         ]);
 
+        $galleryImage = ! empty($validated['gallery_image_id'])
+            ? GalleryImage::findOrFail($validated['gallery_image_id'])
+            : null;
         $imageName = null;
+
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images/gifts'), $imageName);
+            $imageName = $request->file('image')->store('gifts', 'public');
+
+            if (! $imageName) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
+            }
+        } elseif ($galleryImage) {
+            $extension = pathinfo($galleryImage->image, PATHINFO_EXTENSION);
+            $imageName = 'gifts/'.Str::uuid().($extension ? '.'.$extension : '');
+
+            if (! Storage::disk('public')->copy($galleryImage->image, $imageName)) {
+                return back()->withErrors(['image' => 'The selected gallery image could not be copied.'])->withInput();
+            }
         }
 
         GiftDesign::create([
-            'item_name'            => $request->item_name,
-            'category'             => $request->category,
+            'item_name' => $validated['item_name'],
+            'category' => $galleryImage
+                ? ($galleryImage->category === 'Frame Designs' ? 'Frame' : 'Gift')
+                : $validated['category'],
             'material'             => $request->material,
             'size'                 => $request->size,
-            'price'                => $request->price,
+            'price'                => $validated['price'],
+            'offer_price'          => $validated['offer_price'] ?? null,
             'customization_option' => $request->customization_option,
             'description'          => $request->description,
             'image'                => $imageName,

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\GalleryImage;
 use App\Models\GiftDesign;
 use Illuminate\Support\Facades\Storage;
 
@@ -10,8 +11,16 @@ class GiftDesignController extends Controller
 {
     public function index()
     {
-        $gifts = GiftDesign::all();
-        return view('gift-design', compact('gifts'));
+        $frames = GiftDesign::query()
+            ->whereRaw('LOWER(TRIM(category)) IN (?, ?)', ['frame', 'frames'])
+            ->get();
+        $gifts = GiftDesign::query()
+            ->whereRaw('LOWER(TRIM(category)) NOT IN (?, ?)', ['frame', 'frames'])
+            ->get();
+        $giftGalleryImages = GalleryImage::where('category', 'Gift & Design')->latest()->get();
+        $frameDesignImages = GalleryImage::where('category', 'Frame Designs')->latest()->get();
+
+        return view('gift-design', compact('gifts', 'frames', 'giftGalleryImages', 'frameDesignImages'));
     }
 
     public function show($id)

@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\GalleryImageController;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -50,6 +51,10 @@ require __DIR__.'/auth.php';
 
 
 Route::prefix('admin')->group(function () {
+
+    Route::get('/gallery', [GalleryImageController::class, 'index'])->name('admin.gallery.index');
+    Route::get('/gallery/create', [GalleryImageController::class, 'create'])->name('admin.gallery.create');
+    Route::post('/gallery', [GalleryImageController::class, 'store'])->name('admin.gallery.store');
 
     // Dashboard
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
