@@ -600,27 +600,38 @@ class AdminController extends Controller
             'image' => ['nullable', 'file', 'max:10240', new ValidGiftImage],
             'gallery_image_id' => [
                 'nullable',
-                Rule::exists('gallery_images', 'id')->where(fn ($query) => $query->whereIn('category', ['Gift & Design', 'Frame Designs'])),
+                'integer',
+                Rule::exists('gallery_images', 'id')
+                    ->where(fn ($query) => $query->whereIn('category', ['Gift & Design', 'Frame Designs'])),
             ],
         ]);
-        $imageName = $request->file('image')?->store('gifts', 'public');
-
-        if ($request->hasFile('image') && ! $imageName) {
-            return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
-        }
 
         $galleryImage = ! empty($validated['gallery_image_id'])
             ? GalleryImage::findOrFail($validated['gallery_image_id'])
             : null;
+        $imageName = null;
 
-        if (! $imageName && $galleryImage) {
+        if ($request->hasFile('image')) {
+            $imageName = $request->file('image')->store('gifts', 'public');
+
+            if (! $imageName) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
+            }
+        } elseif ($galleryImage) {
+            $publicDisk = Storage::disk('public');
+
+            if (! $publicDisk->exists($galleryImage->image)) {
+                return back()->withErrors(['image' => 'The selected gallery image is no longer available.'])->withInput();
+            }
+
             $extension = pathinfo($galleryImage->image, PATHINFO_EXTENSION);
             $imageName = 'gifts/'.Str::uuid().($extension ? '.'.$extension : '');
 
-            if (! Storage::disk('public')->copy($galleryImage->image, $imageName)) {
+            if (! $publicDisk->copy($galleryImage->image, $imageName)) {
                 return back()->withErrors(['image' => 'The selected gallery image could not be copied.'])->withInput();
             }
         }
+
 
         GiftDesign::create([
             'item_name' => $validated['item_name'],

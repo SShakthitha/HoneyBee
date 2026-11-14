@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\GalleryImage;
 use App\Models\GiftDesign;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class GiftAndFrameCatalogTest extends TestCase
@@ -84,6 +86,74 @@ class GiftAndFrameCatalogTest extends TestCase
 
     public function test_the_admin_gift_form_offers_gift_and_frame_categories(): void
     {
+        $this->actingAsAdmin();
+
+        $this->get(route('admin.gift.create'))
+            ->assertOk()
+            ->assertSee('value="Gift"', false)
+            ->assertSee('value="Frame"', false);
+    }
+
+    public function test_admin_can_create_a_frame_product_from_a_frame_gallery_image(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('gallery/frame-design.jpg', 'test image content');
+
+        $galleryImage = GalleryImage::create([
+            'title' => 'Wedding Frame',
+            'category' => 'Frame Designs',
+            'image' => 'gallery/frame-design.jpg',
+        ]);
+
+        $this->actingAsAdmin();
+
+        $this->get(route('admin.gift.create', ['gallery_image_id' => $galleryImage->id]))
+            ->assertOk()
+            ->assertSee('Selected gallery image will be used')
+            ->assertSee('Wedding Frame')
+            ->assertSee('name="category" value="Frame"', false);
+
+        $this->post(route('admin.gift.store'), [
+            'gallery_image_id' => $galleryImage->id,
+            'item_name' => 'Wedding Frame Product',
+            'category' => 'Gift',
+            'price' => 2500,
+        ])->assertRedirect(route('admin.services.gift'));
+
+        $product = GiftDesign::where('item_name', 'Wedding Frame Product')->firstOrFail();
+
+        $this->assertSame('Frame', $product->category);
+        $this->assertStringStartsWith('gifts/', $product->image);
+        $this->assertNotSame($galleryImage->image, $product->image);
+        Storage::disk('public')->assertExists($galleryImage->image);
+        Storage::disk('public')->assertExists($product->image);
+    }
+
+    public function test_gallery_images_outside_gift_and_frame_categories_cannot_be_used_as_products(): void
+    {
+        $galleryImage = GalleryImage::create([
+            'title' => 'Event Photo',
+            'category' => 'Events',
+            'image' => 'gallery/event.jpg',
+        ]);
+
+        $this->actingAsAdmin();
+
+        $this->from(route('admin.gift.create'))
+            ->post(route('admin.gift.store'), [
+                'gallery_image_id' => $galleryImage->id,
+                'item_name' => 'Event Product',
+                'category' => 'Gift',
+                'price' => 2500,
+            ])
+            ->assertRedirect(route('admin.gift.create'))
+            ->assertSessionHasErrors('gallery_image_id');
+
+        $this->assertDatabaseCount('gift_designs', 0);
+    }
+
+    private function actingAsAdmin(): void
+    {
         $email = 'admin@example.com';
         Staff::create([
             'full_name' => 'Test Admin',
@@ -93,10 +163,5 @@ class GiftAndFrameCatalogTest extends TestCase
             'hire_date' => now()->toDateString(),
         ]);
         $this->actingAs(User::factory()->create(['email' => $email]));
-
-        $this->get(route('admin.gift.create'))
-            ->assertOk()
-            ->assertSee('value="Gift"', false)
-            ->assertSee('value="Frame"', false);
     }
 }

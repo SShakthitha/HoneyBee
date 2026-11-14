@@ -32,9 +32,11 @@
         @csrf
         @if($galleryImage)
             <input type="hidden" name="gallery_image_id" value="{{ $galleryImage->id }}">
-            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:12px;background:#fff8e8;border-radius:10px;">
-                <img src="{{ asset('storage/'.$galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Selected gallery image' }}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
-                <p style="margin:0;">Selected gallery image will be used for this gift. Add the price below.</p>
+            <div class="d-flex align-items-center gap-3 mb-3 p-3" style="background:#fff8e8;border-radius:10px;">
+                <img src="{{ asset('storage/'.$galleryImage->image) }}"
+                     alt="{{ $galleryImage->title ?? 'Selected gallery image' }}"
+                     style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
+                <p class="mb-0">Selected gallery image will be used unless you upload a replacement.</p>
             </div>
         @endif
 
@@ -47,21 +49,28 @@
 
             <div>
                 <label>Category *</label>
-                <select name="category" required style="width:100%;padding:10px;">
-                    <option value="">Select a category</option>
-                    <option value="Gift" @selected(old('category', $galleryImage ? $defaultCategory : '') === 'Gift')>Gift</option>
-                    <option value="Frame" @selected(old('category', $galleryImage ? $defaultCategory : '') === 'Frame')>Frame</option>
-                </select>
+                @if($galleryImage)
+                    <input type="hidden" name="category" value="{{ $defaultCategory }}">
+                    <select disabled style="width:100%;padding:10px;">
+                        <option selected>{{ $defaultCategory }}</option>
+                    </select>
+                @else
+                    <select name="category" required style="width:100%;padding:10px;">
+                        <option value="">Select a category</option>
+                        <option value="Gift" @selected(old('category') === 'Gift')>Gift</option>
+                        <option value="Frame" @selected(old('category') === 'Frame')>Frame</option>
+                    </select>
+                @endif
             </div>
 
             <div>
                 <label>Material</label>
-                <input type="text" name="material" style="width:100%;padding:10px;">
+                <input type="text" name="material" value="{{ old('material') }}" style="width:100%;padding:10px;">
             </div>
 
             <div>
                 <label>Size</label>
-                <input type="text" name="size" style="width:100%;padding:10px;">
+                <input type="text" name="size" value="{{ old('size') }}" style="width:100%;padding:10px;">
             </div>
 
             <div>
@@ -71,7 +80,7 @@
 
             <div>
                 <label>Customization</label>
-                <input type="text" name="customization_option" style="width:100%;padding:10px;">
+                <input type="text" name="customization_option" value="{{ old('customization_option') }}" style="width:100%;padding:10px;">
             </div>
 
             <div>
@@ -82,7 +91,7 @@
             <div>
                 <label>Image</label>
                 <input type="file" name="image" accept="image/jpeg,image/png,image/webp" style="width:100%;padding:10px;">
-                <small style="color:#666;">JPG, PNG, or WebP — maximum 10 MB. {{ $galleryImage ? 'Upload only if you want to replace the selected gallery image.' : '' }}</small>
+                <small style="color:#666;">JPG, PNG, or WebP — maximum 10 MB. {{ $galleryImage ? 'Upload only to replace the selected gallery image.' : '' }}</small>
             </div>
 
         </div>
