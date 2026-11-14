@@ -41,7 +41,28 @@
         <span id="cart-count">0</span>
       </button>
       @auth
-        <a class="btn btn-login" href="{{ route('dashboard') }}">Dashboard</a>
+        @php
+          $dashboardUser = auth()->user();
+          $dashboardStaffRecords = \App\Models\Staff::where('email', $dashboardUser->email)->get(['role']);
+          $dashboardCustomerExists = \App\Models\Customer::where('email', $dashboardUser->email)->exists();
+
+          if ($dashboardStaffRecords->count() === 1 && ! $dashboardCustomerExists) {
+              $dashboardRole = strtolower((string) $dashboardStaffRecords->first()->role);
+              $dashboardRoute = match ($dashboardRole) {
+                  'admin' => 'admin.dashboard',
+                  'manager' => 'manager.dashboard',
+                  'staff' => 'staff.dashboard',
+                  default => null,
+              };
+          } elseif ($dashboardStaffRecords->isEmpty() && $dashboardCustomerExists) {
+              $dashboardRoute = 'dashboard';
+          } else {
+              $dashboardRoute = null;
+          }
+
+          abort_unless($dashboardRoute !== null, 403);
+        @endphp
+        <a class="btn btn-login" href="{{ route($dashboardRoute) }}">Dashboard</a>
       @else
         <a class="btn btn-login" href="{{ route('login') }}">Login</a>
       @endauth

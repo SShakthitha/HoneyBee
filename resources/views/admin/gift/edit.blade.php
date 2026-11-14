@@ -6,7 +6,7 @@
 
 <div class="topbar">
     <h1>Edit <span>Gift & Design</span> Item</h1>
-    <a href="{{ route('admin.gift.index') }}">← Back</a>
+    <a href="{{ route('admin.services.gift') }}">← Back</a>
 </div>
 
 <div style="background: #fff; border-radius: 15px; padding: 30px;">

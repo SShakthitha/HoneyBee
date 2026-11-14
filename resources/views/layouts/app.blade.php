@@ -58,18 +58,30 @@
     <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
 </head>
 <body>
+    @auth
     @php
-        $dashboardUrl = route('dashboard');
-        if (auth()->check()) {
-            $staffRole = strtolower((string) \App\Models\Staff::where('email', auth()->user()->email)->value('role'));
-            $dashboardUrl = match ($staffRole) {
-                'admin' => route('admin.dashboard'),
-                'manager' => route('manager.dashboard'),
-                'staff' => route('staff.dashboard'),
-                default => route('customer.dashboard'),
+        $dashboardUser = auth()->user();
+        $dashboardStaffRecords = \App\Models\Staff::where('email', $dashboardUser->email)->get(['role']);
+        $dashboardCustomerExists = \App\Models\Customer::where('email', $dashboardUser->email)->exists();
+
+        if ($dashboardStaffRecords->count() === 1 && ! $dashboardCustomerExists) {
+            $dashboardRole = strtolower((string) $dashboardStaffRecords->first()->role);
+            $dashboardRoute = match ($dashboardRole) {
+                'admin' => 'admin.dashboard',
+                'manager' => 'manager.dashboard',
+                'staff' => 'staff.dashboard',
+                default => null,
             };
+        } elseif ($dashboardStaffRecords->isEmpty() && $dashboardCustomerExists) {
+            $dashboardRoute = 'dashboard';
+        } else {
+            $dashboardRoute = null;
         }
+
+        abort_unless($dashboardRoute !== null, 403);
+        $dashboardUrl = route($dashboardRoute);
     @endphp
+    @endauth
     <header class="header" id="header">
         <div class="header-inner container">
             <a href="{{ route('home') }}" class="brand">
