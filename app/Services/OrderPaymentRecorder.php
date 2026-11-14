@@ -9,11 +9,11 @@ use Illuminate\Validation\ValidationException;
 class OrderPaymentRecorder
 {
     /** Record an advance only after an authorized staff member confirms receipt. */
-    public function recordConfirmedAdvance(Order $order, string $amount): void
+    public function recordConfirmedAdvance(Order $order, string $amount, InventoryManager $inventory): void
     {
         $advanceCents = $this->amountInCents($amount);
 
-        DB::transaction(function () use ($order, $advanceCents): void {
+        DB::transaction(function () use ($order, $advanceCents, $inventory): void {
             $lockedOrder = Order::query()
                 ->lockForUpdate()
                 ->findOrFail($order->order_id);
@@ -27,6 +27,10 @@ class OrderPaymentRecorder
             $lockedOrder->advanced_paid = $this->centsToAmount($advanceCents);
             $lockedOrder->payment_date = $advanceCents > 0 ? now() : null;
             $lockedOrder->save();
+
+            if ($advanceCents > 0) {
+                $inventory->confirmOrder($lockedOrder);
+            }
         });
     }
 

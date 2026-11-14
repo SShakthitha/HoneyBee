@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\LaserWork;
 use App\Models\GalleryImage;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class LaserWorkController extends Controller
@@ -20,7 +21,7 @@ class LaserWorkController extends Controller
     public function show($id)
     {
         $laserWork = LaserWork::findOrFail($id);
-        return view('laser-work-detail', compact('laserWork'));
+        return view('laser-work-detail', ['laserWork' => $laserWork, 'submissionToken' => Str::random(64)]);
     }
 
     public function store(Request $request)

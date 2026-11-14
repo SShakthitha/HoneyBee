@@ -78,14 +78,16 @@ class WhatsAppOrderFlowTest extends TestCase
     public function test_order_is_committed_before_its_owner_can_view_confirmation(): void
     {
         $customer = $this->customer();
-        $product = GiftDesign::create(['item_name' => 'Gift & Frame', 'category' => 'Gift', 'price' => 3500]);
+        $product = GiftDesign::create(['item_name' => 'Gift & Frame', 'category' => 'Gift', 'price' => 3500, 'stock_quantity' => 2]);
 
         $this->actingAs($customer)->post(route('checkout.store'), [
+            'submission_token' => str_repeat('h', 64),
             'items' => [['item_id' => $product->gift_design_id, 'item_type' => 'gift', 'quantity' => 2]],
         ])->assertRedirect(route('checkout.confirmation', ['order' => 1]));
 
         $order = Order::with('items')->sole();
         $this->assertSame('7000.00', $order->paid_amount);
+        $this->assertSame('bank_transfer', $order->payment_method);
         $this->assertCount(1, $order->items);
         $this->assertSame('7000.00', $order->items->first()->subtotal);
         $this->actingAs($customer)->get(route('checkout.confirmation', $order))->assertOk()->assertSee('Your order ID is <strong>#1</strong>', false);
@@ -105,11 +107,36 @@ class WhatsAppOrderFlowTest extends TestCase
         $customer = $this->customer();
 
         $this->actingAs($customer)->post(route('checkout.store'), [
+            'submission_token' => str_repeat('i', 64),
             'items' => [['item_id' => 999999, 'item_type' => 'gift', 'quantity' => 1]],
         ])->assertNotFound();
 
         $this->assertDatabaseCount('orders', 0);
         $this->assertDatabaseCount('order_items', 0);
+    }
+
+    public function test_repeated_checkout_submission_token_does_not_create_a_duplicate_order(): void
+    {
+        $customer = $this->customer();
+        $product = GiftDesign::create(['item_name' => 'Repeat Gift', 'category' => 'Gift', 'price' => 1250, 'stock_quantity' => 2]);
+        $this->actingAs($customer)->get(route('checkout'))
+            ->assertOk()
+            ->assertSee('name="submission_token"', false)
+            ->assertSee('Payment is by bank transfer only.');
+        $payload = [
+            'submission_token' => str_repeat('j', 64),
+            'items' => [['item_id' => $product->gift_design_id, 'item_type' => 'gift', 'quantity' => 2]],
+        ];
+
+        $this->actingAs($customer)->post(route('checkout.store'), $payload)
+            ->assertRedirect(route('checkout.confirmation', ['order' => 1]));
+
+        $this->post(route('checkout.store'), $payload)
+            ->assertRedirect(route('checkout.confirmation', ['order' => 1]));
+
+        $this->assertDatabaseCount('orders', 1);
+        $this->assertDatabaseCount('order_items', 1);
+        $this->assertSame(2500.0, (float) Customer::where('email', $customer->email)->value('total_spent'));
     }
 
     public function test_message_builder_uses_official_number_replaces_placeholders_and_encodes_url(): void

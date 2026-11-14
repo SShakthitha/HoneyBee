@@ -9,11 +9,13 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\WhatsAppSettingsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CheckoutConfirmationController;
+use App\Http\Controllers\CatalogOrderController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\CustomerProfileController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GiftDesignController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LaserWorkController;
 use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ManagerStaffController;
@@ -25,6 +27,7 @@ use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\Staff\ProductExportController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -54,17 +57,19 @@ Route::get('/events', [EventController::class, 'index'])->name('events');
 Route::get('/event', [EventController::class, 'index'])->name('event');
 
 // Orders (frontend)
-Route::middleware(['auth', 'customer'])->group(function () {
+Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/create/{service}', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::post('/orders/catalog', [CatalogOrderController::class, 'store'])->name('orders.catalog.store');
 
     // Gift & Design cart checkout. The cart itself remains in the browser so it
     // can be kept while the customer signs in and navigates to this page.
     Route::get('/checkout', function () {
         $customer = Customer::where('email', auth()->user()->email)->first();
+        $submissionToken = Str::random(64);
 
-        return view('checkout', compact('customer'));
+        return view('checkout', compact('customer', 'submissionToken'));
     })->name('checkout');
 
     Route::post('/checkout', [OrderController::class, 'storeCartOrder'])->name('checkout.store');
@@ -106,8 +111,9 @@ Route::get('/manager/dashboard', [ManagerDashboardController::class, 'index'])
  | staff can fulfil orders and maintain the catalogue/gallery, but cannot
  | reach customer or staff administration routes.
  */
-Route::prefix('staff')->middleware(['auth', 'staff'])->name('staff.')->group(function () {
+Route::prefix('staff')->middleware(['auth', 'verified', 'staff'])->name('staff.')->group(function () {
     Route::get('/dashboard', [StaffDashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 
     Route::get('/orders', [StaffDashboardController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{id}', [StaffDashboardController::class, 'showOrder'])->name('orders.show');
@@ -149,9 +155,20 @@ Route::prefix('staff')->middleware(['auth', 'staff'])->name('staff.')->group(fun
         Route::put('/{id}', [ManagerStaffController::class, 'update'])->name('update');
         Route::delete('/{id}', [ManagerStaffController::class, 'destroy'])->name('destroy');
     });
+
+    Route::middleware('manager')->put('/inventory/{type}/{id}', [InventoryController::class, 'adjust'])
+        ->whereIn('type', ['gift', 'frame', 'laser', 'event'])
+        ->whereNumber('id')
+        ->name('inventory.adjust');
 });
 
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->group(function () {
+
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('admin.inventory.index');
+    Route::put('/inventory/{type}/{id}', [InventoryController::class, 'adjust'])
+        ->whereIn('type', ['gift', 'frame', 'laser', 'event'])
+        ->whereNumber('id')
+        ->name('admin.inventory.adjust');
 
     Route::get('/settings/whatsapp', [WhatsAppSettingsController::class, 'edit'])->name('admin.settings.whatsapp.edit');
     Route::put('/settings/whatsapp', [WhatsAppSettingsController::class, 'update'])->name('admin.settings.whatsapp.update');

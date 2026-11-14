@@ -107,6 +107,11 @@
                 From <strong>Rs {{ number_format((float) $laserWork->price, 2) }}</strong>
               @endif
             </p>
+            @if($laserWork->production_type === 'ready_made')
+              <p class="stock-availability {{ $laserWork->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $laserWork->available_stock > 0 ? $laserWork->available_stock.' ready-made units available' : 'Out of stock' }}</p>
+            @else
+              <p class="stock-availability text-info">Made to order</p>
+            @endif
             <div class="card-actions">
               <a class="btn btn-ghost" href="{{ route('laser.work.show', $laserWork->laser_id) }}">View Details</a>
               <a class="btn btn-primary" href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ $message }}" target="_blank" rel="noopener noreferrer">Order Now</a>

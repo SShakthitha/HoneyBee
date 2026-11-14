@@ -21,5 +21,14 @@ class LaserWork extends Model
         'offer_price',
         'engraving_text',
         'description', 'image',
+        'production_type',
+        'stock_quantity',
+        'reserved_quantity',
+        'low_stock_threshold',
     ];
+
+    public function getAvailableStockAttribute(): int
+    {
+        return max(0, (int) $this->stock_quantity - (int) $this->reserved_quantity);
+    }
 }

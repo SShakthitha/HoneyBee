@@ -29,7 +29,13 @@
       @if($laserWork->size)<p><strong>Size:</strong> {{ $laserWork->size }}</p>@endif
       @if($laserWork->engraving_text)<p><strong>Engraving:</strong> {{ $laserWork->engraving_text }}</p>@endif
       <p class="product-detail__price">@if($laserWork->hasValidOfferPrice())<del class="text-muted">Rs. {{ number_format((float)$laserWork->price,2) }}</del> Rs. {{ number_format((float)$laserWork->offer_price,2) }}@else Rs. {{ number_format((float)$laserWork->price,2) }}@endif</p>
+      @if($laserWork->production_type === 'ready_made')<p class="{{ $laserWork->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $laserWork->available_stock }} ready-made units available</p>@else<p class="text-info">Made to order</p>@endif
       <div class="product-detail__actions">
+        @if($laserWork->production_type === 'custom_made' || $laserWork->available_stock > 0)
+          <form method="POST" action="{{ route('orders.catalog.store') }}" class="d-flex gap-2 align-items-center">@csrf<input type="hidden" name="item_type" value="laser"><input type="hidden" name="item_id" value="{{ $laserWork->laser_id }}"><input type="hidden" name="submission_token" value="{{ $submissionToken }}"><label class="visually-hidden" for="laser-quantity">Quantity</label><input id="laser-quantity" class="form-control" type="number" name="quantity" min="1" @if($laserWork->production_type === 'ready_made') max="{{ $laserWork->available_stock }}" @endif value="1" style="width:90px"><button class="btn btn-warning">Order</button></form>
+        @else
+          <button class="btn btn-secondary" type="button" disabled>Out of stock</button>
+        @endif
         <a class="btn btn-primary" href="{{ route('laser.work') }}#products">Browse more products</a>
         <a class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer" href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ rawurlencode('Hello HoneyBee Laser Works, I would like to enquire about '.$laserWork->product_name.'.') }}">Ask about this product</a>
       </div>

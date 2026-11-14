@@ -148,10 +148,18 @@
             @if($event->event_date)
               <p class="event-card-desc"><i class="fas fa-calendar"></i> {{ \Illuminate\Support\Carbon::parse($event->event_date)->format('d M Y') }}</p>
             @endif
+            <p class="event-card-desc {{ $event->available_slots > 0 ? 'text-success' : 'text-danger' }}">{{ $event->available_slots }} booking slots available</p>
             <div class="event-card-actions">
               <button class="btn-sm btn-sm-outline" onclick="openDetail(this)" type="button" data-title="{{ e($event->event_name) }}" data-tag="{{ e($event->event_type) }}" data-price="Rs {{ number_format($price, 2) }}" data-desc="{{ e($desc) }}" data-whatsapp="{{ $whatsappUrl }}">View Details</button>
               <a class="btn-sm btn-sm-fill" href="{{ $whatsappUrl }}" target="_blank" rel="noopener">Book / Discuss</a>
             </div>
+            @if($isCustomer && $event->available_slots > 0)
+              <form method="POST" action="{{ route('orders.catalog.store') }}" class="d-flex gap-2 align-items-center mt-3">@csrf<input type="hidden" name="item_type" value="event"><input type="hidden" name="item_id" value="{{ $event->event_id }}"><input type="hidden" name="submission_token" value="{{ $submissionTokens[$event->event_id] }}"><label class="visually-hidden" for="event-quantity-{{ $event->event_id }}">Slots</label><input id="event-quantity-{{ $event->event_id }}" class="form-control form-control-sm" type="number" name="quantity" min="1" max="{{ $event->available_slots }}" value="1" style="width:80px"><button class="btn btn-sm btn-warning">Reserve slots</button></form>
+            @elseif(! $isCustomer && auth()->guest())
+              <a class="btn btn-sm btn-outline-warning mt-3" href="{{ route('login') }}">Sign in to reserve</a>
+            @elseif($event->available_slots < 1)
+              <button class="btn btn-sm btn-secondary mt-3" type="button" disabled>No slots available</button>
+            @endif
           </div>
         </div>
       @empty

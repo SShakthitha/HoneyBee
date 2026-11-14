@@ -50,6 +50,8 @@
 
       <section class="checkout-card requirements-card">
 
+          <p class="checkout-note">Payment is by bank transfer only. HoneyBee will confirm the transfer before recording payment.</p>
+
           <label for="special-requirements">
               Special requirements or notes
           </label>
@@ -69,6 +71,7 @@
                   style="flex:1;"
               >
                   @csrf
+                  <input type="hidden" name="submission_token" value="{{ $submissionToken }}">
 
                   <button
                       type="submit"

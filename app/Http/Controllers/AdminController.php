@@ -14,6 +14,8 @@ use App\Models\Service;
 use App\Models\Staff;
 use App\Rules\ValidGiftImage;
 use App\Services\OrderPaymentRecorder;
+use App\Services\OrderStatusManager;
+use App\Services\InventoryManager;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -211,14 +213,14 @@ class AdminController extends Controller
         return view('admin.orders', compact('orders'));
     }
 
-    public function updateOrderPayment(Request $request, int $id, OrderPaymentRecorder $paymentRecorder)
+    public function updateOrderPayment(Request $request, int $id, OrderPaymentRecorder $paymentRecorder, InventoryManager $inventory)
     {
         $order = Order::findOrFail($id);
         $validated = $request->validate([
             'advanced_paid' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
         ]);
 
-        $paymentRecorder->recordConfirmedAdvance($order, (string) $validated['advanced_paid']);
+        $paymentRecorder->recordConfirmedAdvance($order, (string) $validated['advanced_paid'], $inventory);
 
         return redirect()->route('admin.orders.show', $order->order_id)->with('success', 'Confirmed advance payment updated.');
     }
@@ -248,14 +250,14 @@ class AdminController extends Controller
             ->download('honeybee-order-'.$order->order_id.'.pdf');
     }
 
-    public function updateOrderStatus(Request $request, $id)
+    public function updateOrderStatus(Request $request, $id, OrderStatusManager $statusManager, InventoryManager $inventory)
     {
         $order = Order::findOrFail($id);
         $validated = $request->validate([
             'status' => ['required', Rule::in(['pending', 'processing', 'completed', 'cancelled'])],
         ]);
 
-        $order->update($validated);
+        $statusManager->update($order, $validated['status'], $inventory);
 
         return redirect()->route('admin.orders')->with('success', 'Order status updated!');
     }
@@ -700,9 +702,10 @@ class AdminController extends Controller
         return redirect()->route('admin.services.gift')->with('success', 'Gift item updated successfully!');
     }
 
-    public function destroyGift($id)
+    public function destroyGift($id, InventoryManager $inventory)
     {
         $gift = GiftDesign::findOrFail($id);
+        $inventory->assertProductCanBeDeleted(in_array(strtolower($gift->category), ['frame', 'frames'], true) ? 'frame' : 'gift', (int) $gift->gift_design_id);
 
         if ($gift->image && Storage::disk('public')->exists($gift->image)) {
             Storage::disk('public')->delete($gift->image);
@@ -787,9 +790,10 @@ class AdminController extends Controller
         return redirect()->route('admin.services.laser')->with('success', 'Laser work updated successfully!');
     }
 
-    public function destroyLaser($id)
+    public function destroyLaser($id, InventoryManager $inventory)
     {
         $laserWork = LaserWork::findOrFail($id);
+        $inventory->assertProductCanBeDeleted('laser', (int) $laserWork->laser_id);
         if ($laserWork->image && Storage::disk('public')->exists($laserWork->image)) {
             Storage::disk('public')->delete($laserWork->image);
         }
@@ -878,9 +882,10 @@ class AdminController extends Controller
         return redirect()->route('admin.services.events')->with('success', 'Event updated successfully!');
     }
 
-    public function destroyEvent($id)
+    public function destroyEvent($id, InventoryManager $inventory)
     {
         $event = Event::findOrFail($id);
+        $inventory->assertProductCanBeDeleted('event', (int) $event->event_id);
         if ($event->image && Storage::disk('public')->exists($event->image)) {
             Storage::disk('public')->delete($event->image);
         }

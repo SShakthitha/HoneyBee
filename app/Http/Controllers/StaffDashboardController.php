@@ -9,6 +9,8 @@ use App\Models\LaserWork;
 use App\Models\Order;
 use App\Models\Staff;
 use App\Services\OrderPaymentRecorder;
+use App\Services\InventoryManager;
+use App\Services\OrderStatusManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -48,22 +50,23 @@ class StaffDashboardController extends Controller
         return view('staff.order-show', ['order' => Order::with(['customer', 'items'])->where('order_id', $id)->firstOrFail()]);
     }
 
-    public function updateOrderStatus(Request $request, $id)
+    public function updateOrderStatus(Request $request, $id, OrderStatusManager $statusManager, InventoryManager $inventory)
     {
         $order = Order::findOrFail($id);
-        $order->update($request->validate(['status' => ['required', Rule::in(['pending', 'processing', 'completed', 'cancelled'])]]));
+        $validated = $request->validate(['status' => ['required', Rule::in(['pending', 'processing', 'completed', 'cancelled'])]]);
+        $statusManager->update($order, $validated['status'], $inventory);
 
         return redirect()->route('staff.orders.show', $order->order_id)->with('success', 'Order status updated.');
     }
 
-    public function updateOrderPayment(Request $request, int $id, OrderPaymentRecorder $paymentRecorder)
+    public function updateOrderPayment(Request $request, int $id, OrderPaymentRecorder $paymentRecorder, InventoryManager $inventory)
     {
         $order = Order::findOrFail($id);
         $validated = $request->validate([
             'advanced_paid' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
         ]);
 
-        $paymentRecorder->recordConfirmedAdvance($order, (string) $validated['advanced_paid']);
+        $paymentRecorder->recordConfirmedAdvance($order, (string) $validated['advanced_paid'], $inventory);
 
         return redirect()->route('staff.orders.show', $order->order_id)->with('success', 'Confirmed advance payment updated.');
     }
@@ -147,9 +150,11 @@ class StaffDashboardController extends Controller
         return redirect()->route('staff.products.category', $type)->with('success', ucfirst($type).' item saved successfully.');
     }
 
-    public function deleteProduct($type, $id)
+    public function deleteProduct($type, $id, InventoryManager $inventory)
     {
         $model = $this->product($type, $id);
+        $inventoryType = $type === 'gift' ? (in_array(strtolower($model->category), ['frame', 'frames'], true) ? 'frame' : 'gift') : $type;
+        $inventory->assertProductCanBeDeleted($inventoryType, (int) $model->getKey());
         if ($model->image && Storage::disk('public')->exists($model->image)) {
             Storage::disk('public')->delete($model->image);
         }

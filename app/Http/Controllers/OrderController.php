@@ -7,10 +7,14 @@ use App\Models\GiftDesign;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Service;
+use App\Services\InventoryManager;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
@@ -130,76 +134,114 @@ class OrderController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function storeCartOrder(Request $request)
+    public function storeCartOrder(Request $request, InventoryManager $inventory)
     {
         $validated = $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.quantity' => 'required|integer|min:1',
+            'submission_token' => ['required', 'string', 'size:64', 'alpha_num'],
+            'items.*.quantity' => 'required|integer|min:1|max:2147483647',
             'items.*.item_id' => 'required|integer',
             'items.*.item_type' => 'required|in:gift,frame',
-            'notes' => 'nullable|string',
+            'notes' => 'nullable|string|max:5000',
         ]);
 
         $customer = Customer::where('email', $request->user()->email)
             ->firstOrFail();
 
+        if ($existingOrder = $this->orderForSubmission($customer, $validated['submission_token'])) {
+            return redirect()->route('checkout.confirmation', ['order' => $existingOrder->order_id]);
+        }
+
         $items = collect($validated['items'])->map(function (array $item) {
             $product = GiftDesign::findOrFail($item['item_id']);
 
-            abort_unless(strtolower($product->category) === $item['item_type'], 422);
+            $category = strtolower(trim($product->category));
+            $categoryType = in_array($category, ['frame', 'frames'], true) ? 'frame' : 'gift';
+            abort_unless($categoryType === $item['item_type'], 422);
 
             // Prices from the browser are never trusted. Use the product's
-            // centralized offer-price rule so zero, equal, or higher offers
-            // cannot reduce (or increase) the order total.
-            $price = $product->currentSellingPrice();
+            // centralized offer-price rule and keep all arithmetic in cents.
+            $priceCents = $this->amountInCents(
+                $product->hasValidOfferPrice() ? $product->offer_price : $product->price
+            );
+            $quantity = (int) $item['quantity'];
+            if ($priceCents < 0 || $priceCents > intdiv(9_999_999_999, $quantity)) {
+                throw ValidationException::withMessages(['items' => 'An item quantity exceeds the supported order total.']);
+            }
 
             return [
                 'item_id' => $product->gift_design_id,
                 'item_type' => $item['item_type'],
                 'item_name' => $product->item_name,
-                'price' => $price,
-                'quantity' => (int) $item['quantity'],
-                'subtotal' => $price * (int) $item['quantity'],
+                'price' => $this->centsToAmount($priceCents),
+                'quantity' => $quantity,
+                'subtotal' => $this->centsToAmount($priceCents * $quantity),
+                'subtotal_cents' => $priceCents * $quantity,
             ];
         });
 
-        $total = $items->sum('subtotal');
+        $totalCents = $items->sum('subtotal_cents');
+        if ($totalCents > 9_999_999_999) {
+            throw ValidationException::withMessages(['items' => 'The order total exceeds the supported amount.']);
+        }
+        $total = $this->centsToAmount($totalCents);
 
-        $order = DB::transaction(function () use (
-            $items,
-            $customer,
-            $total,
-            $validated
-        ) {
-            $order = Order::create([
-                'customer_id' => $customer->customer_id,
-                'order_date' => now(),
-                'paid_amount' => $total,
-                'advanced_paid' => 0,
-                'discount' => 0,
-                'payment_method' => 'WhatsApp',
-                'status' => 'pending',
-                'attribute' => $validated['notes'] ?? null,
-            ]);
-
-            foreach ($items as $item) {
-                OrderItem::create([
-                    'order_id' => $order->order_id,
-                    'item_type' => $item['item_type'],
-                    'item_id' => $item['item_id'],
-                    'item_name' => $item['item_name'],
-                    'price' => $item['price'],
-                    'quantity' => $item['quantity'],
-                    'subtotal' => $item['subtotal'],
+        try {
+            $order = DB::transaction(function () use (
+                $items,
+                $customer,
+                $total,
+                $validated,
+                $inventory
+            ) {
+                $order = Order::create([
+                    'customer_id' => $customer->customer_id,
+                    'submission_token' => $validated['submission_token'],
+                    'order_date' => now(),
+                    'paid_amount' => $total,
+                    'advanced_paid' => 0,
+                    'discount' => 0,
+                    'payment_method' => 'bank_transfer',
+                    'status' => 'pending',
+                    'attribute' => $validated['notes'] ?? null,
                 ]);
+
+                foreach ($items as $item) {
+                    OrderItem::create([
+                        'order_id' => $order->order_id,
+                        'item_type' => $item['item_type'],
+                        'item_id' => $item['item_id'],
+                        'item_name' => $item['item_name'],
+                        'price' => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'subtotal' => $item['subtotal'],
+                    ]);
+                }
+
+                $inventory->reserveOrder($order);
+
+                $customer->increment('total_spent', $total);
+
+                return $order;
+            });
+        } catch (QueryException $exception) {
+            $existingOrder = $this->orderForSubmission($customer, $validated['submission_token']);
+            if (! $existingOrder) {
+                throw $exception;
             }
 
-            $customer->increment('total_spent', $total);
-
-            return $order;
-        });
+            return redirect()->route('checkout.confirmation', ['order' => $existingOrder->order_id]);
+        }
 
         return redirect()
             ->route('checkout.confirmation', ['order' => $order->order_id]);
+    }
+
+    private function orderForSubmission(Customer $customer, string $token): ?Order
+    {
+        return Order::query()
+            ->where('customer_id', $customer->customer_id)
+            ->where('submission_token', $token)
+            ->first();
     }
 }

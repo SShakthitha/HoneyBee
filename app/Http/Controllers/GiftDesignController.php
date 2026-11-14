@@ -7,6 +7,7 @@ use App\Models\GiftDesign;
 use App\Rules\ValidGiftImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class GiftDesignController extends Controller
 {
@@ -81,7 +82,7 @@ class GiftDesignController extends Controller
     {
         $gift = GiftDesign::findOrFail($id);
 
-        return view('gift-design-detail', compact('gift'));
+        return view('gift-design-detail', ['gift' => $gift, 'submissionToken' => Str::random(64)]);
     }
 
     public function store(Request $request)

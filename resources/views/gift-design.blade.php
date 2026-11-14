@@ -74,6 +74,7 @@
           <div class="product-body">
             <h3>{{ $gift->item_name }}</h3>
             <p>{{ $gift->description ?: $gift->category }}</p>
+            <p class="small {{ $gift->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $gift->available_stock > 0 ? $gift->available_stock.' available' : 'Out of stock' }}</p>
             <p class="price">
               @if($gift->hasValidOfferPrice())
                 <del>Rs {{ number_format((float) $gift->price, 2) }}</del>
@@ -87,7 +88,7 @@
               <button
                   class="btn btn-cart-add"
                   data-cart-product data-product-name="{{ $gift->item_name }}" data-product-price="{{ (float) $price }}" data-product-id="{{ $gift->gift_design_id }}" data-product-type="gift"
-                  type="button">
+                  type="button" @disabled($gift->available_stock < 1)>
                   Add
               </button>
               <a class="btn btn-details" href="{{ route('gift.design.show', $gift->gift_design_id) }}">Details</a>
@@ -130,6 +131,7 @@
           <div class="product-body">
             <h3>{{ $frame->item_name }}</h3>
             <p>{{ $frame->description ?: $frame->category }}</p>
+            <p class="small {{ $frame->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $frame->available_stock > 0 ? $frame->available_stock.' available' : 'Out of stock' }}</p>
             <p class="price">
               @if($frame->hasValidOfferPrice())
                 <del>Rs {{ number_format((float) $frame->price, 2) }}</del>
@@ -143,7 +145,7 @@
               <button
                   class="btn btn-cart-add"
                   data-cart-product data-product-name="{{ $frame->item_name }}" data-product-price="{{ (float) $price }}" data-product-id="{{ $frame->gift_design_id }}" data-product-type="frame"
-                  type="button">
+                  type="button" @disabled($frame->available_stock < 1)>
                   Add
               </button>
               <a class="btn btn-details" href="{{ route('gift.design.show', $frame->gift_design_id) }}">Details</a>

@@ -25,6 +25,7 @@
     @php($staffProductType = request()->route('type'))
     <a class="{{ request()->routeIs('manager.dashboard', 'staff.dashboard') ? 'active' : '' }}" href="{{ $isManager ? route('manager.dashboard') : route('staff.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
     <a class="{{ request()->routeIs('staff.orders.*') ? 'active' : '' }}" href="{{ route('staff.orders.index') }}"><i class="fa-solid fa-receipt"></i> Orders</a>
+    <a class="{{ request()->routeIs('staff.inventory.*') ? 'active' : '' }}" href="{{ route('staff.inventory.index') }}"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
     <ul class="staff-products-menu">
         <li>
             <details class="sidebar-services" {{ request()->routeIs('staff.products.*') ? 'open' : '' }}>

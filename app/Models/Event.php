@@ -26,6 +26,10 @@ class Event extends Model
         'offer_price',
         'description',
         'image',
+        'booking_capacity',
+        'reserved_slots',
+        'booked_slots',
+        'low_slots_threshold',
     ];
 
     protected function casts(): array
@@ -38,5 +42,10 @@ class Event extends Model
             'photography_service' => 'boolean',
             'cake_service' => 'boolean',
         ];
+    }
+
+    public function getAvailableSlotsAttribute(): int
+    {
+        return max(0, (int) $this->booking_capacity - (int) $this->reserved_slots - (int) $this->booked_slots);
     }
 }

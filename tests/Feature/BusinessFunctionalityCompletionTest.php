@@ -30,11 +30,13 @@ class BusinessFunctionalityCompletionTest extends TestCase
             'category' => 'Gift',
             'price' => 1500,
             'offer_price' => 1200,
+            'stock_quantity' => 10,
         ]);
 
         $this->get(route('gift.design'))->assertOk()->assertSee('Isolated Test Gift');
 
         $this->actingAs($user)->post(route('checkout.store'), [
+            'submission_token' => str_repeat('a', 64),
             'items' => [[
                 'item_id' => $product->gift_design_id,
                 'item_type' => 'gift',
@@ -50,7 +52,7 @@ class BusinessFunctionalityCompletionTest extends TestCase
         $this->assertSame('0.00', $order->advanced_paid);
         $this->assertSame('0.00', $order->discount);
         $this->assertSame('pending', $order->status);
-        $this->assertSame('WhatsApp', $order->payment_method);
+        $this->assertSame('bank_transfer', $order->payment_method);
         $this->assertSame('Isolated Test Gift', $order->items->sole()->item_name);
         $this->assertSame('1200.00', $order->items->sole()->price);
         $this->assertSame(2, $order->items->sole()->quantity);

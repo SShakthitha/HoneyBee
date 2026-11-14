@@ -251,6 +251,7 @@
                 </details>
             </li>
             <li><a href="/admin/orders" class="{{ request()->is('admin/orders') ? 'active' : '' }}"><i class="fa-solid fa-receipt"></i> Orders</a></li>
+            <li><a href="{{ route('admin.inventory.index') }}" class="{{ request()->is('admin/inventory*') ? 'active' : '' }}"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a></li>
             <li><a href="/admin/customers" class="{{ request()->is('admin/customers*') ? 'active' : '' }}"><i class="fa-solid fa-users"></i> Customers</a></li>
             <li><a href="{{ route('admin.promotions.index') }}" class="{{ request()->is('admin/promotions*') ? 'active' : '' }}"><i class="fa-solid fa-bullhorn"></i> Promotions</a></li>
             <li><a href="{{ route('admin.settings.whatsapp.edit') }}" class="{{ request()->is('admin/settings/whatsapp') ? 'active' : '' }}"><i class="fa-brands fa-whatsapp"></i> WhatsApp Settings</a></li>
