@@ -75,26 +75,28 @@
             font-weight: bold;
         }
 
-        .sidebar-services summary {
-            color: #aaa;
-            cursor: pointer;
+        .sidebar ul li form button.sidebar-logout {
+            color: var(--admin-accent);
+            text-decoration: none;
             font-size: 15px;
             padding: 10px 15px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             gap: 10px;
-            list-style: none;
+            transition: all 0.3s;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            text-align: left;
+            font-family: inherit;
+            cursor: pointer;
         }
 
-        .sidebar-services summary::-webkit-details-marker { display: none; }
-        .sidebar-services summary:hover,
-        .sidebar-services[open] summary { background: #333; color: var(--admin-accent); }
-        .sidebar-services summary .caret { margin-left: auto; transition: transform .2s ease; }
-        .sidebar-services[open] summary .caret { transform: rotate(180deg); }
-        .sidebar-services ul { margin: 5px 0 0; padding-left: 14px; }
-        .sidebar-services li { margin-bottom: 3px; }
-        .sidebar-services a { font-size: 14px; padding: 8px 12px; }
+        .sidebar ul li form button.sidebar-logout:hover {
+            background: #333;
+            color: var(--admin-accent);
+        }
 
         .main-content {
             margin-left: 250px;
@@ -224,16 +226,17 @@
         @media (min-width: 901px) { .admin-mobile-bar, .admin-nav-overlay { display:none; } }
     </style>
     <link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sidebar-dropdown.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="admin-mobile-bar"><button type="button" id="admin-menu-toggle" aria-controls="admin-sidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i> Menu</button><strong>HoneyBee Admin</strong></div>
     <div class="admin-nav-overlay" id="admin-nav-overlay"></div>
     <div class="sidebar" id="admin-sidebar">
         <div class="logo">
-            <img src="{{ asset('images/logo.png') }}" alt="HoneyBee">
+            <img src="{{ asset('images/logo.webp') }}" alt="HoneyBee">
         </div>
         <ul>
-            @php($servicesOpen = request()->is('admin/services*') || request()->is('admin/gift*') || request()->is('admin/laser*') || request()->is('admin/event*'))
+            @php($servicesOpen = request()->is('admin/services*') || request()->is('admin/service-records*') || request()->is('admin/gift*') || request()->is('admin/laser*') || request()->is('admin/event*'))
             <li><a href="/admin" class="{{ request()->is('admin') ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
             <li><a href="{{ route('admin.businesses') }}" class="{{ request()->is('admin/businesses*') ? 'active' : '' }}"><i class="fa-solid fa-building"></i> Business</a></li>
             <li>
@@ -243,6 +246,7 @@
                         <li><a href="{{ route('admin.services.gift') }}" class="{{ request()->is('admin/services/gift-design') || request()->is('admin/gift*') ? 'active' : '' }}"><i class="fa-solid fa-gift"></i> Gift &amp; Design</a></li>
                         <li><a href="{{ route('admin.services.events') }}" class="{{ request()->is('admin/services/events') || request()->is('admin/event*') ? 'active' : '' }}"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
                         <li><a href="{{ route('admin.services.laser') }}" class="{{ request()->is('admin/services/laser-work') || request()->is('admin/laser*') ? 'active' : '' }}"><i class="fa-solid fa-wand-magic-sparkles"></i> Laser Work</a></li>
+                        <li><a href="{{ route('admin.service-records.index') }}" class="{{ request()->is('admin/service-records*') ? 'active' : '' }}"><i class="fa-solid fa-list-check"></i> Bookable Services</a></li>
                     </ul>
                 </details>
             </li>
@@ -259,6 +263,7 @@
                 </a>
             </li>
             <li style="margin-top: 30px;"><a href="/" style="color: #f5a623;"><i class="fa-solid fa-globe"></i> View Website</a></li>
+            <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="sidebar-logout" type="submit"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></form></li>
         </ul>
     </div>
 

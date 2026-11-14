@@ -16,18 +16,39 @@
         .honey-card { background:#fff; border:1px solid var(--border); box-shadow:0 5px 20px rgba(0,0,0,.07); border-radius:15px; padding:24px }.btn-honey { background:var(--honey); border-color:var(--honey); color:var(--dark); font-weight:700 }.btn-honey:hover { background:#dd941f; border-color:#dd941f; color:var(--dark) }.table thead th { background:var(--honey); color:var(--dark); white-space:nowrap }.badge-status { display:inline-block; padding:.38rem .7rem; border-radius:999px; font-size:.78rem; font-weight:700 }.status-pending { background:#fff3cd; color:#856404 }.status-processing { background:#cfe2ff; color:#084298 }.status-completed { background:#d4edda; color:#155724 }.status-cancelled { background:#f8d7da; color:#842029 }
         .staff-mobile-bar { display:none }
         @media(max-width:900px) { .staff-mobile-bar { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--dark); color:#fff; position:sticky; top:0; z-index:30 }.staff-mobile-bar button { border:1px solid rgba(255,255,255,.3); background:transparent; color:#fff; border-radius:7px; padding:7px 10px }.staff-sidebar { transform:translateX(-105%); transition:transform .2s ease; width:min(280px,85vw); overflow-y:auto; box-shadow:8px 0 24px rgba(0,0,0,.25) } body.staff-sidebar-open .staff-sidebar { transform:translateX(0) }.staff-nav-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9 } body.staff-sidebar-open .staff-nav-overlay { display:block }.brand { justify-content:flex-start; margin-bottom:12px }.brand img { height:42px }.staff-main { margin-left:0; padding:22px 16px }.page-head { align-items:flex-start; flex-direction:column }.honey-card { padding:16px } }
-    </style><link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
+    </style><link href="{{ asset('css/responsive.css') }}" rel="stylesheet"><link href="{{ asset('css/sidebar-dropdown.css') }}?v={{ filemtime(public_path('css/sidebar-dropdown.css')) }}" rel="stylesheet">@stack('styles')
 </head>
 <body>
 <div class="staff-mobile-bar"><button type="button" id="staff-menu-toggle" aria-controls="staff-sidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i> Menu</button><strong>HoneyBee Staff</strong></div><div class="staff-nav-overlay" id="staff-nav-overlay"></div>
-<aside class="staff-sidebar" id="staff-sidebar"><div class="brand"><img src="{{ asset('images/logo.png') }}" alt="HoneyBee Shop"></div><nav>
-    <a class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}" href="{{ route('staff.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+<aside class="staff-sidebar" id="staff-sidebar"><div class="brand"><img src="{{ asset('images/logo.webp') }}" alt="HoneyBee Shop"></div><nav>
+    @php($isManager = strtolower((string) \App\Models\Staff::where('email', auth()->user()->email)->value('role')) === 'manager')
+    @php($staffProductType = request()->route('type'))
+    <a class="{{ request()->routeIs('manager.dashboard', 'staff.dashboard') ? 'active' : '' }}" href="{{ $isManager ? route('manager.dashboard') : route('staff.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
     <a class="{{ request()->routeIs('staff.orders.*') ? 'active' : '' }}" href="{{ route('staff.orders.index') }}"><i class="fa-solid fa-receipt"></i> Orders</a>
-    <a class="{{ request()->routeIs('staff.products.*') ? 'active' : '' }}" href="{{ route('staff.products.index') }}"><i class="fa-solid fa-box-open"></i> Products / Business</a>
+    <ul class="staff-products-menu">
+        <li>
+            <details class="sidebar-services" {{ request()->routeIs('staff.products.*') ? 'open' : '' }}>
+                <summary><i class="fa-solid fa-box-open"></i> Product <i class="fa-solid fa-chevron-down caret"></i></summary>
+                <ul>
+                    @foreach(['gift' => ['Gift', 'Gifts', 'fa-gift'], 'laser' => ['Laser', 'Laser Work', 'fa-wand-magic-sparkles'], 'event' => ['Event', 'Events', 'fa-calendar-days']] as $productType => [$productLabel, $productPlural, $productIcon])
+                        <li>
+                            <details class="sidebar-services staff-product-category" {{ $staffProductType === $productType ? 'open' : '' }}>
+                                <summary><i class="fa-solid {{ $productIcon }}"></i> {{ $productLabel }} <i class="fa-solid fa-chevron-down caret"></i></summary>
+                                <ul>
+                                    <li><a class="{{ $staffProductType === $productType && request()->routeIs('staff.products.category', 'staff.products.show', 'staff.products.edit') ? 'active' : '' }}" href="{{ route('staff.products.category', $productType) }}"><i class="fa-solid fa-list-check"></i> View {{ $productPlural }}</a></li>
+                                    <li><a class="{{ request()->routeIs('staff.products.create') && $staffProductType === $productType ? 'active' : '' }}" href="{{ route('staff.products.create', $productType) }}"><i class="fa-solid fa-plus"></i> Add {{ $productLabel === 'Laser' ? 'Laser Work' : $productLabel }}</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                    @endforeach
+                </ul>
+            </details>
+        </li>
+    </ul>
     <a class="{{ request()->routeIs('staff.gallery.*') ? 'active' : '' }}" href="{{ route('staff.gallery.index') }}"><i class="fa-solid fa-images"></i> Gallery</a>
     <a class="{{ request()->routeIs('staff.promotions.*') ? 'active' : '' }}" href="{{ route('staff.promotions.index') }}"><i class="fa-solid fa-bullhorn"></i> Promotions</a>
     <a class="{{ request()->routeIs('staff.profile*') ? 'active' : '' }}" href="{{ route('staff.profile') }}"><i class="fa-solid fa-user"></i> My Profile</a>
-    @if(\App\Models\Staff::where('email', auth()->user()->email)->where('role', 'manager')->exists())
+    @if($isManager)
     <a class="{{ request()->routeIs('staff.staff.*') ? 'active' : '' }}" href="{{ route('staff.staff.index') }}"><i class="fa-solid fa-user-tie"></i> Staff Management</a>
     @endif
     <a href="{{ route('home') }}"><i class="fa-solid fa-globe"></i> View Website</a>
@@ -36,5 +57,5 @@
 <main class="staff-main">
 @if(session('success'))<div class="alert alert-success alert-dismissible fade show">{{ session('success') }}<button class="btn-close" data-bs-dismiss="alert"></button></div>@endif
 @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-@yield('content')</main><script src="{{ asset('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script><script>document.addEventListener('DOMContentLoaded',function(){const t=document.getElementById('staff-menu-toggle'),o=document.getElementById('staff-nav-overlay'),close=()=>{document.body.classList.remove('staff-sidebar-open');t?.setAttribute('aria-expanded','false')};t?.addEventListener('click',()=>{const open=document.body.classList.toggle('staff-sidebar-open');t.setAttribute('aria-expanded',String(open))});o?.addEventListener('click',close);document.querySelectorAll('#staff-sidebar a').forEach(a=>a.addEventListener('click',close));});</script>
+@yield('content')</main><script src="{{ asset('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script><script>document.addEventListener('DOMContentLoaded',function(){const t=document.getElementById('staff-menu-toggle'),o=document.getElementById('staff-nav-overlay'),close=()=>{document.body.classList.remove('staff-sidebar-open');t?.setAttribute('aria-expanded','false')};t?.addEventListener('click',()=>{const open=document.body.classList.toggle('staff-sidebar-open');t.setAttribute('aria-expanded',String(open))});o?.addEventListener('click',close);document.querySelectorAll('#staff-sidebar a').forEach(a=>a.addEventListener('click',close));});</script>@stack('scripts')
 </body></html>

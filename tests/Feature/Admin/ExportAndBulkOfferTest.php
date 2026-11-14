@@ -11,6 +11,8 @@ use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Fakes\ExcelFake;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Tests\TestCase;
 
 class ExportAndBulkOfferTest extends TestCase
@@ -19,21 +21,43 @@ class ExportAndBulkOfferTest extends TestCase
 
     public function test_admin_can_download_customer_product_order_and_staff_excel_exports(): void
     {
-        Excel::fake();
-        $admin = $this->admin();
-        Customer::create(['full_name' => 'Customer One', 'email' => 'customer@example.com', 'phone' => '0771234567', 'total_spent' => 1000, 'registered_date' => now()]);
-        GiftDesign::create(['item_name' => 'Gift One', 'category' => 'Gift', 'price' => 1500]);
-        LaserWork::create(['product_name' => 'Laser One', 'laser_type' => 'Engraving', 'price' => 2000]);
-        Event::create(['event_name' => 'Event One', 'event_type' => 'Wedding', 'event_date' => now(), 'price' => 5000]);
+        $temporaryFile = tempnam(sys_get_temp_dir(), 'honeybee-export-test-');
+        $this->assertNotFalse($temporaryFile);
+        file_put_contents($temporaryFile, '');
 
-        foreach (['customers', 'products', 'orders', 'staff'] as $export) {
-            $this->actingAs($admin)->get(route("admin.exports.{$export}"))->assertOk();
+        $excelFake = new class($temporaryFile) extends ExcelFake
+        {
+            public function __construct(private string $temporaryFile) {}
+
+            public function download($export, string $fileName, ?string $writerType = null, array $headers = []): BinaryFileResponse
+            {
+                $this->downloads[$fileName] = $export;
+
+                return new BinaryFileResponse($this->temporaryFile);
+            }
+        };
+        Excel::swap($excelFake);
+
+        try {
+            $admin = $this->admin();
+            Customer::create(['full_name' => 'Customer One', 'email' => 'customer@example.com', 'phone' => '0771234567', 'total_spent' => 1000, 'registered_date' => now()]);
+            GiftDesign::create(['item_name' => 'Gift One', 'category' => 'Gift', 'price' => 1500]);
+            LaserWork::create(['product_name' => 'Laser One', 'laser_type' => 'Engraving', 'price' => 2000]);
+            Event::create(['event_name' => 'Event One', 'event_type' => 'Wedding', 'event_date' => now(), 'price' => 5000]);
+
+            foreach (['customers', 'products', 'orders', 'staff'] as $export) {
+                $this->actingAs($admin)->get(route("admin.exports.{$export}"))->assertOk();
+            }
+
+            Excel::assertDownloaded('honeybee-customers.xlsx', fn (HoneyBeeExport $export) => $export->headings() === ['Customer ID', 'Name', 'Email', 'Phone', 'Address', 'Registration Date', 'Total Spent']);
+            Excel::assertDownloaded('honeybee-products.xlsx', fn (HoneyBeeExport $export) => $export->headings()[0] === 'Type');
+            Excel::assertDownloaded('honeybee-orders.xlsx', fn (HoneyBeeExport $export) => $export->headings()[0] === 'Order ID');
+            Excel::assertDownloaded('honeybee-staff.xlsx', fn (HoneyBeeExport $export) => $export->headings()[0] === 'Staff ID');
+        } finally {
+            if (file_exists($temporaryFile)) {
+                unlink($temporaryFile);
+            }
         }
-
-        Excel::assertDownloaded('honeybee-customers.xlsx', fn (HoneyBeeExport $export) => $export->headings() === ['Customer ID', 'Name', 'Email', 'Phone', 'Address', 'Registration Date', 'Total Spent']);
-        Excel::assertDownloaded('honeybee-products.xlsx', fn (HoneyBeeExport $export) => $export->headings()[0] === 'Type');
-        Excel::assertDownloaded('honeybee-orders.xlsx', fn (HoneyBeeExport $export) => $export->headings()[0] === 'Order ID');
-        Excel::assertDownloaded('honeybee-staff.xlsx', fn (HoneyBeeExport $export) => $export->headings()[0] === 'Staff ID');
     }
 
     public function test_non_admin_cannot_export_or_manage_bulk_offers(): void

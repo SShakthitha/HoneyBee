@@ -281,7 +281,9 @@ function submitInquiry() {
     'Customization requirement: ' + message,
   ].filter(Boolean).join('\n');
 
-  window.open('https://wa.me/94766199881?text=' + encodeURIComponent(details), '_blank', 'noopener');
+  const whatsappNumber = window.honeyBeeContact?.whatsappNumber;
+  if (!whatsappNumber) return;
+  window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(details), '_blank', 'noopener');
 }
 
 /* ─── CLOSE MODALS ON OVERLAY CLICK ────────────────────── */

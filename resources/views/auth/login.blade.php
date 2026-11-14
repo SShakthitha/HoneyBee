@@ -2,7 +2,7 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form id="login-form" method="POST" action="{{ route('login') }}">
         @csrf
 
         <!-- Email Address -->
@@ -22,33 +22,38 @@
         </div>
 
         <!-- Password -->
-        <!-- Password -->
-<div class="mt-4">
-    <x-input-label for="password" :value="__('Password')" />
+        <div class="mt-4">
+            <x-input-label for="password" :value="__('Password')" />
 
-    <div class="relative">
-        <x-text-input id="password"
-                      class="block mt-1 w-full pr-10"
-                      type="password"
-                      name="password"
-                      required
-                      autocomplete="current-password" />
+            <div class="relative">
+                <x-text-input id="password"
+                              class="block mt-1 w-full pr-10"
+                              type="password"
+                              name="password"
+                              required
+                              autocomplete="current-password" />
 
-        <button type="button"
-                onclick="togglePassword('password', this)"
-                class="absolute right-3 top-3 text-gray-500 hover:text-amber-500">
-            <i class="fa-solid fa-eye"></i>
-        </button>
-    </div>
+                <button type="button"
+                        onclick="togglePassword('password', this)"
+                        aria-label="Show password"
+                        aria-controls="password"
+                        aria-pressed="false"
+                        class="absolute right-3 top-3 text-gray-500 hover:text-amber-500">
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                </button>
+            </div>
 
-    <x-input-error :messages="$errors->get('password')" class="mt-2" />
-</div>
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        </div>
 
 
         <!-- Login Button (Full Width) -->
         <div class="mt-6">
-            <x-primary-button class="w-full justify-center">
-                {{ __('Log in') }}
+            <x-primary-button id="login-submit" class="w-full justify-center">
+                <span id="login-submit-label">{{ __('Log in') }}</span>
+                <span id="login-loading" class="hidden" role="status" aria-live="polite">
+                    {{ __('Signing in…') }}
+                </span>
             </x-primary-button>
         </div>
 
@@ -93,17 +98,29 @@
 function togglePassword(fieldId, button) {
     const field = document.getElementById(fieldId);
     const icon = button.querySelector('i');
+    const isVisible = field.type === "password";
 
-    if (field.type === "password") {
+    if (isVisible) {
         field.type = "text";
         icon.classList.remove("fa-eye");
         icon.classList.add("fa-eye-slash");
+        button.setAttribute("aria-label", "Hide password");
+        button.setAttribute("aria-pressed", "true");
     } else {
         field.type = "password";
         icon.classList.remove("fa-eye-slash");
         icon.classList.add("fa-eye");
+        button.setAttribute("aria-label", "Show password");
+        button.setAttribute("aria-pressed", "false");
     }
 }
+
+document.getElementById('login-form').addEventListener('submit', function () {
+    const submitButton = document.getElementById('login-submit');
+    submitButton.disabled = true;
+    document.getElementById('login-submit-label').classList.add('hidden');
+    document.getElementById('login-loading').classList.remove('hidden');
+});
 </script>
     </form>
 </x-guest-layout>

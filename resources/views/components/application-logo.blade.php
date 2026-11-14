@@ -1,1 +1,1 @@
-<img src="{{ asset('images/logo.png') }}" alt="HoneyBee Shop" style="height: 200px; width: auto;">
+<img src="{{ asset('images/logo.webp') }}" alt="HoneyBee Shop" style="height: 200px; width: auto;">

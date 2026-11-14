@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Contact Us')
+@section('meta_description', 'Contact HoneyBee Gifts & Designs to ask about custom gifts, event styling, laser work, or an existing order.')
 
 @section('content')
 
@@ -24,12 +25,12 @@
                     </div>
                 @endif
 
-                <form action="/contact" method="POST">
+                <form action="{{ route('contact.send') }}" method="POST">
                     @csrf
 
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; margin-bottom: 8px; font-weight: bold;">Your Name *</label>
-                        <input type="text" name="name" required
+                        <input type="text" name="name" value="{{ old('name') }}" required
                             style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                         @error('name')
                             <p style="color: red; font-size: 13px; margin-top: 5px;">{{ $message }}</p>
@@ -38,7 +39,7 @@
 
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; margin-bottom: 8px; font-weight: bold;">Your Email *</label>
-                        <input type="email" name="email" required
+                        <input type="email" name="email" value="{{ old('email') }}" required
                             style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                         @error('email')
                             <p style="color: red; font-size: 13px; margin-top: 5px;">{{ $message }}</p>
@@ -47,7 +48,7 @@
 
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; margin-bottom: 8px; font-weight: bold;">Phone Number</label>
-                        <input type="text" name="phone"
+                        <input type="text" name="phone" value="{{ old('phone') }}"
                             style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                     </div>
 
@@ -55,7 +56,7 @@
                         <label style="display: block; margin-bottom: 8px; font-weight: bold;">Message *</label>
                         <textarea name="message" rows="5" required
                             style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;"
-                            placeholder="How can we help you?"></textarea>
+                            placeholder="How can we help you?">{{ old('message') }}</textarea>
                         @error('message')
                             <p style="color: red; font-size: 13px; margin-top: 5px;">{{ $message }}</p>
                         @enderror
@@ -79,7 +80,8 @@
                         <div style="font-size: 30px;">📱</div>
                         <div>
                             <p style="font-weight: bold; margin-bottom: 5px;">WhatsApp</p>
-                            <a href="https://wa.me/94717714267" target="_blank" style="color: #25D366; text-decoration: none;">+94 717 714 267</a>
+                            <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}" target="_blank" rel="noopener noreferrer" style="color: #25D366; text-decoration: none;">{{ config('honeybee.contact.phone_local') }}</a>
+                            <p class="mb-0"><a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">Call {{ config('honeybee.contact.phone_local') }}</a></p>
                         </div>
                     </div>
 
@@ -111,7 +113,7 @@
                 <!-- WHATSAPP DIRECT -->
                 <div style="background: #25D366; border-radius: 15px; padding: 30px; text-align: center;">
                     <p style="color: #fff; font-size: 18px; font-weight: bold; margin-bottom: 15px;">Chat with us directly!</p>
-                    <a href="https://wa.me/94717714267" target="_blank"
+                    <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}" target="_blank" rel="noopener noreferrer"
                         style="background: #fff; color: #25D366; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">
                         Open WhatsApp
                     </a>

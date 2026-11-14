@@ -3,17 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
-use App\Models\GalleryImage;
+use Illuminate\View\View;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(): View
     {
-        $services = Service::where('availability_status', 'available')
+        $services = Service::query()
+            ->with('business')
+            ->where('availability_status', 'available')
+            ->latest('service_id')
             ->paginate(12);
 
-        $galleryImages = GalleryImage::latest()->get();
+        return view('services.index', compact('services'));
+    }
 
-        return view('home', compact('services', 'galleryImages'));
+    public function show(int $id): View
+    {
+        $service = Service::query()
+            ->with('business')
+            ->where('availability_status', 'available')
+            ->findOrFail($id);
+
+        return view('services.show', compact('service'));
     }
 }

@@ -1,9 +1,13 @@
+@php
+  $whatsappNumber = config('honeybee.contact.whatsapp_number');
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Events - HoneyBee</title>
+  <meta name="description" content="Plan memorable celebrations with HoneyBee event decoration, styling, and custom event services.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +20,7 @@
 <header class="header" id="header">
   <div class="header-inner">
     <a class="logo-wrap" href="{{ route('home') }}">
-      <img src="{{ asset('images/logo.png') }}" alt="HoneyBee Gifts & Designs Logo" class="logo-img">
+      <img src="{{ asset('images/logo.webp') }}" alt="HoneyBee Gifts & Designs Logo" class="logo-img">
       <div class="logo-text"><span class="brand-name">HoneyBee<span class="accent"> Shop</span></span></div>
     </a>
     <nav class="nav" id="nav">
@@ -97,10 +101,16 @@
             $services ? 'Included options: ' . implode(', ', $services) : null,
             'My requirements: ',
           ])));
-          $whatsappUrl = 'https://wa.me/94766975438?text=' . $message;
+          $whatsappUrl = 'https://wa.me/' . $whatsappNumber . '?text=' . $message;
         @endphp
         <div class="event-card reveal visible" data-name="{{ strtolower($event->event_name . ' ' . $event->event_type . ' ' . $desc) }}">
-          <div class="event-card-img" style="background:linear-gradient(135deg,#f5a623,#ff6b6b)"><span><i class="fas fa-calendar-star"></i></span></div>
+          <div class="event-card-img">
+            @if($event->image)
+              <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->event_name }}" class="event-product-image" loading="lazy">
+            @else
+              <span class="event-image-placeholder" aria-label="No event image available"><i class="fas fa-calendar-star"></i></span>
+            @endif
+          </div>
           <div class="event-card-body">
             <span class="event-card-tag">{{ $event->event_type }}</span>
             <h3 class="event-card-name">{{ $event->event_name }}</h3>
@@ -124,26 +134,7 @@
           </div>
         </div>
       @empty
-        @foreach([
-          ['Birthday Party Events','Celebrations','Rs 3,500','Magical birthday setups from kids themes to milestone adult parties.','linear-gradient(135deg,#f5a623,#ff6b6b)','fa-cake-candles'],
-          ['Wedding Events','Weddings','Rs 25,000','Elegant wedding setups that transform any venue into a romantic setting.','linear-gradient(135deg,#c9a227,#e8d5a3)','fa-ring'],
-          ['Engagement Events','Milestones','Rs 15,000','Beautiful engagement setups to mark your journey together.','linear-gradient(135deg,#e91e8c,#ff9a9e)','fa-gem'],
-          ['Corporate Events','Business','Rs 30,000','Professional corporate event design for launches, meetings, and awards.','linear-gradient(135deg,#2c3e50,#3498db)','fa-briefcase'],
-        ] as $sample)
-          <div class="event-card reveal visible" data-name="{{ strtolower($sample[0] . ' ' . $sample[1] . ' ' . $sample[3]) }}">
-            <div class="event-card-img" style="background:{{ $sample[4] }}"><span><i class="fas {{ $sample[5] }}"></i></span></div>
-            <div class="event-card-body">
-              <span class="event-card-tag">{{ $sample[1] }}</span>
-              <h3 class="event-card-name">{{ $sample[0] }}</h3>
-              <div class="event-card-price">{{ $sample[2] }}</div>
-              <p class="event-card-desc">{{ $sample[3] }}</p>
-              <div class="event-card-actions">
-                <button class="btn-sm btn-sm-outline" onclick="openDetail(this)" type="button" data-title="{{ $sample[0] }}" data-tag="{{ $sample[1] }}" data-price="{{ $sample[2] }}" data-desc="{{ $sample[3] }}">View Details</button>
-                <button class="btn-sm btn-sm-fill" onclick="document.getElementById('inquiry').scrollIntoView({behavior:'smooth'})" type="button">Book Now</button>
-              </div>
-            </div>
-          </div>
-        @endforeach
+        <p class="catalog-empty">No events are listed yet. Please contact us to discuss your event requirements.</p>
       @endforelse
     </div>
     <p class="no-results" id="noResults" style="display:none">No event categories match your search. Try another keyword.</p>
@@ -187,7 +178,7 @@
         <span class="section-eyebrow">Get In Touch</span>
         <h2 class="section-title">Book Your Dream Event</h2>
         <p>Ready to make memories? Reach out and our team will get back to you as soon as possible.</p>
-        <div class="inquiry-actions"><button class="btn-primary" onclick="document.getElementById('inquiryForm').scrollIntoView({behavior:'smooth'})" type="button"><i class="fas fa-calendar-plus"></i> Book Event</button><a href="https://wa.me/94766975438?text=Hello%20HoneyBee%20Events!%20I%27d%20like%20to%20book%20an%20event." target="_blank" rel="noopener" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></div>
+        <div class="inquiry-actions"><button class="btn-primary" onclick="document.getElementById('inquiryForm').scrollIntoView({behavior:'smooth'})" type="button"><i class="fas fa-calendar-plus"></i> Book Event</button><a href="https://wa.me/{{ $whatsappNumber }}?text=Hello%20HoneyBee%20Events!%20I%27d%20like%20to%20book%20an%20event." target="_blank" rel="noopener noreferrer" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></div>
       </div>
       <form class="inquiry-form" id="inquiryForm" onsubmit="submitInquiry(event)">
         <h3>Send an Inquiry</h3>
@@ -205,10 +196,10 @@
 <section class="contact-section" id="contact">
   <div class="container">
     <div class="contact-grid">
-      <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone-alt"></i></div><h4>Phone</h4><p>+94 0766975438</p></div>
+      <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone-alt"></i></div><h4>Phone</h4><p><a href="tel:+{{ $whatsappNumber }}">{{ config('honeybee.contact.phone_local') }}</a></p></div>
       <div class="contact-item"><div class="contact-icon"><i class="fas fa-envelope"></i></div><h4>Email</h4><p>Honeybeeevents99@gmail.com</p></div>
       <div class="contact-item"><div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div><h4>Address</h4><p>190, Sir. Pom Ramanathan Road,<br>Thirunelvely, Jaffna</p></div>
-      <div class="contact-item"><div class="contact-icon"><i class="fas fa-share-alt"></i></div><h4>Follow Us</h4><div class="social-links d-flex flex-wrap justify-content-center gap-2"><a href="#" class="btn btn-outline-warning rounded-circle social-link social-facebook"><i class="fab fa-facebook-f"></i></a><a href="#" class="btn btn-outline-warning rounded-circle social-link social-instagram"><i class="fab fa-instagram"></i></a><a href="https://wa.me/94766975438" target="_blank" rel="noopener" class="btn btn-outline-warning rounded-circle social-link social-whatsapp"><i class="fab fa-whatsapp"></i></a></div></div>
+      <div class="contact-item"><div class="contact-icon"><i class="fas fa-share-alt"></i></div><h4>Follow Us</h4><div class="social-links d-flex flex-wrap justify-content-center gap-2"><a href="#" class="btn btn-outline-warning rounded-circle social-link social-facebook"><i class="fab fa-facebook-f"></i></a><a href="#" class="btn btn-outline-warning rounded-circle social-link social-instagram"><i class="fab fa-instagram"></i></a><a href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-warning rounded-circle social-link social-whatsapp"><i class="fab fa-whatsapp"></i></a></div></div>
     </div>
   </div>
 </section>
@@ -216,10 +207,10 @@
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
-      <div class="footer-brand"><img src="{{ asset('images/logo.png') }}" alt="HoneyBee" class="footer-logo"><p>Creating unforgettable event experiences across Jaffna District.</p></div>
+      <div class="footer-brand"><img src="{{ asset('images/logo.webp') }}" alt="HoneyBee" class="footer-logo"><p>Creating unforgettable event experiences across Jaffna District.</p></div>
       <div class="footer-links"><h5>Quick Links</h5><a href="#home">Home</a><a href="#events">Events</a><a href="#gallery">Gallery</a><a href="#inquiry">Book Event</a><a href="#contact">Contact</a></div>
       <div class="footer-links"><h5>Event Types</h5><a href="#events">Weddings</a><a href="#events">Birthdays</a><a href="#events">Corporate</a><a href="#events">Religious</a></div>
-      <div class="footer-contact"><h5>Contact Info</h5><ul style="list-style:none;padding:0;"><li><i class="fas fa-phone-alt"></i> +94 0766975438</li><li><i class="fas fa-envelope"></i> Honeybeeevents99@gmail.com</li><li><i class="fas fa-map-marker-alt"></i> Jaffna, Sri Lanka</li></ul></div>
+      <div class="footer-contact"><h5>Contact Info</h5><ul style="list-style:none;padding:0;"><li><i class="fas fa-phone-alt"></i> <a href="tel:+{{ $whatsappNumber }}">{{ config('honeybee.contact.phone_local') }}</a></li><li><i class="fas fa-envelope"></i> Honeybeeevents99@gmail.com</li><li><i class="fas fa-map-marker-alt"></i> Jaffna, Sri Lanka</li></ul></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2025 HoneyBee Gifts &amp; Designs. All rights reserved.</p></div>
   </div>
@@ -234,7 +225,7 @@
       <h2 id="detailName"></h2>
       <p class="detail-price" id="detailPrice"></p>
       <p id="detailDesc"></p>
-      <div class="detail-actions"><a id="detailWhatsApp" href="https://wa.me/94766975438" target="_blank" rel="noopener" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> Book via WhatsApp</a><button class="btn-primary" onclick="closeDetail(); document.getElementById('inquiry').scrollIntoView({behavior:'smooth'})" type="button">Book Now</button></div>
+      <div class="detail-actions"><a id="detailWhatsApp" href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> Book via WhatsApp</a><button class="btn-primary" onclick="closeDetail(); document.getElementById('inquiry').scrollIntoView({behavior:'smooth'})" type="button">Book Now</button></div>
     </div>
   </div>
 </div>
@@ -266,7 +257,7 @@ function openDetail(button) {
   document.getElementById('detailName').textContent = button.dataset.title;
   document.getElementById('detailPrice').textContent = button.dataset.price;
   document.getElementById('detailDesc').textContent = button.dataset.desc;
-  document.getElementById('detailWhatsApp').href = button.dataset.whatsapp || 'https://wa.me/94766975438';
+  document.getElementById('detailWhatsApp').href = button.dataset.whatsapp || 'https://wa.me/{{ $whatsappNumber }}';
   document.getElementById('detailOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -297,7 +288,7 @@ function submitInquiry(e) {
     requirements ? 'Requirements: ' + requirements : null,
   ].filter(Boolean).join('\n');
 
-  window.open('https://wa.me/94766975438?text=' + encodeURIComponent(message), '_blank', 'noopener');
+  window.open('https://wa.me/{{ $whatsappNumber }}?text=' + encodeURIComponent(message), '_blank', 'noopener');
 }
 function showToast(message) {
   const toast = document.getElementById('toast');

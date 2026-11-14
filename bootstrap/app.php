@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureCustomer;
 use App\Http\Middleware\EnsureManager;
 use App\Http\Middleware\EnsureOperationalStaff;
 use App\Http\Middleware\EnsureStaffAdmin;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'admin' => EnsureStaffAdmin::class,
+            'customer' => EnsureCustomer::class,
             'staff' => EnsureOperationalStaff::class,
             'manager' => EnsureManager::class,
         ]);

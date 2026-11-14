@@ -18,7 +18,9 @@ class EnsureManager
             return redirect()->route('login');
         }
 
-        abort_unless(Staff::where('email', $user->email)->where('role', 'manager')->exists(), 403);
+        $staffRole = Staff::where('email', $user->email)->value('role');
+
+        abort_unless(strtolower((string) $staffRole) === 'manager', 403);
 
         return $next($request);
     }

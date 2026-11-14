@@ -4,7 +4,7 @@
 
 'use strict';
 
-const WHATSAPP_NUMBER = '94767158873';
+const WHATSAPP_NUMBER = '94717714267';
 
 // ── Product data (mirrors the DOM for search) ──
 const PRODUCTS = [

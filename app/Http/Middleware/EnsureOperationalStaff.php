@@ -18,7 +18,9 @@ class EnsureOperationalStaff
             return redirect()->route('login');
         }
 
-        abort_unless(Staff::where('email', $user->email)->whereIn('role', ['staff', 'manager'])->exists(), 403);
+        $staffRole = strtolower((string) Staff::where('email', $user->email)->value('role'));
+
+        abort_unless(in_array($staffRole, ['staff', 'manager'], true), 403);
 
         return $next($request);
     }

@@ -86,14 +86,14 @@
             <div class="product-actions">
               <button
                   class="btn btn-cart-add"
-                  onclick="addToCart('{{ addslashes($gift->item_name) }}', {{ (float) $price }}, {{ $gift->gift_design_id }}, 'gift')"
+                  data-cart-product data-product-name="{{ $gift->item_name }}" data-product-price="{{ (float) $price }}" data-product-id="{{ $gift->gift_design_id }}" data-product-type="gift"
                   type="button">
                   Add
               </button>
-              <button class="btn btn-details" onclick="viewDetails('{{ addslashes($gift->item_name) }}')" type="button">Details</button>
-              <a class="btn btn-wa" href="https://wa.me/94767158873?text={{ $message }}" target="_blank" rel="noopener">WhatsApp</a>
+              <a class="btn btn-details" href="{{ route('gift.design.show', $gift->gift_design_id) }}">Details</a>
+              <a class="btn btn-wa" href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ $message }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             </div>
-            <p class="customization-prompt">Need Customization? <a href="https://wa.me/94767158873?text={{ $customizationMessage }}" target="_blank" rel="noopener">Discuss with Admin</a></p>
+            <p class="customization-prompt">Need Customization? <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ $customizationMessage }}" target="_blank" rel="noopener noreferrer">Discuss with HoneyBee</a></p>
           </div>
         </div>
       @empty
@@ -142,14 +142,14 @@
             <div class="product-actions">
               <button
                   class="btn btn-cart-add"
-                  onclick="addToCart('{{ addslashes($frame->item_name) }}', {{ (float) $price }}, {{ $frame->gift_design_id }}, 'frame')"
+                  data-cart-product data-product-name="{{ $frame->item_name }}" data-product-price="{{ (float) $price }}" data-product-id="{{ $frame->gift_design_id }}" data-product-type="frame"
                   type="button">
                   Add
               </button>
-              <button class="btn btn-details" onclick="viewDetails('{{ addslashes($frame->item_name) }}')" type="button">Details</button>
-              <a class="btn btn-wa" href="https://wa.me/94767158873?text={{ $message }}" target="_blank" rel="noopener">WhatsApp</a>
+              <a class="btn btn-details" href="{{ route('gift.design.show', $frame->gift_design_id) }}">Details</a>
+              <a class="btn btn-wa" href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ $message }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             </div>
-            <p class="customization-prompt">Need Customization? <a href="https://wa.me/94767158873?text={{ $customizationMessage }}" target="_blank" rel="noopener">Discuss with Admin</a></p>
+            <p class="customization-prompt">Need Customization? <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ $customizationMessage }}" target="_blank" rel="noopener noreferrer">Discuss with HoneyBee</a></p>
           </div>
         </div>
       @empty
@@ -229,10 +229,10 @@
       <h2 class="section-title">Contact Gift and Design</h2>
     </div>
     <div class="contact-grid">
-      <div class="contact-item"><h4>Phone</h4><p>+94 767158873</p><p>+94 707159988</p></div>
+      <div class="contact-item"><h4>Phone</h4><p><a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">{{ config('honeybee.contact.phone_local') }}</a></p></div>
       <div class="contact-item"><h4>Email</h4><p><a href="mailto:Hoheybeedestgns99@gmail.com">Hoheybeedestgns99@gmail.com</a></p></div>
       <div class="contact-item"><h4>Address</h4><p>190, Sir. Pom Ramanathan Road,<br>Thirunelvely, Jaffna</p></div>
-      <div class="contact-item"><h4>Social Media</h4><div class="social-links"><a href="#" class="social-icon social-facebook"><i class="bi bi-facebook"></i></a><a href="#" class="social-icon social-instagram"><i class="bi bi-instagram"></i></a><a href="https://wa.me/94767158873" class="social-icon social-whatsapp" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a></div></div>
+      <div class="contact-item"><h4>Social Media</h4><div class="social-links"><a href="#" class="social-icon social-facebook"><i class="bi bi-facebook"></i></a><a href="#" class="social-icon social-instagram"><i class="bi bi-instagram"></i></a><a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}" class="social-icon social-whatsapp" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp"></i></a></div></div>
     </div>
   </div>
 </section>
@@ -248,12 +248,13 @@
         <button class="btn btn-whatsapp" onclick="whatsappOrder('General Inquiry')" type="button">WhatsApp Us</button>
       </div>
     </div>
-    <form class="inquiry-form" id="inquiry-form" onsubmit="submitForm(event)">
+    <form class="inquiry-form" id="inquiry-form" method="POST" action="{{ route('gift.enquiry') }}">
+      @csrf
       <h3>Send an Enquiry</h3>
-      <div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" required></div><div class="form-group"><label>Phone / WhatsApp</label><input type="tel" required></div></div>
-      <div class="form-group"><label>Email Address</label><input type="email"></div>
-      <div class="form-group"><label>Product / Service</label><select id="inquiry-product">@foreach($gifts as $gift)<option>{{ $gift->item_name }}</option>@endforeach @foreach($frames as $frame)<option>{{ $frame->item_name }}</option>@endforeach<option>Customized Gifts</option><option>Custom Frame Work</option></select></div>
-      <div class="form-group"><label>Message</label><textarea rows="4" placeholder="Tell us what you need..."></textarea></div>
+      <div class="form-row"><div class="form-group"><label for="gift-enquiry-name">Full Name</label><input id="gift-enquiry-name" type="text" name="name" maxlength="255" required></div><div class="form-group"><label for="gift-enquiry-phone">Phone / WhatsApp</label><input id="gift-enquiry-phone" type="tel" name="phone" maxlength="30" required></div></div>
+      <div class="form-group"><label for="gift-enquiry-email">Email Address</label><input id="gift-enquiry-email" type="email" name="email" maxlength="255"></div>
+      <div class="form-group"><label for="inquiry-product">Product / Service</label><select id="inquiry-product" name="product">@foreach($gifts as $gift)<option>{{ $gift->item_name }}</option>@endforeach @foreach($frames as $frame)<option>{{ $frame->item_name }}</option>@endforeach<option>Customized Gifts</option><option>Custom Frame Work</option></select></div>
+      <div class="form-group"><label for="gift-enquiry-message">Message</label><textarea id="gift-enquiry-message" name="message" rows="4" maxlength="2000" placeholder="Tell us what you need..."></textarea></div>
       <button type="submit" class="btn btn-primary btn-full">Send Enquiry</button>
     </form>
   </div>
@@ -271,7 +272,7 @@
 <div class="toast" id="toast"></div>
 
 @push('scripts')
-<script>window.honeyBeeCheckoutUrl = @json(request()->getBaseUrl() . '/checkout');</script>
+<script>window.honeyBeeCheckoutUrl = @json(request()->getBaseUrl() . '/checkout'); window.honeyBeeContact = { whatsappNumber: @json(config('honeybee.contact.whatsapp_number')) };</script>
 <script src="{{ request()->getBaseUrl() }}/js/gift-design.js"></script>
 @endpush
 

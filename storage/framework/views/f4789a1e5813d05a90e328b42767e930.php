@@ -75,6 +75,29 @@
             font-weight: bold;
         }
 
+        .sidebar ul li form button.sidebar-logout {
+            color: var(--admin-accent);
+            text-decoration: none;
+            font-size: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            text-align: left;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .sidebar ul li form button.sidebar-logout:hover {
+            background: #333;
+            color: var(--admin-accent);
+        }
+
         .main-content {
             margin-left: 250px;
             padding: 40px;
@@ -174,40 +197,89 @@
 
         @media (max-width: 900px) {
             body { display: block; }
+            .admin-mobile-bar { display:flex; position:sticky; top:0; z-index:30; align-items:center; gap:12px; padding:12px 16px; background:var(--admin-dark); color:#fff; }
+            .admin-mobile-bar button { border:1px solid rgba(255,255,255,.3); background:transparent; color:#fff; border-radius:7px; padding:7px 10px; }
             .sidebar {
-                position: static;
-                width: 100%;
-                min-height: auto;
+                position: fixed;
+                width: min(280px, 85vw);
+                min-height: 100vh;
+                transform: translateX(-105%);
+                transition: transform .2s ease;
+                overflow-y: auto;
+                box-shadow: 8px 0 24px rgba(0,0,0,.25);
             }
+            body.admin-sidebar-open .sidebar { transform:translateX(0); }
+            .admin-nav-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:15; }
+            body.admin-sidebar-open .admin-nav-overlay { display:block; }
             .main-content {
                 margin-left: 0;
                 max-width: 100%;
-                padding: 24px;
+                padding: 20px 14px;
             }
             .topbar {
                 align-items: flex-start;
                 flex-direction: column;
             }
+            .admin-card-body { padding:16px; }
+            .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_length { margin-bottom:10px; }
         }
+        @media (min-width: 901px) { .admin-mobile-bar, .admin-nav-overlay { display:none; } }
     </style>
+    <link href="<?php echo e(asset('css/responsive.css')); ?>" rel="stylesheet">
+    <link href="<?php echo e(asset('css/sidebar-dropdown.css')); ?>" rel="stylesheet">
 </head>
 <body>
-    <div class="sidebar">
+    <div class="admin-mobile-bar"><button type="button" id="admin-menu-toggle" aria-controls="admin-sidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i> Menu</button><strong>HoneyBee Admin</strong></div>
+    <div class="admin-nav-overlay" id="admin-nav-overlay"></div>
+    <div class="sidebar" id="admin-sidebar">
         <div class="logo">
-            <img src="<?php echo e(asset('images/logo.png')); ?>" alt="HoneyBee">
+            <img src="<?php echo e(asset('images/logo.webp')); ?>" alt="HoneyBee">
         </div>
         <ul>
+            <?php ($servicesOpen = request()->is('admin/services*') || request()->is('admin/service-records*') || request()->is('admin/gift*') || request()->is('admin/laser*') || request()->is('admin/event*')); ?>
             <li><a href="/admin" class="<?php echo e(request()->is('admin') ? 'active' : ''); ?>"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
             <li><a href="<?php echo e(route('admin.businesses')); ?>" class="<?php echo e(request()->is('admin/businesses*') ? 'active' : ''); ?>"><i class="fa-solid fa-building"></i> Business</a></li>
-            <li><a href="/admin/services" class="<?php echo e(request()->is('admin/services') || request()->is('admin/gift*') || request()->is('admin/laser*') || request()->is('admin/event*') ? 'active' : ''); ?>"><i class="fa-solid fa-box-open"></i> Services</a></li>
+            <li>
+                <details class="sidebar-services" <?php echo e($servicesOpen ? 'open' : ''); ?>>
+                    <summary><i class="fa-solid fa-box-open"></i> Services <i class="fa-solid fa-chevron-down caret"></i></summary>
+                    <ul>
+                        <li><a href="<?php echo e(route('admin.services.gift')); ?>" class="<?php echo e(request()->is('admin/services/gift-design') || request()->is('admin/gift*') ? 'active' : ''); ?>"><i class="fa-solid fa-gift"></i> Gift &amp; Design</a></li>
+                        <li><a href="<?php echo e(route('admin.services.events')); ?>" class="<?php echo e(request()->is('admin/services/events') || request()->is('admin/event*') ? 'active' : ''); ?>"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
+                        <li><a href="<?php echo e(route('admin.services.laser')); ?>" class="<?php echo e(request()->is('admin/services/laser-work') || request()->is('admin/laser*') ? 'active' : ''); ?>"><i class="fa-solid fa-wand-magic-sparkles"></i> Laser Work</a></li>
+                        <li><a href="<?php echo e(route('admin.service-records.index')); ?>" class="<?php echo e(request()->is('admin/service-records*') ? 'active' : ''); ?>"><i class="fa-solid fa-list-check"></i> Bookable Services</a></li>
+                    </ul>
+                </details>
+            </li>
             <li><a href="/admin/orders" class="<?php echo e(request()->is('admin/orders') ? 'active' : ''); ?>"><i class="fa-solid fa-receipt"></i> Orders</a></li>
             <li><a href="/admin/customers" class="<?php echo e(request()->is('admin/customers*') ? 'active' : ''); ?>"><i class="fa-solid fa-users"></i> Customers</a></li>
+            <li><a href="<?php echo e(route('admin.promotions.index')); ?>" class="<?php echo e(request()->is('admin/promotions*') ? 'active' : ''); ?>"><i class="fa-solid fa-bullhorn"></i> Promotions</a></li>
+            <li><a href="<?php echo e(route('admin.settings.whatsapp.edit')); ?>" class="<?php echo e(request()->is('admin/settings/whatsapp') ? 'active' : ''); ?>"><i class="fa-brands fa-whatsapp"></i> WhatsApp Settings</a></li>
             <li><a href="/admin/staff" class="<?php echo e(request()->is('admin/staff*') ? 'active' : ''); ?>"><i class="fa-solid fa-user-tie"></i> Staff</a></li>
+            <li>
+                <a href="<?php echo e(route('admin.gallery.index')); ?>"
+                    class="<?php echo e(request()->is('admin/gallery*') ? 'active' : ''); ?>">
+                    <i class="fa-solid fa-images"></i>
+                    Gallery
+                </a>
+            </li>
             <li style="margin-top: 30px;"><a href="/" style="color: #f5a623;"><i class="fa-solid fa-globe"></i> View Website</a></li>
+            <li><form method="POST" action="<?php echo e(route('logout')); ?>"><?php echo csrf_field(); ?><button class="sidebar-logout" type="submit"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></form></li>
         </ul>
     </div>
 
     <main class="main-content">
+        <?php if(session('success')): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php echo e(session('success')); ?>
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+        <?php if($errors->any()): ?>
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0"><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><li><?php echo e($error); ?></li><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></ul>
+            </div>
+        <?php endif; ?>
         <?php echo $__env->yieldContent('content'); ?>
     </main>
 
@@ -217,6 +289,12 @@
     <script src="<?php echo e(asset('vendor/datatables/dataTables.bootstrap5.min.js')); ?>"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('admin-menu-toggle');
+            const overlay = document.getElementById('admin-nav-overlay');
+            const closeMenu = () => { document.body.classList.remove('admin-sidebar-open'); toggle?.setAttribute('aria-expanded', 'false'); };
+            toggle?.addEventListener('click', () => { const open = document.body.classList.toggle('admin-sidebar-open'); toggle.setAttribute('aria-expanded', String(open)); });
+            overlay?.addEventListener('click', closeMenu);
+            document.querySelectorAll('#admin-sidebar a').forEach(link => link.addEventListener('click', closeMenu));
             document.querySelectorAll('table.admin-datatable').forEach(function (table) {
                 new DataTable(table, {
                     pageLength: 10,

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Home')
+@section('meta_description', 'Shop handcrafted gifts, custom designs, laser work, and event services from HoneyBee Gifts & Designs.')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
@@ -69,5 +70,5 @@
 @endsection
 
 @section('homepage-footer')
-<footer class="hb-original-footer"><div class="container"><div class="hb-original-footer__inner"><div class="hb-original-footer__brand"><div><img src="{{ asset('images/logo.png') }}" alt="HoneyBee Logo"><span>Honey<span>Bee</span></span></div><p>Gifts, events &amp; laser work crafted with care — bringing your ideas to life, one detail at a time.</p></div><div><h3>Explore</h3><a href="{{ route('home') }}">Home</a><a href="{{ route('gift.design') }}">Gift &amp; Design</a><a href="{{ route('events') }}">Events</a><a href="{{ route('laser.work') }}">Laser Work</a></div><div><h3>Company</h3><a href="#offers">Offers</a><a href="#gallery">Gallery</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div><div><h3>Contact</h3><a href="{{ route('contact') }}"><i class="bi bi-envelope"></i> Send an enquiry</a><a href="{{ route('contact') }}"><i class="bi bi-chat-dots"></i> Message HoneyBee</a></div></div><p class="hb-original-footer__bottom">&copy; {{ now()->year }} HoneyBee Gifts <span>&amp;</span> Designs. All rights reserved.</p></div></footer>
+<footer class="hb-original-footer"><div class="container"><div class="hb-original-footer__inner"><div class="hb-original-footer__brand"><div><img src="{{ asset('images/logo.webp') }}" alt="HoneyBee Logo"><span>Honey<span>Bee</span></span></div><p>Gifts, events &amp; laser work crafted with care — bringing your ideas to life, one detail at a time.</p></div><div><h3>Explore</h3><a href="{{ route('home') }}">Home</a><a href="{{ route('gift.design') }}">Gift &amp; Design</a><a href="{{ route('events') }}">Events</a><a href="{{ route('laser.work') }}">Laser Work</a></div><div><h3>Company</h3><a href="#offers">Offers</a><a href="#gallery">Gallery</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div><div><h3>Contact</h3><a href="{{ route('contact') }}"><i class="bi bi-envelope"></i> Send an enquiry</a><a href="{{ route('contact') }}"><i class="bi bi-chat-dots"></i> Message HoneyBee</a></div></div><p class="hb-original-footer__bottom">&copy; {{ now()->year }} HoneyBee Gifts <span>&amp;</span> Designs. All rights reserved.</p></div></footer>
 @endsection

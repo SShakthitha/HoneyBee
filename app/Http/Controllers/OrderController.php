@@ -10,6 +10,7 @@ use App\Models\Service;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -76,30 +77,51 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        $serviceId = $request->validate([
+            'service_id' => ['required', 'integer', 'exists:services,service_id'],
+        ])['service_id'];
+
+        $service = Service::query()
+            ->where('availability_status', 'available')
+            ->findOrFail($serviceId);
+
+        $totalCents = $this->amountInCents($service->price);
         $validated = $request->validate([
-            'service_id' => 'required|exists:services,service_id',
-            'payment_method' => 'required',
-            'paid_amount' => 'required|numeric|min:0',
+            'payment_method' => ['required', Rule::in(['cash', 'bank_transfer', 'card'])],
+            'delivery_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'attribute' => ['nullable', 'string', 'max:5000'],
         ]);
 
         $customer = Customer::where('email', $request->user()->email)
             ->firstOrFail();
 
-        $order = Order::create([
+        $order = DB::transaction(fn () => Order::create([
             'customer_id' => $customer->customer_id,
-            'service_id' => $validated['service_id'],
+            'service_id' => $service->service_id,
             'order_date' => now(),
-            'paid_amount' => $validated['paid_amount'],
-            'advanced_paid' => $request->advanced_paid ?? 0,
-            'discount' => $request->discount ?? 0,
-            'payment_method' => $request->payment_method,
+            'paid_amount' => $this->centsToAmount($totalCents),
+            'advanced_paid' => '0.00',
+            'discount' => '0.00',
+            'payment_method' => $validated['payment_method'],
             'status' => 'pending',
-            'delivery_date' => $request->delivery_date,
-            'attribute' => $request->attribute,
-        ]);
+            'delivery_date' => $validated['delivery_date'] ?? null,
+            'attribute' => $validated['attribute'] ?? null,
+        ]));
 
         return redirect('/orders')
             ->with('success', 'Order placed successfully!');
+    }
+
+    private function amountInCents(mixed $amount): int
+    {
+        [$whole, $fraction] = array_pad(explode('.', (string) $amount, 2), 2, '');
+
+        return ((int) $whole * 100) + (int) str_pad(substr($fraction, 0, 2), 2, '0');
+    }
+
+    private function centsToAmount(int $cents): string
+    {
+        return intdiv($cents, 100).'.'.str_pad((string) ($cents % 100), 2, '0', STR_PAD_LEFT);
     }
 
     /*

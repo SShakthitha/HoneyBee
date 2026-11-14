@@ -9,6 +9,8 @@ input, select, textarea, button { max-width: 100%; }
 .dataTables_wrapper { max-width: 100%; }
 .dataTables_wrapper .dataTables_scroll, .dataTables_wrapper .dataTables_scrollBody { max-width: 100%; }
 .dataTables_wrapper table { width: 100% !important; }
+.main-content .dt-container { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.main-content .dt-container table { min-width: max-content; }
 .dataTables_wrapper .dataTables_filter input, .dataTables_wrapper .dataTables_length select { max-width: 100%; }
 .mobile-account-link { display: none; }
 

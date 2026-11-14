@@ -14,7 +14,8 @@
             @method('PUT')
             <div class="mb-4">
                 <label class="form-label" for="order_number">WhatsApp Order Number</label>
-                <input class="form-control @error('order_number') is-invalid @enderror" id="order_number" name="order_number" type="tel" inputmode="tel" value="{{ old('order_number', '+' . $settings->order_number) }}" placeholder="+94767158873" required>
+                <input class="form-control @error('order_number') is-invalid @enderror" id="order_number" name="order_number" type="tel" inputmode="tel" value="{{ old('order_number', config('honeybee.contact.phone_international')) }}" readonly aria-readonly="true" required>
+                <div class="form-text">HoneyBee’s customer contact number is fixed by the application contact configuration.</div>
                 <div class="form-text">Use an international number. Spaces, hyphens and parentheses are removed when saved.</div>
                 @error('order_number')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>

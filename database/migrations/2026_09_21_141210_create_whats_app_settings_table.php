@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -22,7 +22,7 @@ return new class extends Migration
 
         DB::table('whats_app_settings')->insert([
             'singleton_key' => true,
-            'order_number' => '94767158873',
+            'order_number' => '94717714267',
             'message_template' => "Hello HoneyBee Shop,\n\nI would like to place an order.\n\nOrder ID: #{order_id}\n\nCustomer: {customer_name}\n\nItems:\n{items}\n\nTotal: Rs. {total}\n\nThank you.",
             'created_at' => now(),
             'updated_at' => now(),

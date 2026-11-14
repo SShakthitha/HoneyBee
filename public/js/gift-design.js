@@ -4,7 +4,9 @@ function loadCart() {
   try {
     const storedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
     return Array.isArray(storedCart)
-      ? storedCart.filter(item => item && typeof item.name === 'string' && Number.isFinite(Number(item.price)))
+      ? storedCart
+        .filter(item => item && typeof item.name === 'string' && Number.isFinite(Number(item.price)))
+        .map(item => ({ ...item, price: Number(item.price) }))
       : [];
   } catch (error) {
     return [];
@@ -44,15 +46,25 @@ function updateCart() {
     return;
   }
 
-  items.innerHTML = cart.map((item, index) => `
-    <div class="cart-item">
-      <div>
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">${formatPrice(item.price)}</div>
-      </div>
-      <button class="cart-item-remove" onclick="removeFromCart(${index})" type="button">Remove</button>
-    </div>
-  `).join('');
+  items.replaceChildren(...cart.map((item, index) => {
+    const row = document.createElement('div');
+    row.className = 'cart-item';
+    const details = document.createElement('div');
+    const name = document.createElement('div');
+    name.className = 'cart-item-name';
+    name.textContent = item.name;
+    const price = document.createElement('div');
+    price.className = 'cart-item-price';
+    price.textContent = formatPrice(item.price);
+    details.append(name, price);
+    const remove = document.createElement('button');
+    remove.className = 'cart-item-remove';
+    remove.type = 'button';
+    remove.textContent = 'Remove';
+    remove.addEventListener('click', () => removeFromCart(index));
+    row.append(details, remove);
+    return row;
+  }));
 }
 
 function addToCart(name, price, itemId, itemType) {
@@ -89,7 +101,9 @@ function proceedToCheckout() {
 
 function whatsappOrder(name) {
   const text = encodeURIComponent('Hello HoneyBee Gift and Design, I am interested in ' + name + '.');
-  window.open('https://wa.me/94767158873?text=' + text, '_blank');
+  const number = window.honeyBeeContact?.whatsappNumber;
+  if (!number) return;
+  window.open('https://wa.me/' + number + '?text=' + text, '_blank', 'noopener');
 }
 
 function requestCustomFrame() {
@@ -98,7 +112,7 @@ function requestCustomFrame() {
   document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' });
 }
 
-function viewDetails(name) {
+function viewDetails(name, description = '') {
   const modal = document.getElementById('detail-modal');
   const overlay = document.getElementById('detail-overlay');
   const title = document.getElementById('detail-title');
@@ -106,7 +120,7 @@ function viewDetails(name) {
   const button = document.getElementById('detail-wa');
 
   if (title) title.textContent = name;
-  if (body) body.textContent = 'Custom made with your preferred colors, text, photos, size, and material. Contact us to confirm the final design and price.';
+  if (body) body.textContent = description || 'Contact HoneyBee to discuss this product and any customization options.';
   if (button) button.onclick = () => whatsappOrder(name);
 
   overlay?.classList.add('visible');
@@ -145,11 +159,18 @@ function searchProducts() {
     : '<div class="search-result-item">No matching items found.</div>';
 }
 
-function submitForm(event) {
-  event.preventDefault();
-  showToast('Enquiry sent. We will contact you soon.');
-  event.target.reset();
-}
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-cart-product], [data-detail-product]');
+  if (!button) return;
+
+  const name = button.dataset.productName || '';
+  const price = Number(button.dataset.productPrice || 0);
+  const id = button.dataset.productId;
+  const type = button.dataset.productType;
+
+  if (button.hasAttribute('data-cart-product')) addToCart(name, price, id, type);
+  else viewDetails(name, button.dataset.productDescription || '');
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   updateCart();

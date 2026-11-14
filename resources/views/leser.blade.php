@@ -16,7 +16,7 @@
   <header class="header" id="header">
     <div class="header-inner container">
       <a href="#home" class="brand">
-        <img src="{{ asset('images/logo.png') }}" alt="Laser Works Logo" class="brand-logo" />
+        <img src="{{ asset('images/logo.webp') }}" alt="Laser Works Logo" class="brand-logo" />
         <span class="brand-name">Laser<span class="accent"> Works</span></span>
       </a>
       <nav class="nav" id="nav">
@@ -348,7 +348,7 @@
             <button class="btn btn-primary" onclick="scrollToForm()">
               <i class="fas fa-file-alt"></i> Order Now
             </button>
-            <a href="https://wa.me/94771234567?text=Hello%2C%20I%27m%20interested%20in%20Laser%20Works%20products!" target="_blank" class="btn btn-whatsapp">
+            <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text=Hello%2C%20I%27m%20interested%20in%20Laser%20Works%20products!" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
               <i class="fab fa-whatsapp"></i> WhatsApp Inquiry
             </a>
           </div>
@@ -410,7 +410,7 @@
         <div class="contact-item">
           <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
           <h4>Phone</h4>
-          <p>+94 0766199881</p>
+          <p><a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">{{ config('honeybee.contact.phone_local') }}</a></p>
         </div>
         <div class="contact-item">
           <div class="contact-icon"><i class="fas fa-envelope"></i></div>
@@ -471,7 +471,7 @@
       <div class="footer-col">
         <h5>Contact Info</h5>
         <ul class="footer-contact">
-          <li><i class="fas fa-phone-alt"></i> +94 0766199881</li>
+          <li><i class="fas fa-phone-alt"></i> <a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">{{ config('honeybee.contact.phone_local') }}</a></li>
           <li><i class="fas fa-envelope"></i> Honey beelaserworks @gmail.com.</li>
           <li><i class="fas fa-map-marker-alt"></i> 190, Sir. Pom Ramanathan Road,Thirunelvely,Jaffna</li>
         </ul>
@@ -487,6 +487,7 @@
   <!-- ===== TOAST ===== -->
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
+  <script>window.honeyBeeContact = { whatsappNumber: @json(config('honeybee.contact.whatsapp_number')) };</script>
   <script src="{{ asset('js/leser.js') }}"></script>
 </body>
 </html>

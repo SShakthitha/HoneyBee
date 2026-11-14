@@ -6,7 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>HoneyBee - Account</title>
+    <meta name="description" content="Sign in or create your HoneyBee Gifts & Designs account to manage orders and discover handcrafted gifts and services.">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

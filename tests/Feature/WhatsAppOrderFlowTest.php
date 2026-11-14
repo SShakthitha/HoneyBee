@@ -39,12 +39,12 @@ class WhatsAppOrderFlowTest extends TestCase
             ->assertOk()->assertSee('WhatsApp Order Settings');
 
         $this->actingAs($admin)->put(route('admin.settings.whatsapp.update'), [
-            'order_number' => '+94 76-715 8873',
+            'order_number' => config('honeybee.contact.phone_international'),
             'message_template' => 'Order #{order_id}: {customer_name} {items} Rs. {total}',
         ])->assertRedirect(route('admin.settings.whatsapp.edit'));
 
         $this->assertDatabaseHas('whats_app_settings', [
-            'order_number' => '94767158873',
+            'order_number' => config('honeybee.contact.whatsapp_number'),
             'message_template' => 'Order #{order_id}: {customer_name} {items} Rs. {total}',
         ]);
     }
@@ -69,6 +69,10 @@ class WhatsAppOrderFlowTest extends TestCase
         $this->actingAs($admin)->from(route('admin.settings.whatsapp.edit'))->put(route('admin.settings.whatsapp.update'), [
             'order_number' => '94767158873', 'message_template' => 'Hello {unknown}',
         ])->assertSessionHasErrors('message_template');
+
+        $this->actingAs($admin)->from(route('admin.settings.whatsapp.edit'))->put(route('admin.settings.whatsapp.update'), [
+            'order_number' => '94771234567', 'message_template' => 'Hello {order_id}',
+        ])->assertSessionHasErrors('order_number');
     }
 
     public function test_order_is_committed_before_its_owner_can_view_confirmation(): void
@@ -108,7 +112,7 @@ class WhatsAppOrderFlowTest extends TestCase
         $this->assertDatabaseCount('order_items', 0);
     }
 
-    public function test_message_builder_uses_configured_number_replaces_placeholders_and_encodes_url(): void
+    public function test_message_builder_uses_official_number_replaces_placeholders_and_encodes_url(): void
     {
         $user = $this->customer();
         $order = Order::create(['customer_id' => Customer::where('email', $user->email)->value('customer_id'), 'order_date' => now(), 'paid_amount' => 7500]);
@@ -125,17 +129,17 @@ class WhatsAppOrderFlowTest extends TestCase
         $this->assertStringContainsString('Gift & Box × 2 — Rs. 7500', $message);
         $this->assertStringContainsString('Total: 7500', $message);
         $this->assertStringNotContainsString('{items}', $message);
-        $this->assertStringStartsWith('https://wa.me/94770000000?text=', $url);
+        $this->assertStringStartsWith('https://wa.me/94717714267?text=', $url);
         $this->assertStringContainsString('Gift%20%26%20Box', $url);
     }
 
-    public function test_missing_whatsapp_setting_does_not_prevent_order_confirmation(): void
+    public function test_missing_whatsapp_setting_does_not_prevent_order_confirmation_or_contact_action(): void
     {
         $customer = $this->customer();
         $order = Order::create(['customer_id' => Customer::where('email', $customer->email)->value('customer_id'), 'order_date' => now()]);
         WhatsAppSetting::query()->delete();
 
         $this->actingAs($customer)->get(route('checkout.confirmation', $order))
-            ->assertOk()->assertSee('WhatsApp ordering is currently unavailable');
+            ->assertOk()->assertSee('https://wa.me/94717714267');
     }
 }

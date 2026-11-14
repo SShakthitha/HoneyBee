@@ -8,6 +8,7 @@ use App\Models\GiftDesign;
 use App\Models\LaserWork;
 use App\Models\Order;
 use App\Models\Staff;
+use App\Services\OrderPaymentRecorder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -55,9 +56,47 @@ class StaffDashboardController extends Controller
         return redirect()->route('staff.orders.show', $order->order_id)->with('success', 'Order status updated.');
     }
 
-    public function products()
+    public function updateOrderPayment(Request $request, int $id, OrderPaymentRecorder $paymentRecorder)
     {
-        return view('staff.products', ['gifts' => GiftDesign::latest()->get(), 'lasers' => LaserWork::latest()->get(), 'events' => Event::latest()->get()]);
+        $order = Order::findOrFail($id);
+        $validated = $request->validate([
+            'advanced_paid' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
+        ]);
+
+        $paymentRecorder->recordConfirmedAdvance($order, (string) $validated['advanced_paid']);
+
+        return redirect()->route('staff.orders.show', $order->order_id)->with('success', 'Confirmed advance payment updated.');
+    }
+
+    public function products(?string $type = null)
+    {
+        abort_if($type !== null && ! in_array($type, ['gift', 'laser', 'event'], true), 404);
+
+        $definitions = [
+            'gift' => ['title' => 'Gift & Design', 'model' => GiftDesign::class, 'name' => 'item_name', 'category' => 'category', 'key' => 'gift_design_id'],
+            'laser' => ['title' => 'Laser Work', 'model' => LaserWork::class, 'name' => 'product_name', 'category' => 'product_category', 'key' => 'laser_id'],
+            'event' => ['title' => 'Events', 'model' => Event::class, 'name' => 'event_name', 'category' => 'event_type', 'key' => 'event_id'],
+        ];
+        $sections = [];
+
+        foreach ($definitions as $sectionType => $definition) {
+            if ($type !== null && $sectionType !== $type) {
+                continue;
+            }
+
+            $model = $definition['model'];
+            $sections[$sectionType] = $definition + ['items' => $model::latest()->get()];
+            unset($sections[$sectionType]['model']);
+        }
+
+        return view('staff.products', compact('sections', 'type'));
+    }
+
+    public function showProduct(string $type, $id)
+    {
+        abort_unless(in_array($type, ['gift', 'laser', 'event'], true), 404);
+
+        return view('staff.product-show', compact('type') + ['model' => $this->product($type, $id)]);
     }
 
     public function productForm($type, $id = null)
@@ -77,18 +116,35 @@ class StaffDashboardController extends Controller
         // keeps the existing public-disk image path intact.
         unset($data['image']);
         $attributes = $this->productAttributes($request, $type, $data);
+        $previousImage = $model?->image;
+        $newImage = null;
 
         if ($request->hasFile('image')) {
-            if ($model?->image && Storage::disk('public')->exists($model->image)) {
-                Storage::disk('public')->delete($model->image);
+            $newImage = $request->file('image')->store($type === 'gift' ? 'gifts' : $type, 'public');
+            if (! $newImage) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
             }
-            $attributes['image'] = $request->file('image')->store($type === 'gift' ? 'gifts' : $type, 'public');
+            $attributes['image'] = $newImage;
         }
 
         $class = ['gift' => GiftDesign::class, 'laser' => LaserWork::class, 'event' => Event::class][$type];
-        $model ? $model->update($attributes) : $class::create($attributes);
+        if ($model) {
+            if (! $model->update($attributes)) {
+                if ($newImage) {
+                    Storage::disk('public')->delete($newImage);
+                }
 
-        return redirect()->route('staff.products.index')->with('success', ucfirst($type).' item saved successfully.');
+                return back()->withErrors(['product' => 'The product could not be saved.'])->withInput();
+            }
+        } else {
+            $model = $class::create($attributes);
+        }
+
+        if ($newImage && $previousImage && $previousImage !== $newImage && Storage::disk('public')->exists($previousImage)) {
+            Storage::disk('public')->delete($previousImage);
+        }
+
+        return redirect()->route('staff.products.category', $type)->with('success', ucfirst($type).' item saved successfully.');
     }
 
     public function deleteProduct($type, $id)
@@ -99,7 +155,7 @@ class StaffDashboardController extends Controller
         }
         $model->delete();
 
-        return redirect()->route('staff.products.index')->with('success', 'Product deleted.');
+        return redirect()->route('staff.products.category', $type)->with('success', 'Product deleted.');
     }
 
     public function gallery()

@@ -24,21 +24,6 @@ class Service extends Model
         return $this->belongsTo(Business::class, 'business_id');
     }
 
-    public function giftDesign()
-    {
-        return $this->hasOne(GiftDesign::class, 'service_id');
-    }
-
-    public function laserWork()
-    {
-        return $this->hasOne(LaserWork::class, 'service_id');
-    }
-
-    public function event()
-    {
-        return $this->hasOne(Event::class, 'service_id');
-    }
-
     public function orders()
     {
         return $this->hasMany(Order::class, 'service_id');

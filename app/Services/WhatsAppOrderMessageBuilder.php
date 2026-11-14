@@ -9,7 +9,7 @@ class WhatsAppOrderMessageBuilder
 {
     public function messageFor(Order $order, ?WhatsAppSetting $settings = null): string
     {
-        $settings ??= WhatsAppSetting::query()->firstOrFail();
+        $settings ??= WhatsAppSetting::query()->first();
         $order->loadMissing(['customer', 'items']);
 
         $items = $order->items->map(fn ($item) => sprintf(
@@ -19,7 +19,7 @@ class WhatsAppOrderMessageBuilder
             $this->money($item->subtotal)
         ))->implode("\n");
 
-        return strtr($settings->message_template, [
+        return strtr($settings?->message_template ?? WhatsAppSetting::DEFAULT_MESSAGE_TEMPLATE, [
             '{order_id}' => (string) $order->order_id,
             '{customer_name}' => $order->customer?->full_name ?? 'Customer',
             '{items}' => $items,
@@ -30,11 +30,7 @@ class WhatsAppOrderMessageBuilder
     public function urlFor(Order $order): ?string
     {
         $settings = WhatsAppSetting::query()->first();
-        if (! $settings || blank($settings->order_number)) {
-            return null;
-        }
-
-        $number = ltrim(preg_replace('/[\s\-()]/', '', $settings->order_number), '+');
+        $number = (string) config('honeybee.contact.whatsapp_number');
         if (! preg_match('/^[1-9][0-9]{6,14}$/', $number)) {
             return null;
         }

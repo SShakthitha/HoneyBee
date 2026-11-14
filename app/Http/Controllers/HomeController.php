@@ -79,17 +79,23 @@ class HomeController extends Controller
 
     public function sendContact(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'message' => 'required',
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:30',
+            'message' => 'required|string|max:2000',
         ]);
 
-        // Redirect to WhatsApp with message
-        $message = 'Hi! My name is '.$request->name.'. '.$request->message.' (Email: '.$request->email.')';
-        $whatsappUrl = 'https://wa.me/94717714267?text='.urlencode($message);
+        $message = implode("\n", [
+            'Website contact enquiry',
+            'Name: '.$data['name'],
+            'Email: '.$data['email'],
+            'Phone: '.($data['phone'] ?? 'Not provided'),
+            'Message: '.$data['message'],
+        ]);
+        $whatsappUrl = 'https://wa.me/'.config('honeybee.contact.whatsapp_number').'?text='.rawurlencode($message);
 
-        return redirect($whatsappUrl);
+        return redirect()->away($whatsappUrl);
     }
 
     public function about()

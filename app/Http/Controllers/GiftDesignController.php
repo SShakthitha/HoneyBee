@@ -2,14 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\GiftDesign;
-use Illuminate\Support\Facades\Storage;
-use Yajra\DataTables\Facades\DataTables;
 use App\Models\GalleryImage;
+use App\Models\GiftDesign;
+use App\Rules\ValidGiftImage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class GiftDesignController extends Controller
 {
+    public function sendEnquiry(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:30'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'product' => ['required', 'string', 'max:255'],
+            'message' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $lines = [
+            'Gift & Design enquiry',
+            'Name: '.$data['name'],
+            'Phone: '.$data['phone'],
+            'Email: '.($data['email'] ?? 'Not provided'),
+            'Product: '.$data['product'],
+            'Message: '.($data['message'] ?? 'No additional message'),
+        ];
+        $url = 'https://wa.me/'.config('honeybee.contact.whatsapp_number').'?text='.rawurlencode(implode("\n", $lines));
+
+        return redirect()->away($url);
+    }
+
     public function index()
     {
         $gifts = GiftDesign::query()
@@ -34,6 +57,7 @@ class GiftDesignController extends Controller
     public function show($id)
     {
         $gift = GiftDesign::findOrFail($id);
+
         return view('gift-design-detail', compact('gift'));
     }
 
@@ -44,9 +68,10 @@ class GiftDesignController extends Controller
             'category' => 'required',
             'price' => 'required|numeric',
             'offer_price' => 'nullable|numeric',
+            'image' => ['nullable', 'file', 'max:10240', new ValidGiftImage],
         ]);
 
-        $gift = new GiftDesign();
+        $gift = new GiftDesign;
 
         $gift->item_name = $request->item_name;
         $gift->category = $request->category;
@@ -58,7 +83,13 @@ class GiftDesignController extends Controller
         $gift->description = $request->description;
 
         if ($request->hasFile('image')) {
-            $gift->image = $request->file('image')->store('gifts', 'public');
+            $imagePath = $request->file('image')->store('gifts', 'public');
+
+            if (! $imagePath) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
+            }
+
+            $gift->image = $imagePath;
         }
 
         $gift->save();
@@ -70,6 +101,7 @@ class GiftDesignController extends Controller
     public function edit($id)
     {
         $gift = GiftDesign::findOrFail($id);
+
         return view('admin.gift.edit', compact('gift'));
     }
 
@@ -80,6 +112,7 @@ class GiftDesignController extends Controller
             'category' => 'required',
             'price' => 'required|numeric',
             'offer_price' => 'nullable|numeric',
+            'image' => ['nullable', 'file', 'max:10240', new ValidGiftImage],
         ]);
 
         $gift = GiftDesign::findOrFail($id);
@@ -93,17 +126,25 @@ class GiftDesignController extends Controller
         $gift->customization_option = $request->customization_option;
         $gift->description = $request->description;
 
-        // safer image update (prevents storage buildup)
+        $oldImagePath = $gift->image;
+        $newImagePath = null;
+
         if ($request->hasFile('image')) {
 
-            if ($gift->image && Storage::disk('public')->exists($gift->image)) {
-                Storage::disk('public')->delete($gift->image);
+            $newImagePath = $request->file('image')->store('gifts', 'public');
+
+            if (! $newImagePath) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
             }
 
-            $gift->image = $request->file('image')->store('gifts', 'public');
+            $gift->image = $newImagePath;
         }
 
         $gift->save();
+
+        if ($newImagePath && $oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
+            Storage::disk('public')->delete($oldImagePath);
+        }
 
         return redirect('/admin/services')
             ->with('success', 'Gift updated successfully!');

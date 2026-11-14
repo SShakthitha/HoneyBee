@@ -8,6 +8,12 @@ class Handles extends Model
 {
     protected $primaryKey = 'handles_id';
 
+    protected $casts = [
+        'assigned_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
     protected $fillable = [
         'staff_id',
         'service_id',
@@ -17,7 +23,7 @@ class Handles extends Model
         'workload',
         'status',
         'feedback',
-        'attribute'
+        'attribute',
     ];
 
     public function staff()

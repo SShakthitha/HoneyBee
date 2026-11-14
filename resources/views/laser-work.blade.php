@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laser Works - HoneyBee</title>
+  <meta name="description" content="Explore HoneyBee custom laser work, personalized engraving, and handcrafted designs made for thoughtful gifts.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +17,7 @@
 <header class="header" id="header">
   <div class="header-inner container">
     <a href="{{ route('home') }}" class="brand">
-      <img src="{{ asset('images/logo.png') }}" alt="Laser Works Logo" class="brand-logo">
+      <img src="{{ asset('images/logo.webp') }}" alt="Laser Works Logo" class="brand-logo">
       <span class="brand-name">HoneyBee<span class="accent"> Shop</span></span>
     </a>
     <nav class="nav" id="nav">
@@ -82,14 +83,16 @@
         @php
           $price = $laserWork->currentSellingPrice();
           $desc = $laserWork->description ?: 'Precision laser-crafted product made just for you. Contact us to discuss sizes, materials, and pricing.';
-          $safeName = addslashes($laserWork->product_name);
-          $safeDesc = addslashes($desc);
           $message = rawurlencode('Hello HoneyBee Laser Works, I am interested in ' . $laserWork->product_name . ' - Rs. ' . $price);
           $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$laserWork->product_name}\nLaser type: {$laserWork->laser_type}\nMaterial: " . ($laserWork->material_type ?: 'Not specified') . "\nPrice: Rs. {$price}\nMy customization requirement: ");
         @endphp
         <div class="product-card" data-name="{{ e($laserWork->product_name) }}">
           <div class="card-img-wrap">
-            <div class="card-img-placeholder frame-img"><i class="fas fa-bolt"></i></div>
+            @if($laserWork->image)
+              <img src="{{ asset('storage/' . $laserWork->image) }}" alt="{{ $laserWork->product_name }}" class="laser-product-image" loading="lazy">
+            @else
+              <div class="card-img-placeholder frame-img" aria-label="No product image available"><i class="fas fa-bolt"></i></div>
+            @endif
             @if($laserWork->hasValidOfferPrice())<span class="card-badge badge-new">Offer</span>@endif
           </div>
           <div class="card-body">
@@ -105,34 +108,14 @@
               @endif
             </p>
             <div class="card-actions">
-              <button class="btn btn-ghost" onclick="openModal('{{ $safeName }}','{{ $safeDesc }}')" type="button">View Details</button>
-              <a class="btn btn-primary" href="https://wa.me/94766199881?text={{ $message }}" target="_blank" rel="noopener">Order Now</a>
+              <a class="btn btn-ghost" href="{{ route('laser.work.show', $laserWork->laser_id) }}">View Details</a>
+              <a class="btn btn-primary" href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ $message }}" target="_blank" rel="noopener noreferrer">Order Now</a>
             </div>
-            <p class="customization-prompt">Need Customization? <a href="https://wa.me/94766199881?text={{ $customizationMessage }}" target="_blank" rel="noopener">Discuss with Admin</a></p>
+            <p class="customization-prompt">Need Customization? <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ $customizationMessage }}" target="_blank" rel="noopener noreferrer">Discuss with HoneyBee</a></p>
           </div>
         </div>
       @empty
-        @foreach([
-          ['Laser Photo Frames', 'Beautifully etched wooden and acrylic frames that preserve your memories.', 'fa-image', 'frame-img'],
-          ['Customized Name Boards', 'Durable name boards laser-cut to any shape, size, or font style.', 'fa-sign-hanging', 'board-img'],
-          ['Wooden Name Plates', 'Natural wood grain meets precise laser engraving for homes and offices.', 'fa-tree', 'wood-img'],
-          ['Acrylic Name Boards', 'Glossy acrylic boards with modern edge-lit effects.', 'fa-gem', 'acrylic-img'],
-          ['Customized Key Tags', 'Personalized key fobs engraved with names, logos, or QR codes.', 'fa-key', 'key-img'],
-          ['Trophy Award Engraving', 'Precision-engraved trophies, plaques, and medals.', 'fa-trophy', 'trophy-img'],
-        ] as $sample)
-          <div class="product-card" data-name="{{ $sample[0] }}">
-            <div class="card-img-wrap"><div class="card-img-placeholder {{ $sample[3] }}"><i class="fas {{ $sample[2] }}"></i></div></div>
-            <div class="card-body">
-              <h3 class="card-title">{{ $sample[0] }}</h3>
-              <p class="card-desc">{{ $sample[1] }}</p>
-              <p class="price">From <strong>Rs 3,500</strong></p>
-              <div class="card-actions">
-                <button class="btn btn-ghost" onclick="openModal('{{ $sample[0] }}','{{ $sample[1] }}')" type="button">View Details</button>
-                <button class="btn btn-primary" onclick="openOrderForm('{{ $sample[0] }}')" type="button">Order Now</button>
-              </div>
-            </div>
-          </div>
-        @endforeach
+        <p class="catalog-empty">No laser products are available yet. Please check back soon or contact us about a custom request.</p>
       @endforelse
     </div>
   </div>
@@ -172,7 +155,7 @@
         <p class="section-eyebrow">Ready to Order?</p>
         <h2 class="section-title">Let's Create<br>Something Special</h2>
         <p class="inquiry-intro">We engrave memories, milestones, and brands with care and precision.</p>
-        <div class="inquiry-btns"><button class="btn btn-primary" onclick="scrollToForm()" type="button"><i class="fas fa-file-alt"></i> Order Now</button><a href="https://wa.me/94766199881?text=Hello%2C%20I%27m%20interested%20in%20Laser%20Works%20products!" target="_blank" class="btn btn-whatsapp" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp Inquiry</a></div>
+        <div class="inquiry-btns"><button class="btn btn-primary" onclick="scrollToForm()" type="button"><i class="fas fa-file-alt"></i> Order Now</button><a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text=Hello%2C%20I%27m%20interested%20in%20Laser%20Works%20products!" target="_blank" class="btn btn-whatsapp" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i> WhatsApp Inquiry</a></div>
       </div>
       <div class="inquiry-form-col" id="contactForm">
         <div class="form-card">
@@ -193,10 +176,10 @@
   <div class="container">
     <div class="section-header"><p class="section-eyebrow">Find Us</p><h2 class="section-title">Contact Laser Works</h2></div>
     <div class="contact-grid">
-      <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone-alt"></i></div><h4>Phone</h4><p>+94 0766199881</p></div>
+      <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone-alt"></i></div><h4>Phone</h4><p><a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">{{ config('honeybee.contact.phone_local') }}</a></p></div>
       <div class="contact-item"><div class="contact-icon"><i class="fas fa-envelope"></i></div><h4>Email</h4><p>Honey beelaserworks @gmail.com.</p></div>
       <div class="contact-item"><div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div><h4>Address</h4><p>190, Sir. Pom Ramanathan Road,<br>Thirunelvely, Jaffna</p></div>
-      <div class="contact-item"><div class="contact-icon"><i class="fas fa-share-alt"></i></div><h4>Social Media</h4><div class="social-links"><a href="#" class="social-icon fb"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-icon ig"><i class="fab fa-instagram"></i></a><a href="https://wa.me/94766199881" class="social-icon wa" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a></div></div>
+      <div class="contact-item"><div class="contact-icon"><i class="fas fa-share-alt"></i></div><h4>Social Media</h4><div class="social-links"><a href="#" class="social-icon fb"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-icon ig"><i class="fab fa-instagram"></i></a><a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}" class="social-icon wa" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a></div></div>
     </div>
   </div>
 </section>
@@ -205,7 +188,7 @@
   <div class="container footer-inner">
     <div class="footer-brand"><span class="brand-name footer-brand-name">Laser<span class="accent">Works</span></span><p>Precision laser engraving and cutting for every occasion.</p></div>
     <div class="footer-col"><h5>Quick Links</h5><ul><li><a href="#home">Home</a></li><li><a href="#products">Laser Products</a></li><li><a href="#inquiry">Order Now</a></li><li><a href="#contact">Contact</a></li></ul></div>
-    <div class="footer-col"><h5>Contact Info</h5><ul class="footer-contact"><li><i class="fas fa-phone-alt"></i> +94 0766199881</li><li><i class="fas fa-envelope"></i> Honey beelaserworks @gmail.com.</li><li><i class="fas fa-map-marker-alt"></i> 190, Sir. Pom Ramanathan Road, Thirunelvely, Jaffna</li></ul></div>
+    <div class="footer-col"><h5>Contact Info</h5><ul class="footer-contact"><li><i class="fas fa-phone-alt"></i> <a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">{{ config('honeybee.contact.phone_local') }}</a></li><li><i class="fas fa-envelope"></i> Honey beelaserworks @gmail.com.</li><li><i class="fas fa-map-marker-alt"></i> 190, Sir. Pom Ramanathan Road, Thirunelvely, Jaffna</li></ul></div>
   </div>
   <div class="footer-bottom"><div class="container"><p>&copy; 2025 Laser Works. All rights reserved.</p></div></div>
 </footer>
@@ -220,6 +203,7 @@
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
 <script src="{{ asset('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+<script>window.honeyBeeContact = { whatsappNumber: @json(config('honeybee.contact.whatsapp_number')) };</script>
 <script src="{{ asset('js/leser.js') }}"></script>
 </body>
 </html>

@@ -21,10 +21,15 @@ class EnsureStaffAdmin
             return redirect()->route('login');
         }
 
-        $isStaff = Staff::where('email', $user->email)->where('role', 'admin')->exists();
+        $staffRole = Staff::where('email', $user->email)->value('role');
 
-        abort_unless($isStaff, 403);
+        abort_unless(strtolower((string) $staffRole) === 'admin', 403);
 
-        return $next($request);
+        $response = $next($request);
+        $response->headers->set('Cache-Control', 'no-store, private, max-age=0, must-revalidate');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response;
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\WhatsAppSetting;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class WhatsAppSettingsController extends Controller
 {
@@ -23,7 +22,16 @@ class WhatsAppSettingsController extends Controller
         ]);
 
         $validated = $request->validate([
-            'order_number' => ['required', 'string', 'regex:/^\+?[1-9][0-9]{6,14}$/'],
+            'order_number' => [
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $digits = preg_replace('/\D/', '', (string) $value);
+                    if ($digits !== config('honeybee.contact.whatsapp_number')) {
+                        $fail('The HoneyBee contact number is fixed by the application contact configuration.');
+                    }
+                },
+            ],
             'message_template' => [
                 'required',
                 'string',
@@ -38,7 +46,6 @@ class WhatsAppSettingsController extends Controller
         ]);
 
         WhatsAppSetting::current()->update([
-            'order_number' => ltrim($validated['order_number'], '+'),
             'message_template' => $validated['message_template'],
         ]);
 

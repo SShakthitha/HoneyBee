@@ -6,12 +6,16 @@ use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\GiftDesign;
+use App\Models\Handles;
 use App\Models\LaserWork;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\Staff;
+use App\Rules\ValidGiftImage;
+use App\Services\OrderPaymentRecorder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
@@ -51,10 +55,17 @@ class AdminController extends Controller
 
     public function businessesData()
     {
-        $businesses = Business::select('business_id', 'business_name', 'contact_email', 'phone', 'description');
+        $businesses = Business::query()
+            ->select('business_id', 'business_name', 'contact_email', 'phone', 'description')
+            ->withCount(['staff', 'services']);
 
         return DataTables::of($businesses)
             ->addColumn('action', function ($b) {
+                $canDelete = $b->staff_count === 0 && $b->services_count === 0;
+                $deleteTitle = $canDelete
+                    ? 'Delete this unreferenced business'
+                    : 'Deletion is blocked while this business has linked staff or services';
+
                 return '
                     <div class="d-flex justify-content-end gap-1">
                         <button type="button"
@@ -63,7 +74,8 @@ class AdminController extends Controller
                             <i class="fa-solid fa-pen"></i>
                         </button>
                         <button type="button"
-                            class="btn btn-outline-danger btn-sm deleteBtn"
+                            class="btn btn-outline-danger btn-sm deleteBtn" '.($canDelete ? '' : 'disabled aria-disabled="true"').'
+                            title="'.$deleteTitle.'"
                             data-id="'.$b->business_id.'">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -121,7 +133,50 @@ class AdminController extends Controller
 
     public function deleteBusiness($id)
     {
-        Business::where('business_id', $id)->delete();
+        $blockers = DB::transaction(function () use ($id): array {
+            $business = Business::where('business_id', $id)->lockForUpdate()->firstOrFail();
+            $businessId = $business->business_id;
+            $blockers = [];
+
+            if ($business->staff()->exists()) {
+                $blockers[] = 'staff';
+            }
+
+            if ($business->services()->exists()) {
+                $blockers[] = 'services';
+            }
+
+            $hasAssignments = Handles::query()
+                ->whereHas('staff', fn ($query) => $query->where('business_id', $businessId))
+                ->orWhereHas('service', fn ($query) => $query->where('business_id', $businessId))
+                ->exists();
+
+            if ($hasAssignments) {
+                $blockers[] = 'staff assignments';
+            }
+
+            $hasOrders = Order::query()
+                ->whereHas('service', fn ($query) => $query->where('business_id', $businessId))
+                ->exists();
+
+            if ($hasOrders) {
+                $blockers[] = 'historical orders';
+            }
+
+            if ($blockers !== []) {
+                return $blockers;
+            }
+
+            $business->delete();
+
+            return [];
+        });
+
+        if ($blockers !== []) {
+            return back()->withErrors([
+                'business' => 'This business cannot be deleted because it has associated '.implode(', ', $blockers).'. The related records and order history have been preserved.',
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Business deleted!');
     }
@@ -152,6 +207,18 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.orders', compact('orders'));
+    }
+
+    public function updateOrderPayment(Request $request, int $id, OrderPaymentRecorder $paymentRecorder)
+    {
+        $order = Order::findOrFail($id);
+        $validated = $request->validate([
+            'advanced_paid' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
+        ]);
+
+        $paymentRecorder->recordConfirmedAdvance($order, (string) $validated['advanced_paid']);
+
+        return redirect()->route('admin.orders.show', $order->order_id)->with('success', 'Confirmed advance payment updated.');
     }
 
     public function showOrder($id)
@@ -519,9 +586,13 @@ class AdminController extends Controller
             'item_name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'in:Gift,Frame'],
             'price' => ['required', 'numeric', 'min:0'], 'offer_price' => ['nullable', 'numeric', 'min:0'],
-            'image' => ['nullable', 'image', 'max:10240'],
+            'image' => ['nullable', 'file', 'max:10240', new ValidGiftImage],
         ]);
         $imageName = $request->file('image')?->store('gifts', 'public');
+
+        if ($request->hasFile('image') && ! $imageName) {
+            return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
+        }
 
         GiftDesign::create([
             'item_name' => $validated['item_name'],
@@ -549,20 +620,24 @@ class AdminController extends Controller
     public function updateGift(Request $request, $id)
     {
         $gift = GiftDesign::findOrFail($id);
-        $imageName = $gift->image;
+        $oldImageName = $gift->image;
+        $imageName = $oldImageName;
 
         $validated = $request->validate([
             'item_name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'in:Gift,Frame'],
             'price' => ['required', 'numeric', 'min:0'], 'offer_price' => ['nullable', 'numeric', 'min:0'],
-            'image' => ['nullable', 'image', 'max:10240'],
+            'image' => ['nullable', 'file', 'max:10240', new ValidGiftImage],
         ]);
 
         if ($request->hasFile('image')) {
-            if ($imageName && Storage::disk('public')->exists($imageName)) {
-                Storage::disk('public')->delete($imageName);
+            $newImageName = $request->file('image')->store('gifts', 'public');
+
+            if (! $newImageName) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
             }
-            $imageName = $request->file('image')->store('gifts', 'public');
+
+            $imageName = $newImageName;
         }
 
         $gift->update([
@@ -576,6 +651,10 @@ class AdminController extends Controller
             'description' => $request->description,
             'image' => $imageName,
         ]);
+
+        if ($request->hasFile('image') && $oldImageName && Storage::disk('public')->exists($oldImageName)) {
+            Storage::disk('public')->delete($oldImageName);
+        }
 
         return redirect()->route('admin.services.gift')->with('success', 'Gift item updated successfully!');
     }
@@ -637,6 +716,8 @@ class AdminController extends Controller
     public function updateLaser(Request $request, $id)
     {
         $laserWork = LaserWork::findOrFail($id);
+        $oldImage = $laserWork->image;
+        $newImage = null;
         $validated = $request->validate([
             'product_name' => 'required|string|max:255', 'laser_type' => 'required|string|max:255',
             'price' => 'required|numeric|min:0', 'offer_price' => 'nullable|numeric|min:0',
@@ -645,12 +726,22 @@ class AdminController extends Controller
             'image' => 'nullable|image|max:10240',
         ]);
         if ($request->hasFile('image')) {
-            if ($laserWork->image && Storage::disk('public')->exists($laserWork->image)) {
-                Storage::disk('public')->delete($laserWork->image);
+            $newImage = $request->file('image')->store('laser', 'public');
+            if (! $newImage) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
             }
-            $validated['image'] = $request->file('image')->store('laser', 'public');
+            $validated['image'] = $newImage;
         }
-        $laserWork->update($validated);
+        if (! $laserWork->update($validated)) {
+            if ($newImage) {
+                Storage::disk('public')->delete($newImage);
+            }
+
+            return back()->withErrors(['product' => 'The product could not be saved.'])->withInput();
+        }
+        if ($newImage && $oldImage && $oldImage !== $newImage && Storage::disk('public')->exists($oldImage)) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         return redirect()->route('admin.services.laser')->with('success', 'Laser work updated successfully!');
     }
@@ -713,6 +804,8 @@ class AdminController extends Controller
     public function updateEvent(Request $request, $id)
     {
         $event = Event::findOrFail($id);
+        $oldImage = $event->image;
+        $newImage = null;
         $validated = $request->validate([
             'event_name' => 'required|string|max:255', 'event_type' => 'required|string|max:255',
             'event_date' => 'required|date', 'price' => 'required|numeric|min:0', 'offer_price' => 'nullable|numeric|min:0',
@@ -724,12 +817,22 @@ class AdminController extends Controller
             $validated[$field] = $request->boolean($field);
         }
         if ($request->hasFile('image')) {
-            if ($event->image && Storage::disk('public')->exists($event->image)) {
-                Storage::disk('public')->delete($event->image);
+            $newImage = $request->file('image')->store('events', 'public');
+            if (! $newImage) {
+                return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
             }
-            $validated['image'] = $request->file('image')->store('events', 'public');
+            $validated['image'] = $newImage;
         }
-        $event->update($validated);
+        if (! $event->update($validated)) {
+            if ($newImage) {
+                Storage::disk('public')->delete($newImage);
+            }
+
+            return back()->withErrors(['product' => 'The event could not be saved.'])->withInput();
+        }
+        if ($newImage && $oldImage && $oldImage !== $newImage && Storage::disk('public')->exists($oldImage)) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         return redirect()->route('admin.services.events')->with('success', 'Event updated successfully!');
     }

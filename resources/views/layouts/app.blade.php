@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoneyBee - @yield('title', 'Shop')</title>
+    <title>HoneyBee - {{ trim($__env->yieldContent('title', 'Shop')) }}</title>
+    <meta name="description" content="{{ trim($__env->yieldContent('meta_description', 'Discover handcrafted gifts, custom designs, laser work, and event services from HoneyBee Gifts & Designs.')) }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,10 +58,22 @@
     <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
 </head>
 <body>
+    @php
+        $dashboardUrl = route('dashboard');
+        if (auth()->check()) {
+            $staffRole = strtolower((string) \App\Models\Staff::where('email', auth()->user()->email)->value('role'));
+            $dashboardUrl = match ($staffRole) {
+                'admin' => route('admin.dashboard'),
+                'manager' => route('manager.dashboard'),
+                'staff' => route('staff.dashboard'),
+                default => route('customer.dashboard'),
+            };
+        }
+    @endphp
     <header class="header" id="header">
         <div class="header-inner container">
             <a href="{{ route('home') }}" class="brand">
-                <img src="{{ asset('images/logo.png') }}" alt="HoneyBee logo" class="brand-logo">
+                <img src="{{ asset('images/logo.webp') }}" alt="HoneyBee logo" class="brand-logo">
                 <span class="brand-name">HoneyBee <span class="amp">Shop</span></span>
             </a>
 
@@ -71,7 +84,7 @@
                     <li><a href="{{ route('laser.work') }}" class="{{ request()->routeIs('laser.*') ? 'active' : '' }}">Laser Work</a></li>
                     <li><a href="{{ route('events') }}" class="{{ request()->routeIs('events') ? 'active' : '' }}">Events</a></li>
                     @auth
-                        <li class="mobile-account-link"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                        <li class="mobile-account-link"><a href="{{ $dashboardUrl }}">Dashboard</a></li>
                         <li class="mobile-account-link"><form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Logout</button></form></li>
                     @else
                         <li class="mobile-account-link"><a href="{{ route('login') }}">Login</a></li>
@@ -90,7 +103,7 @@
                 </button>
 
                 @auth
-                    <a class="btn btn-login" href="{{ route('dashboard') }}">
+                    <a class="btn btn-login" href="{{ $dashboardUrl }}">
                         Dashboard
                     </a>
 

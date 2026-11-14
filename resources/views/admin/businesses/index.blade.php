@@ -7,6 +7,10 @@
 <div class="topbar">
     <h1>All <span>Businesses</span></h1>
 </div>
+
+@if($errors->has('business'))
+    <div class="alert alert-danger" role="alert">{{ $errors->first('business') }}</div>
+@endif
  
 <div class="admin-toolbar">
     <button type="button" class="btn btn-honey" data-bs-toggle="modal" data-bs-target="#addBusinessModal">
@@ -140,12 +144,12 @@
                 </div>
  
                 <div class="modal-body">
-                    Are you sure you want to delete this business? This can't be undone.
+                    <p class="mb-0">An unreferenced business can be deleted. Businesses with staff, services, assignments, or historical orders are protected. The server checks these relationships before deletion.</p>
                 </div>
  
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
                 </div>
             </form>
         </div>

@@ -61,6 +61,23 @@
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body p-4">
+        <h2 class="h4 mb-2">Confirm advance received</h2>
+        <p class="text-muted">Record only an amount HoneyBee has actually received. Order total: Rs {{ number_format((float) $order->paid_amount, 2) }}.</p>
+        <form method="POST" action="{{ route('admin.orders.payment', $order->order_id) }}" class="row g-2 align-items-end">
+            @csrf
+            @method('PUT')
+            <div class="col-sm-8">
+                <label for="advanced_paid" class="form-label">Confirmed advance (Rs.)</label>
+                <input id="advanced_paid" name="advanced_paid" type="number" min="0" max="{{ $order->paid_amount }}" step="0.01" value="{{ old('advanced_paid', $order->advanced_paid) }}" class="form-control" required>
+                @error('advanced_paid')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-sm-4"><button class="btn btn-honey w-100">Save confirmed advance</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
         <h2 class="h4 mb-3">Order Items</h2>
 
         <div class="table-responsive">

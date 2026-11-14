@@ -17,7 +17,7 @@
 <header class="header" id="header">
   <div class="header-inner">
     <div class="logo-wrap">
-      <img src="{{ asset('images/logo.png') }}" alt="HoneyBee Gifts & Designs Logo" class="logo-img"/>
+      <img src="{{ asset('images/logo.webp') }}" alt="HoneyBee Gifts & Designs Logo" class="logo-img"/>
       <div class="logo-text">
         <span class="brand-name">Event<span class="accent"> Celebration</span></span>
       </div>
@@ -166,7 +166,7 @@
           <button class="btn-primary" onclick="document.getElementById('inquiryForm').scrollIntoView({behavior:'smooth'})">
             <i class="fas fa-calendar-plus"></i> Book Event
           </button>
-          <a href="https://wa.me/94XXXXXXXXX?text=Hello%20HoneyBee%20Events!%20I%27d%20like%20to%20book%20an%20event." target="_blank" class="btn-whatsapp">
+          <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text=Hello%20HoneyBee%20Events!%20I%27d%20like%20to%20book%20an%20event." target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
             <i class="fab fa-whatsapp"></i> WhatsApp Us
           </a>
         </div>
@@ -230,7 +230,7 @@
       <div class="contact-item">
         <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
         <h4>Phone</h4>
-        <p>+94 0766975438</p>
+        <p><a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">{{ config('honeybee.contact.phone_local') }}</a></p>
       </div>
       <div class="contact-item">
         <div class="contact-icon"><i class="fas fa-envelope"></i></div>
@@ -255,7 +255,7 @@
           <a href="#" class="btn btn-outline-warning rounded-circle social-link social-youtube" aria-label="Subscribe on YouTube" title="YouTube">
             <i class="fab fa-youtube"></i>
           </a>
-          <a href="https://wa.me/94766975438?text=Hello%20HoneyBee%20Events!%20I%27d%20like%20to%20book%20an%20event." target="_blank" rel="noopener noreferrer" class="btn btn-outline-warning rounded-circle social-link social-whatsapp" aria-label="Chat with us on WhatsApp" title="WhatsApp">
+          <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text=Hello%20HoneyBee%20Events!%20I%27d%20like%20to%20book%20an%20event." target="_blank" rel="noopener noreferrer" class="btn btn-outline-warning rounded-circle social-link social-whatsapp" aria-label="Chat with us on WhatsApp" title="WhatsApp">
             <i class="fab fa-whatsapp"></i>
           </a>
         </div>
@@ -269,7 +269,7 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <img src="{{ asset('images/logo.png') }}" alt="HoneyBee" class="footer-logo"/>
+        <img src="{{ asset('images/logo.webp') }}" alt="HoneyBee" class="footer-logo"/>
         <p>Creating unforgettable event experiences across Jaffna District since 2018.</p>
       </div>
       <div class="footer-links">
@@ -291,7 +291,7 @@
       <div class="footer-contact">
         <h5>Contact Info</h5>
         <ul style="list-style:none;padding:0;">
-          <li style="margin-bottom: .5rem;"><i class="fas fa-phone-alt"></i> +94  0766975438</li>
+          <li style="margin-bottom: .5rem;"><i class="fas fa-phone-alt"></i> <a href="tel:+{{ config('honeybee.contact.whatsapp_number') }}">{{ config('honeybee.contact.phone_local') }}</a></li>
           <li style="margin-bottom: .5rem;"><i class="fas fa-envelope"></i> Honeybeeevents99@gmail.com</li>
           <li><i class="fas fa-map-marker-alt"></i> Jaffna, Sri Lanka</li>
         </ul>
@@ -317,7 +317,7 @@
       <p id="detailDesc"></p>
       <ul class="detail-features" id="detailFeatures"></ul>
       <div class="detail-actions">
-        <a href="https://wa.me/94XXXXXXXXX" target="_blank" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> Book via WhatsApp</a>
+        <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> Book via WhatsApp</a>
         <button class="btn-primary" onclick="closeDetail(); document.getElementById('inquiry').scrollIntoView({behavior:'smooth'})">Book Now</button>
       </div>
     </div>

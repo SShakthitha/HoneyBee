@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'About Us')
+@section('meta_description', 'Meet HoneyBee Gifts & Designs and discover the care behind our handcrafted gifts and celebration services.')
 
 @section('content')
 
@@ -15,7 +16,7 @@
 
         <div style="display: flex; gap: 40px; flex-wrap: wrap; align-items: center; margin-bottom: 60px;">
             <div style="flex: 1; min-width: 300px;">
-                <img src="{{ asset('images/logo.png') }}" alt="HoneyBee" style="width: 100%; max-width: 400px; border-radius: 15px;">
+                <img src="{{ asset('images/logo.webp') }}" alt="HoneyBee" style="width: 100%; max-width: 400px; border-radius: 15px;">
             </div>
             <div style="flex: 1; min-width: 300px;">
                 <h2 style="font-size: 32px; margin-bottom: 20px;">Who <span style="color: #f5a623;">We Are</span></h2>
@@ -89,7 +90,7 @@
         <div style="text-align: center;">
             <h2 style="font-size: 28px; margin-bottom: 20px;">Ready to get started?</h2>
             <a href="/contact" style="background: #f5a623; color: #1a1a1a; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 16px; margin-right: 15px;">Contact Us</a>
-            <a href="https://wa.me/94717714267" target="_blank" style="background: #25D366; color: #fff; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 16px;">WhatsApp Us</a>
+            <a href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}" target="_blank" rel="noopener noreferrer" style="background: #25D366; color: #fff; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 16px;">WhatsApp Us</a>
         </div>
 
     </section>

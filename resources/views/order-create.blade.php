@@ -17,7 +17,7 @@
 
         <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
 
-            <form action="/orders" method="POST">
+            <form action="{{ route('orders.store') }}" method="POST">
                 @csrf
 
                 <input type="hidden" name="service_id" value="{{ $service->service_id }}">
@@ -29,15 +29,9 @@
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Amount (Rs.) *</label>
-                    <input type="number" name="paid_amount" value="{{ $service->price }}" step="0.01" required
-                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Advanced Payment (Rs.)</label>
-                    <input type="number" name="advanced_paid" step="0.01"
-                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Service Total</label>
+                    <p style="font-size: 1.25rem; font-weight: 700; color: #1a1a1a;">Rs. {{ number_format((float) $service->price, 2) }}</p>
+                    <p style="color: #6b6256; font-size: .9rem;">HoneyBee calculates the order total. No payment is collected online; confirmed advances are recorded by staff after receipt.</p>
                 </div>
 
                 <div style="margin-bottom: 20px;">
@@ -47,7 +41,7 @@
                         <option value="">Select Payment Method</option>
                         <option value="cash">Cash</option>
                         <option value="bank_transfer">Bank Transfer</option>
-                        <option value="card">Card</option>
+                        <option value="card">Card (arranged with HoneyBee)</option>
                     </select>
                 </div>
 
