@@ -80,7 +80,7 @@
                 <strong>Rs {{ number_format((float) $gift->offer_price, 2) }}</strong>
                 <span class="badge badge-honey">{{ $gift->discountPercentage() }}% OFF</span>
               @else
-                From <strong>Rs {{ number_format((float) $gift->price, 2) }}</strong>
+                From <strong>Rs {{ number_format((float) ($gift->price ?? $price), 2) }}</strong>
               @endif
             </p>
             <div class="product-actions">
@@ -169,8 +169,13 @@
     @if($frameDesignImages->isNotEmpty())
       <div class="gallery-grid">
         @foreach($frameDesignImages as $frameDesignImage)
+          @php
+            $frameImageUrl = str_starts_with($frameDesignImage->image, 'http')
+                ? $frameDesignImage->image
+                : asset('storage/' . $frameDesignImage->image);
+          @endphp
           <figure class="gallery-item m-0">
-            <img src="{{ asset('storage/' . $frameDesignImage->image) }}" alt="{{ $frameDesignImage->title ?? 'Frame design' }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.closest('figure').style.display='none'">
+            <img src="{{ $frameImageUrl }}" alt="{{ $frameDesignImage->title ?? 'Frame design' }}" class="w-100" onerror="this.closest('figure').style.display='none'">
             @if($frameDesignImage->title)
               <figcaption class="gallery-overlay">{{ $frameDesignImage->title }}</figcaption>
             @endif
@@ -208,8 +213,13 @@
     @if($giftGalleryImages->isNotEmpty())
       <div class="gallery-grid">
         @foreach($giftGalleryImages as $galleryImage)
+          @php
+            $galleryImageUrl = str_starts_with($galleryImage->image, 'http')
+                ? $galleryImage->image
+                : asset('storage/' . $galleryImage->image);
+          @endphp
           <figure class="gallery-item m-0">
-            <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Gift and Design gallery image' }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.closest('figure').style.display='none'">
+            <img src="{{ $galleryImageUrl }}" alt="{{ $galleryImage->title ?? 'Gift and Design gallery image' }}" class="w-100" onerror="this.closest('figure').style.display='none'">
             @if($galleryImage->title)
               <figcaption class="gallery-overlay">{{ $galleryImage->title }}</figcaption>
             @endif

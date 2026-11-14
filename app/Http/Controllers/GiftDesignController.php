@@ -36,11 +36,34 @@ class GiftDesignController extends Controller
     public function index()
     {
         $gifts = GiftDesign::query()
-            ->whereRaw('LOWER(category) NOT IN (?, ?)', ['frame', 'frames'])
+            ->where(function ($query) {
+                $query->whereNull('category')
+                    ->orWhereRaw('LOWER(TRIM(category)) NOT IN (?, ?, ?, ?, ?, ?, ?, ?)', [
+                        'frame',
+                        'frames',
+                        'frame design',
+                        'frame designs',
+                        'frame-design',
+                        'frame_design',
+                        'frame designs',
+                        'frames design',
+                    ]);
+            })
             ->get();
+
         $frames = GiftDesign::query()
-            ->whereRaw('LOWER(category) IN (?, ?)', ['frame', 'frames'])
+            ->whereRaw('LOWER(TRIM(category)) IN (?, ?, ?, ?, ?, ?, ?, ?)', [
+                'frame',
+                'frames',
+                'frame design',
+                'frame designs',
+                'frame-design',
+                'frame_design',
+                'frame designs',
+                'frames design',
+            ])
             ->get();
+
         // Keep the existing Gift & Design gallery as the gifts gallery so that
         // images uploaded before the category split remain visible.
         $giftGalleryImages = GalleryImage::where('category', 'Gift & Design')->get();

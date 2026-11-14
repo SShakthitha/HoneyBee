@@ -37,6 +37,51 @@ class GiftAndFrameCatalogTest extends TestCase
             ->assertSee('storage/'.$frame->image);
     }
 
+    public function test_legacy_and_cased_category_names_are_grouped_correctly(): void
+    {
+        GiftDesign::create([
+            'item_name' => 'Legacy Gift Design',
+            'category' => 'Gift & Design',
+            'price' => 1800,
+        ]);
+
+        GiftDesign::create([
+            'item_name' => 'Legacy Frame Design',
+            'category' => 'Frame Designs',
+            'price' => 2600,
+        ]);
+
+        $response = $this->get(route('gift.design'));
+
+        $response->assertOk()
+            ->assertSeeInOrder([
+                'Our Gift Collection',
+                'Legacy Gift Design',
+                'Frame Collection',
+                'Legacy Frame Design',
+            ]);
+    }
+
+    public function test_empty_catalog_does_not_display_demo_products(): void
+    {
+        $response = $this->get(route('gift.design'));
+
+        $response->assertOk()
+            ->assertSee('Gift products will be added here soon.')
+            ->assertDontSee('Birthday Gifts')
+            ->assertDontSee('https://images.unsplash.com');
+    }
+
+    public function test_empty_gallery_sections_do_not_display_demo_images(): void
+    {
+        $response = $this->get(route('gift.design'));
+
+        $response->assertOk()
+            ->assertSee('Our latest creations will be added here soon.')
+            ->assertSee('Frame design pictures will be added here soon.')
+            ->assertDontSee('https://images.unsplash.com');
+    }
+
     public function test_the_admin_gift_form_offers_gift_and_frame_categories(): void
     {
         $email = 'admin@example.com';

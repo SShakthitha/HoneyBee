@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\GalleryImage;
+use App\Models\GiftDesign;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -64,6 +65,88 @@ class GalleryImageManagementTest extends TestCase
         $response->assertRedirect(route('admin.gallery.create'));
         $response->assertSessionHasErrors(['category', 'image']);
         $this->assertDatabaseCount('gallery_images', 0);
+    }
+
+    public function test_an_admin_can_add_a_gift_gallery_image_to_the_gift_collection_with_a_price(): void
+    {
+        Storage::fake('public');
+        $this->actingAsAdmin();
+        Storage::disk('public')->put('gallery/gift-box.jpg', 'image contents');
+
+        $galleryImage = GalleryImage::create([
+            'title' => 'Personalised Gift Box',
+            'category' => 'Gift & Design',
+            'image' => 'gallery/gift-box.jpg',
+        ]);
+
+        $this->get(route('admin.gallery.index'))
+            ->assertOk()
+            ->assertSee(route('admin.gift.create', ['gallery_image_id' => $galleryImage->id]), false)
+            ->assertSee('Add to Gifts');
+
+        $this->get(route('admin.gift.create', ['gallery_image_id' => $galleryImage->id]))
+            ->assertOk()
+            ->assertSee('Personalised Gift Box')
+            ->assertSee('name="gallery_image_id" value="'.$galleryImage->id.'"', false);
+
+        $this->post(route('admin.gift.store'), [
+            'gallery_image_id' => $galleryImage->id,
+            'item_name' => 'Personalised Gift Box',
+            'category' => 'Gift',
+            'price' => 2750,
+        ])->assertRedirect(route('admin.services.gift'));
+
+        $gift = GiftDesign::sole();
+
+        $this->assertSame('Personalised Gift Box', $gift->item_name);
+        $this->assertSame(2750.0, (float) $gift->price);
+        $this->assertStringStartsWith('gifts/', $gift->image);
+        Storage::disk('public')->assertExists($gift->image);
+
+        $this->get(route('gift.design'))
+            ->assertOk()
+            ->assertSee('Personalised Gift Box')
+            ->assertSee('2,750.00');
+    }
+
+    public function test_an_admin_can_add_a_frame_gallery_image_to_the_frame_collection_with_a_price(): void
+    {
+        Storage::fake('public');
+        $this->actingAsAdmin();
+        Storage::disk('public')->put('gallery/photo-frame.jpg', 'image contents');
+
+        $galleryImage = GalleryImage::create([
+            'title' => 'Personalised Photo Frame',
+            'category' => 'Frame Designs',
+            'image' => 'gallery/photo-frame.jpg',
+        ]);
+
+        $this->get(route('admin.gallery.index'))
+            ->assertOk()
+            ->assertSee('Add to Frames');
+
+        $this->get(route('admin.gift.create', ['gallery_image_id' => $galleryImage->id]))
+            ->assertOk()
+            ->assertSee('value="Frame" selected', false);
+
+        $this->post(route('admin.gift.store'), [
+            'gallery_image_id' => $galleryImage->id,
+            'item_name' => 'Personalised Photo Frame',
+            'category' => 'Frame',
+            'price' => 3200,
+        ])->assertRedirect(route('admin.services.gift'));
+
+        $frame = GiftDesign::sole();
+
+        $this->assertSame('Frame', $frame->category);
+        $this->assertSame(3200.0, (float) $frame->price);
+        $this->assertStringStartsWith('gifts/', $frame->image);
+        Storage::disk('public')->assertExists($frame->image);
+
+        $this->get(route('gift.design'))
+            ->assertOk()
+            ->assertSee('Personalised Photo Frame')
+            ->assertSee('3,200.00');
     }
 
     public function test_deleting_a_gallery_image_removes_its_public_file_and_database_record(): void

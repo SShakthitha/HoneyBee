@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\GalleryImage;
 use App\Models\GiftDesign;
 use App\Models\Handles;
 use App\Models\LaserWork;
@@ -17,6 +18,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -573,11 +575,20 @@ class AdminController extends Controller
     }
 
     // ─── Gift & Design ────────────────────────────────────────
-    public function createGift()
+    public function createGift(Request $request)
     {
         $services = Service::where('service_type', 'gift')->get();
+        $galleryImage = null;
+        $defaultCategory = 'Gift';
 
-        return view('admin.gift.create', compact('services'));
+        if ($request->filled('gallery_image_id')) {
+            $galleryImage = GalleryImage::query()
+                ->whereIn('category', ['Gift & Design', 'Frame Designs'])
+                ->findOrFail($request->input('gallery_image_id'));
+            $defaultCategory = $galleryImage->category === 'Frame Designs' ? 'Frame' : 'Gift';
+        }
+
+        return view('admin.gift.create', compact('services', 'galleryImage', 'defaultCategory'));
     }
 
     public function storeGift(Request $request)
@@ -587,6 +598,10 @@ class AdminController extends Controller
             'category' => ['required', 'in:Gift,Frame'],
             'price' => ['required', 'numeric', 'min:0'], 'offer_price' => ['nullable', 'numeric', 'min:0'],
             'image' => ['nullable', 'file', 'max:10240', new ValidGiftImage],
+            'gallery_image_id' => [
+                'nullable',
+                Rule::exists('gallery_images', 'id')->where(fn ($query) => $query->whereIn('category', ['Gift & Design', 'Frame Designs'])),
+            ],
         ]);
         $imageName = $request->file('image')?->store('gifts', 'public');
 
@@ -594,9 +609,24 @@ class AdminController extends Controller
             return back()->withErrors(['image' => 'The image could not be stored.'])->withInput();
         }
 
+        $galleryImage = ! empty($validated['gallery_image_id'])
+            ? GalleryImage::findOrFail($validated['gallery_image_id'])
+            : null;
+
+        if (! $imageName && $galleryImage) {
+            $extension = pathinfo($galleryImage->image, PATHINFO_EXTENSION);
+            $imageName = 'gifts/'.Str::uuid().($extension ? '.'.$extension : '');
+
+            if (! Storage::disk('public')->copy($galleryImage->image, $imageName)) {
+                return back()->withErrors(['image' => 'The selected gallery image could not be copied.'])->withInput();
+            }
+        }
+
         GiftDesign::create([
             'item_name' => $validated['item_name'],
-            'category' => $validated['category'],
+            'category' => $galleryImage
+                ? ($galleryImage->category === 'Frame Designs' ? 'Frame' : 'Gift')
+                : $validated['category'],
             'material' => $request->material,
             'size' => $request->size,
             'price' => $validated['price'],

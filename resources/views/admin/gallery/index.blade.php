@@ -41,6 +41,15 @@
 
                             <div class="d-flex justify-content-end gap-2 mt-3">
 
+                            @if(in_array($image->category, ['Gift & Design', 'Frame Designs'], true))
+                                <a href="{{ route('admin.gift.create', ['gallery_image_id' => $image->id]) }}"
+                                   class="btn btn-sm btn-honey"
+                                   title="Add this image to the {{ $image->category === 'Frame Designs' ? 'Frame' : 'Gift' }} Collection">
+                                    <i class="fa-solid fa-gift"></i>
+                                    Add to {{ $image->category === 'Frame Designs' ? 'Frames' : 'Gifts' }}
+                                </a>
+                            @endif
+
                             <a href="{{ route('admin.gallery.edit', $image->id) }}"
                               class="btn btn-sm btn-outline-primary"
                               title="Edit">
