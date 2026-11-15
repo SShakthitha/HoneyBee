@@ -45,7 +45,11 @@
             @forelse($order->items as $item)
                 <tr><td>{{ $item->item_name }}</td><td class="right">Rs {{ number_format((float) $item->price, 2) }}</td><td class="right">{{ $item->quantity }}</td><td class="right">Rs {{ number_format((float) $item->subtotal, 2) }}</td></tr>
             @empty
-                <tr><td colspan="4">No item details are available for this order.</td></tr>
+                @if($order->service)
+                    <tr><td>{{ $order->service->service_name }} (Service)</td><td class="right">Rs {{ number_format((float) $order->paid_amount, 2) }}</td><td class="right">1</td><td class="right">Rs {{ number_format((float) $order->paid_amount, 2) }}</td></tr>
+                @else
+                    <tr><td colspan="4">No item details are available for this order.</td></tr>
+                @endif
             @endforelse
             <tr class="total"><td colspan="3" class="right">Order Total</td><td class="right">Rs {{ number_format((float) ($order->items->isNotEmpty() ? $order->items->sum('subtotal') : $order->paid_amount), 2) }}</td></tr>
         </tbody>

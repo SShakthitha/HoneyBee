@@ -99,15 +99,24 @@
                             <td>Rs {{ number_format((float) $item->subtotal, 2) }}</td>
                         </tr>
                     @empty
+                        @if($order->service)
+                            <tr>
+                                <td>{{ $order->service->service_name }} (Service)</td>
+                                <td>1</td>
+                                <td>Rs {{ number_format((float) $order->paid_amount, 2) }}</td>
+                                <td>Rs {{ number_format((float) $order->paid_amount, 2) }}</td>
+                            </tr>
+                        @else
                         <tr>
                             <td colspan="4" class="text-muted">No items found for this order.</td>
                         </tr>
+                        @endif
                     @endforelse
                 </tbody>
                 <tfoot>
                     <tr>
                         <th colspan="3" class="text-end">Order Total</th>
-                        <th>Rs {{ number_format((float) $order->items->sum('subtotal'), 2) }}</th>
+                        <th>Rs {{ number_format((float) ($order->items->isNotEmpty() ? $order->items->sum('subtotal') : $order->paid_amount), 2) }}</th>
                     </tr>
                 </tfoot>
             </table>

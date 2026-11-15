@@ -41,19 +41,43 @@ class ExportController extends Controller
 
     public function orders(): BinaryFileResponse
     {
-        $rows = Order::with(['customer', 'items'])->orderByDesc('order_date')->get()
-            ->flatMap(fn (Order $order) => $order->items->map(fn ($item) => [
-                $order->order_id,
-                $order->customer?->full_name ?: 'Unknown customer',
-                $order->customer?->email,
-                $this->date($order->order_date),
-                $item->item_name,
-                $item->item_type,
-                $item->quantity,
-                $item->price,
-                $item->subtotal,
-                $order->status,
-            ]));
+        $rows = Order::with(['customer', 'items', 'service'])->orderByDesc('order_date')->get()
+            ->flatMap(function (Order $order) {
+                if ($order->items->isNotEmpty()) {
+                    return $order->items->map(fn ($item) => [
+                        $order->order_id,
+                        $order->customer?->full_name ?: 'Unknown customer',
+                        $order->customer?->email,
+                        $this->date($order->order_date),
+                        $item->item_name,
+                        $item->item_type,
+                        $item->quantity,
+                        $item->price,
+                        $item->subtotal,
+                        $order->status,
+                    ]);
+                }
+
+                if (! $order->service) {
+                    return collect();
+                }
+
+                // Service orders store their one requested service in orders.service_id.
+                // The existing schema has no service quantity, so report the order as one
+                // service line using the server-calculated order total as its price.
+                return collect([[
+                    $order->order_id,
+                    $order->customer?->full_name ?: 'Unknown customer',
+                    $order->customer?->email,
+                    $this->date($order->order_date),
+                    $order->service->service_name,
+                    'service',
+                    1,
+                    $order->paid_amount,
+                    $order->paid_amount,
+                    $order->status,
+                ]]);
+            });
 
         return Excel::download(new HoneyBeeExport(
             $rows,

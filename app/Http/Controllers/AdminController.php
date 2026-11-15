@@ -206,7 +206,7 @@ class AdminController extends Controller
     // ─── Orders ───────────────────────────────────────────────
     public function orders()
     {
-        $orders = Order::with(['customer', 'items'])
+        $orders = Order::with(['customer', 'items', 'service'])
             ->latest('order_date')
             ->get();
 
@@ -227,7 +227,7 @@ class AdminController extends Controller
 
     public function showOrder($id)
     {
-        $order = Order::with(['customer', 'items'])
+        $order = Order::with(['customer', 'items', 'service'])
             ->where('order_id', $id)
             ->firstOrFail();
 
@@ -236,7 +236,7 @@ class AdminController extends Controller
 
     public function downloadOrderPdf($id)
     {
-        $order = Order::with(['customer', 'items'])
+        $order = Order::with(['customer', 'items', 'service'])
             ->where('order_id', $id)
             ->firstOrFail();
 
@@ -264,7 +264,7 @@ class AdminController extends Controller
 
     public function ordersData(Request $request)
     {
-        $orders = Order::with(['customer', 'items'])
+        $orders = Order::with(['customer', 'items', 'service'])
             ->select('orders.*');
 
         $categoryItemTypes = [
@@ -312,30 +312,34 @@ class AdminController extends Controller
             })
 
             ->addColumn('items', function ($order) {
-                if (! $order->items || $order->items->isEmpty()) {
-                    return '<span class="text-muted">No items</span>';
+                if ($order->items && $order->items->isNotEmpty()) {
+                    $html = '';
+
+                    foreach ($order->items as $item) {
+                        $html .= '<div class="mb-2">';
+                        $html .= '<strong>'.e($item->item_name).'</strong>';
+                        $html .= '<br><small class="text-muted">Qty: '.(int) $item->quantity;
+                        $html .= ' × Rs '.number_format((float) $item->price, 2).'</small></div>';
+                    }
+
+                    return $html;
                 }
 
-                $html = '';
+                if ($order->service) {
+                    $serviceName = e($order->service->service_name);
+                    $price = number_format((float) $order->paid_amount, 2);
 
-                foreach ($order->items as $item) {
-                    $html .= '<div class="mb-2">';
-                    $html .= '<strong>'.e($item->item_name).'</strong>';
-                    $html .= '<br>';
-                    $html .= '<small class="text-muted">';
-                    $html .= 'Qty: '.(int) $item->quantity;
-                    $html .= ' × Rs '.number_format((float) $item->price, 2);
-                    $html .= '</small>';
-                    $html .= '</div>';
+                    return '<div class="mb-2"><strong>'.$serviceName.'</strong>'
+                        .'<br><small class="text-muted">Service · Qty: 1 × Rs '.$price.'</small></div>';
                 }
 
-                return $html;
+                return '<span class="text-muted">No items</span>';
             })
 
             ->addColumn('total', function ($order) {
-                $total = $order->items->sum(function ($item) {
-                    return (float) $item->subtotal;
-                });
+                $total = $order->items->isNotEmpty()
+                    ? $order->items->sum(fn ($item) => (float) $item->subtotal)
+                    : (float) $order->paid_amount;
 
                 return '<strong>Rs '.number_format($total, 2).'</strong>';
             })
