@@ -16,6 +16,10 @@ class GiftAndFrameCatalogTest extends TestCase
 
     public function test_gift_and_frame_products_are_displayed_in_their_own_sections(): void
     {
+        Storage::fake('public');
+        Storage::disk('public')->put('gifts/gift-box.jpg', 'gift image');
+        Storage::disk('public')->put('gifts/wedding-frame.jpg', 'frame image');
+
         $gift = GiftDesign::create([
             'item_name' => 'Personalised Gift Box',
             'category' => 'Gift',
@@ -92,6 +96,41 @@ class GiftAndFrameCatalogTest extends TestCase
             ->assertOk()
             ->assertSee('value="Gift"', false)
             ->assertSee('value="Frame"', false);
+    }
+
+    public function test_gift_and_frame_create_and_edit_forms_keep_fields_and_responsive_laser_layout(): void
+    {
+        $this->actingAsAdmin();
+
+        $this->get(route('admin.gift.create'))
+            ->assertOk()
+            ->assertSee('name="item_name"', false)
+            ->assertSee('name="category"', false)
+            ->assertSee('name="material"', false)
+            ->assertSee('name="size"', false)
+            ->assertSee('name="price"', false)
+            ->assertSee('name="offer_price"', false)
+            ->assertSee('name="customization_option"', false)
+            ->assertSee('name="image"', false)
+            ->assertSee('name="description"', false)
+            ->assertSee('grid-template-columns: repeat(2, minmax(0, 1fr))', false)
+            ->assertSee('@media (max-width: 768px)', false);
+
+        $frame = GiftDesign::create([
+            'item_name' => 'Edit-ready Frame',
+            'category' => 'Frame',
+            'price' => 2500,
+            'customization_option' => 'Name engraving',
+        ]);
+
+        $this->get(route('admin.gift.edit', $frame->gift_design_id))
+            ->assertOk()
+            ->assertSee('name="item_name"', false)
+            ->assertSee('name="category"', false)
+            ->assertSee('name="customization_option"', false)
+            ->assertSee('Edit-ready Frame')
+            ->assertSee('Name engraving')
+            ->assertSee('@media (max-width: 768px)', false);
     }
 
     public function test_admin_can_create_a_frame_product_from_a_frame_gallery_image(): void

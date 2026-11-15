@@ -26,10 +26,11 @@
 
                     <div class="card">
 
-                        <img src="{{ asset('storage/'.$image->image) }}"
-                             class="card-img-top"
-                             alt="{{ $image->title ?? $image->category . ' gallery image' }}"
-                             style="height: 180px; object-fit: cover;">
+                        @if($imageUrl = \App\Support\PublicImage::url($image->image))
+                            <img src="{{ $imageUrl }}" class="card-img-top" alt="{{ $image->title ?? $image->category . ' gallery image' }}" style="height: 180px; object-fit: cover;">
+                        @else
+                            <div class="bg-light text-muted d-grid place-items-center" role="img" aria-label="Gallery image unavailable" style="height:180px;place-items:center;">Gallery image unavailable</div>
+                        @endif
 
                         <div class="card-body">
 

@@ -12,8 +12,19 @@
     <div class="checkout-heading">
       <p class="checkout-eyebrow">Almost there</p>
       <h1>Checkout</h1>
-      <p>Review your selected gifts and add any special requirements before placing your order.</p>
+      <p>Review your gifts and frames, then open WhatsApp with a message to HoneyBee.</p>
     </div>
+
+    @if ($errors->any())
+      <div class="checkout-note" role="alert">
+        <strong>We could not prepare your WhatsApp request.</strong>
+        <ul class="mb-0 mt-2">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
 
     <div id="checkout-empty" class="checkout-empty" hidden>
       <h2>Your cart is empty</h2>
@@ -46,15 +57,14 @@
             <tfoot><tr><th colspan="3">Grand total</th><th id="checkout-total">Rs 0</th></tr></tfoot>
           </table>
         </div>
+        <p id="checkout-price-note" class="checkout-note" hidden>These displayed prices are an estimate from your browser cart. The WhatsApp message is rebuilt using the current catalog prices stored by HoneyBee.</p>
       </section>
 
       <section class="checkout-card requirements-card">
 
-          <p class="checkout-note">Payment is by bank transfer only. HoneyBee will confirm the transfer before recording payment.</p>
+          <p class="checkout-note">This opens a WhatsApp request. No order is saved and no stock is checked or reserved at this stage. HoneyBee must confirm availability and the order before payment. Bank transfer is the only payment method; opening WhatsApp does not record payment.</p>
 
-          <label for="special-requirements">
-              Special requirements or notes
-          </label>
+          <label for="special-requirements">Special requirements or notes</label>
 
           <textarea
               id="special-requirements"
@@ -65,23 +75,25 @@
           <div style="margin-top:20px;">
 
               <form
-                  id="place-order-form"
+                  id="whatsapp-order-form"
                   method="POST"
-                  action="{{ route('checkout.store') }}"
+                  action="{{ route('checkout.whatsapp.prepare') }}"
+                  target="honeybee-whatsapp-request"
+                  rel="noopener"
                   style="flex:1;"
               >
                   @csrf
-                  <input type="hidden" name="submission_token" value="{{ $submissionToken }}">
 
                   <button
                       type="submit"
-                      class="checkout-btn checkout-btn--primary"
+                      class="checkout-btn checkout-btn--whatsapp"
                       style="width:100%;"
                   >
-                      Place Order
+                      <i class="bi bi-whatsapp me-2"></i> Order via WhatsApp
                   </button>
               </form>
           </div>
+          <p class="checkout-note mt-3">The WhatsApp message uses current catalog prices. Final availability and order confirmation happen with HoneyBee.</p>
 
       </section>
     </div>

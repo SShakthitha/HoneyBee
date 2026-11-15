@@ -99,6 +99,58 @@ function proceedToCheckout() {
   window.location.href = window.honeyBeeCheckoutUrl;
 }
 
+function prepareWhatsAppCart(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!cart.length) {
+    showToast('Your cart is empty.');
+    return;
+  }
+
+  const invalidItem = cart.some(item =>
+    !Number.isInteger(Number(item.item_id)) ||
+    Number(item.item_id) < 1 ||
+    !['gift', 'frame'].includes(item.item_type)
+  );
+  if (invalidItem) {
+    showToast('A cart item is invalid. Remove it and add the product again.');
+    return;
+  }
+
+  form.querySelectorAll('.cart-generated-input').forEach(input => input.remove());
+  const grouped = new Map();
+  cart.forEach(item => {
+    const key = `${item.item_type}|${Number(item.item_id)}`;
+    grouped.set(key, (grouped.get(key) || 0) + 1);
+  });
+  Array.from(grouped.entries()).forEach(([key, quantity], index) => {
+    const [type, itemId] = key.split('|');
+    addCartRequestInput(form, `items[${index}][item_id]`, Number(itemId));
+    addCartRequestInput(form, `items[${index}][item_type]`, type);
+    addCartRequestInput(form, `items[${index}][quantity]`, quantity);
+  });
+
+  const notes = document.getElementById('cart-order-notes');
+  addCartRequestInput(form, 'notes', notes ? notes.value.trim() : '');
+
+  const button = document.getElementById('checkout-whatsapp-button');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Preparing WhatsApp request…';
+  }
+
+  HTMLFormElement.prototype.submit.call(form);
+}
+
+function addCartRequestInput(form, name, value) {
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = name;
+  input.value = value;
+  input.className = 'cart-generated-input';
+  form.appendChild(input);
+}
+
 function whatsappOrder(name) {
   const text = encodeURIComponent('Hello HoneyBee Gift and Design, I am interested in ' + name + '.');
   const number = window.honeyBeeContact?.whatsappNumber;
@@ -174,6 +226,8 @@ document.addEventListener('click', event => {
 
 document.addEventListener('DOMContentLoaded', () => {
   updateCart();
+
+  document.getElementById('whatsapp-cart-form')?.addEventListener('submit', prepareWhatsAppCart);
 
   const header = document.getElementById('header');
   window.addEventListener('scroll', () => {

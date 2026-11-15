@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\Customer;
-use App\Models\Staff;
+use App\Services\RoleDashboardRouter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,30 +23,16 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request, RoleDashboardRouter $dashboardRouter): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        $email = $request->user()->email;
-        $staff = Staff::where('email', $email)->first();
-        $staffRole = strtolower((string) $staff?->role);
+        $dashboardRoute = $dashboardRouter->routeNameFor($request->user());
 
-        if ($staffRole === 'admin') {
-            return redirect()->route('admin.dashboard');
-        }
-
-        if ($staffRole === 'manager') {
-            return redirect()->route('manager.dashboard');
-        }
-
-        if ($staffRole === 'staff') {
-            return redirect()->route('staff.dashboard');
-        }
-
-        if (! $staff && Customer::where('email', $email)->exists()) {
-            return redirect()->route('customer.dashboard');
+        if ($dashboardRoute !== null) {
+            return redirect()->route($dashboardRoute);
         }
 
         Auth::guard('web')->logout();

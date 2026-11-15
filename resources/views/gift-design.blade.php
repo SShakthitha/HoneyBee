@@ -7,6 +7,19 @@
 @endpush
 
 @section('content')
+@if ($errors->any())
+  <div class="container" role="alert" style="padding-top:1rem;">
+    <div class="checkout-note">
+      <strong>We could not prepare the WhatsApp request.</strong>
+      <ul class="mb-0 mt-2">
+        @foreach ($errors->all() as $error)
+          <li>{{ $error }}</li>
+        @endforeach
+      </ul>
+    </div>
+  </div>
+@endif
+
 <section class="hero" id="home">
   <div class="hero-bg-overlay"></div>
   <div class="container hero-content">
@@ -56,7 +69,7 @@
       @forelse($gifts as $gift)
         @php
           $price = $gift->currentSellingPrice();
-          $image = $gift->image ? asset('storage/' . $gift->image) : null;
+          $image = \App\Support\PublicImage::url($gift->image);
           $message = rawurlencode('Hi! I want to order ' . $gift->item_name . ' - Rs.' . $price);
           $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$gift->item_name}\nCategory: Gift\nPrice: Rs. {$price}\nI would like to customize: ");
         @endphp
@@ -74,7 +87,6 @@
           <div class="product-body">
             <h3>{{ $gift->item_name }}</h3>
             <p>{{ $gift->description ?: $gift->category }}</p>
-            <p class="small {{ $gift->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $gift->available_stock > 0 ? $gift->available_stock.' available' : 'Out of stock' }}</p>
             <p class="price">
               @if($gift->hasValidOfferPrice())
                 <del>Rs {{ number_format((float) $gift->price, 2) }}</del>
@@ -88,7 +100,7 @@
               <button
                   class="btn btn-cart-add"
                   data-cart-product data-product-name="{{ $gift->item_name }}" data-product-price="{{ (float) $price }}" data-product-id="{{ $gift->gift_design_id }}" data-product-type="gift"
-                  type="button" @disabled($gift->available_stock < 1)>
+                  type="button">
                   Add
               </button>
               <a class="btn btn-details" href="{{ route('gift.design.show', $gift->gift_design_id) }}">Details</a>
@@ -115,7 +127,7 @@
       @forelse($frames as $frame)
         @php
           $price = $frame->currentSellingPrice();
-          $image = $frame->image ? asset('storage/' . $frame->image) : null;
+          $image = \App\Support\PublicImage::url($frame->image);
           $message = rawurlencode('Hi! I want to order ' . $frame->item_name . ' - Rs.' . $price);
           $customizationMessage = rawurlencode("Hello HoneyBee, I would like to discuss customization for:\nProduct: {$frame->item_name}\nCategory: Frame\nPrice: Rs. {$price}\nI would like to customize: ");
         @endphp
@@ -131,7 +143,6 @@
           <div class="product-body">
             <h3>{{ $frame->item_name }}</h3>
             <p>{{ $frame->description ?: $frame->category }}</p>
-            <p class="small {{ $frame->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $frame->available_stock > 0 ? $frame->available_stock.' available' : 'Out of stock' }}</p>
             <p class="price">
               @if($frame->hasValidOfferPrice())
                 <del>Rs {{ number_format((float) $frame->price, 2) }}</del>
@@ -145,7 +156,7 @@
               <button
                   class="btn btn-cart-add"
                   data-cart-product data-product-name="{{ $frame->item_name }}" data-product-price="{{ (float) $price }}" data-product-id="{{ $frame->gift_design_id }}" data-product-type="frame"
-                  type="button" @disabled($frame->available_stock < 1)>
+                  type="button">
                   Add
               </button>
               <a class="btn btn-details" href="{{ route('gift.design.show', $frame->gift_design_id) }}">Details</a>
@@ -171,13 +182,12 @@
     @if($frameDesignImages->isNotEmpty())
       <div class="gallery-grid">
         @foreach($frameDesignImages as $frameDesignImage)
-          @php
-            $frameImageUrl = str_starts_with($frameDesignImage->image, 'http')
-                ? $frameDesignImage->image
-                : asset('storage/' . $frameDesignImage->image);
-          @endphp
           <figure class="gallery-item m-0">
-            <img src="{{ $frameImageUrl }}" alt="{{ $frameDesignImage->title ?? 'Frame design' }}" class="w-100" onerror="this.closest('figure').style.display='none'">
+            @if($imageUrl = \App\Support\PublicImage::url($frameDesignImage->image))
+              <img src="{{ $imageUrl }}" alt="{{ $frameDesignImage->title ?? 'Frame design' }}" class="w-100 h-100" style="object-fit: cover;">
+            @else
+              <span class="gallery-image-placeholder" style="width:100%;height:100%;display:grid;place-items:center;">Frame design image unavailable</span>
+            @endif
             @if($frameDesignImage->title)
               <figcaption class="gallery-overlay">{{ $frameDesignImage->title }}</figcaption>
             @endif
@@ -215,13 +225,12 @@
     @if($giftGalleryImages->isNotEmpty())
       <div class="gallery-grid">
         @foreach($giftGalleryImages as $galleryImage)
-          @php
-            $galleryImageUrl = str_starts_with($galleryImage->image, 'http')
-                ? $galleryImage->image
-                : asset('storage/' . $galleryImage->image);
-          @endphp
           <figure class="gallery-item m-0">
-            <img src="{{ $galleryImageUrl }}" alt="{{ $galleryImage->title ?? 'Gift and Design gallery image' }}" class="w-100" onerror="this.closest('figure').style.display='none'">
+            @if($imageUrl = \App\Support\PublicImage::url($galleryImage->image))
+              <img src="{{ $imageUrl }}" alt="{{ $galleryImage->title ?? 'Gift and Design gallery image' }}" class="w-100 h-100" style="object-fit: cover;">
+            @else
+              <span class="gallery-image-placeholder" style="width:100%;height:100%;display:grid;place-items:center;">Gallery image unavailable</span>
+            @endif
             @if($galleryImage->title)
               <figcaption class="gallery-overlay">{{ $galleryImage->title }}</figcaption>
             @endif
@@ -276,7 +285,15 @@
 <aside class="cart-sidebar" id="cart-sidebar">
   <div class="cart-header"><h3>Your Cart</h3><button onclick="toggleCart()" class="cart-close" type="button">Close</button></div>
   <div class="cart-items" id="cart-items"><p class="cart-empty">Your cart is empty.</p></div>
-  <div class="cart-footer"><p class="cart-total">Total: <strong id="cart-total">Rs 0</strong></p><button class="btn btn-primary btn-full" onclick="proceedToCheckout()" type="button">Proceed to Checkout</button></div>
+  <div class="cart-footer">
+    <p class="cart-total">Total: <strong id="cart-total">Rs 0</strong></p>
+    <label for="cart-order-notes">Notes (optional)</label>
+    <textarea id="cart-order-notes" rows="3" maxlength="5000" placeholder="Add a note for HoneyBee"></textarea>
+    <form id="whatsapp-cart-form" method="POST" action="{{ route('checkout.whatsapp.prepare') }}" target="honeybee-whatsapp-request" rel="noopener">
+      @csrf
+      <button class="btn btn-primary btn-full" id="checkout-whatsapp-button" type="submit">Order via WhatsApp</button>
+    </form>
+  </div>
 </aside>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="modal-overlay" id="detail-overlay" onclick="closeDetail()"></div>
@@ -284,7 +301,7 @@
 <div class="toast" id="toast"></div>
 
 @push('scripts')
-<script>window.honeyBeeCheckoutUrl = @json(request()->getBaseUrl() . '/checkout'); window.honeyBeeContact = { whatsappNumber: @json(config('honeybee.contact.whatsapp_number')) };</script>
+<script>window.honeyBeeCheckoutUrl = @json(request()->getBaseUrl() . '/checkout'); window.honeyBeeContact = { whatsappNumber: @json(config('honeybee.contact.whatsapp_number')) }; window.honeyBeeCheckoutPrepareUrl = @json(route('checkout.whatsapp.prepare'));</script>
 <script src="{{ request()->getBaseUrl() }}/js/gift-design.js"></script>
 @endpush
 

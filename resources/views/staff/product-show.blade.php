@@ -18,8 +18,8 @@
 </div>
 <section class="honey-card">
     <div class="row g-4">
-        @if($model->image)
-            <div class="col-12 col-md-4"><img src="{{ asset('storage/'.$model->image) }}" alt="{{ $model->{$fields['Name']} }}" class="img-fluid rounded" style="max-height:360px;object-fit:contain"></div>
+        @if($imageUrl = \App\Support\PublicImage::url($model->image))
+            <div class="col-12 col-md-4"><img src="{{ $imageUrl }}" alt="{{ $model->{$fields['Name']} }}" class="img-fluid rounded" style="max-height:360px;object-fit:contain"></div>
         @endif
         <div class="col">
             <dl class="row mb-0">

@@ -19,6 +19,7 @@
 
             <form action="{{ route('orders.store') }}" method="POST">
                 @csrf
+                <input type="hidden" name="submission_token" value="{{ $submissionToken }}">
 
                 <input type="hidden" name="service_id" value="{{ $service->service_id }}">
 
@@ -39,9 +40,7 @@
                     <select name="payment_method" required
                         style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
                         <option value="">Select Payment Method</option>
-                        <option value="cash">Cash</option>
                         <option value="bank_transfer">Bank Transfer</option>
-                        <option value="card">Card (arranged with HoneyBee)</option>
                     </select>
                 </div>
 

@@ -65,9 +65,11 @@
                     <label class="form-label">Current Image</label>
 
                     <div>
-                        <img src="{{ asset('storage/'.$image->image) }}"
-                             alt="{{ $image->title ?? 'Gallery image' }}"
-                             style="width: 250px; height: 180px; object-fit: cover; border-radius: 10px;">
+                        @if($imageUrl = \App\Support\PublicImage::url($image->image))
+                            <img src="{{ $imageUrl }}" alt="{{ $image->title ?? 'Gallery image' }}" style="width:250px;height:180px;object-fit:cover;border-radius:10px;">
+                        @else
+                            <span class="text-muted">Current gallery image is missing.</span>
+                        @endif
                     </div>
                 </div>
 

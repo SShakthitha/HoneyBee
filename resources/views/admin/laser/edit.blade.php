@@ -11,7 +11,7 @@
 
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
 
-    <form action="/admin/laser/{{ $laserWork->laser_id }}" method="POST">
+    <form action="{{ route('admin.laser.update', $laserWork->laser_id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -56,6 +56,17 @@
         </div>
 
         <div style="margin-top: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;" for="laser-image">Product Image</label>
+            @if($laserImageUrl = \App\Support\PublicImage::url($laserWork->image))
+                <img id="laser-image-current" src="{{ $laserImageUrl }}" alt="Current image for {{ $laserWork->product_name }}" style="width:120px;height:120px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+            @elseif($laserWork->image)
+                <span class="text-muted d-block mb-2">Current image is missing.</span>
+            @endif
+            <input id="laser-image" type="file" name="image" accept="image/jpeg,image/png,image/webp" style="width:100%;padding:10px;">
+            <div id="laser-image-preview" class="mt-2" aria-live="polite"></div>
+        </div>
+
+        <div style="margin-top: 20px;">
             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Engraving Text</label>
             <textarea name="engraving_text" rows="3"
                 style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">{{ $laserWork->engraving_text }}</textarea>
@@ -91,5 +102,21 @@
 
     </form>
 </div>
+
+@push('scripts')
+<script>
+document.getElementById('laser-image')?.addEventListener('change', function () {
+    const preview = document.getElementById('laser-image-preview');
+    preview.replaceChildren();
+    const file = this.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const image = document.createElement('img');
+    image.src = URL.createObjectURL(file);
+    image.alt = 'Selected replacement laser image preview';
+    image.style.cssText = 'width:120px;height:120px;object-fit:cover;border-radius:8px';
+    preview.append(image);
+});
+</script>
+@endpush
 
 @endsection

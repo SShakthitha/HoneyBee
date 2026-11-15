@@ -40,7 +40,28 @@
         <span id="cart-count">0</span>
       </button>
       @auth
-        <a class="btn btn-login" href="{{ route('dashboard') }}">Dashboard</a>
+        @php
+          $dashboardUser = auth()->user();
+          $dashboardStaffRecords = \App\Models\Staff::where('email', $dashboardUser->email)->get(['role']);
+          $dashboardCustomerExists = \App\Models\Customer::where('email', $dashboardUser->email)->exists();
+
+          if ($dashboardStaffRecords->count() === 1 && ! $dashboardCustomerExists) {
+              $dashboardRole = strtolower((string) $dashboardStaffRecords->first()->role);
+              $dashboardRoute = match ($dashboardRole) {
+                  'admin' => 'admin.dashboard',
+                  'manager' => 'manager.dashboard',
+                  'staff' => 'staff.dashboard',
+                  default => null,
+              };
+          } elseif ($dashboardStaffRecords->isEmpty() && $dashboardCustomerExists) {
+              $dashboardRoute = 'dashboard';
+          } else {
+              $dashboardRoute = null;
+          }
+
+          $dashboardUrl = $dashboardRoute !== null ? route($dashboardRoute) : null;
+        @endphp
+        @if($dashboardUrl)<a class="btn btn-login" href="{{ $dashboardUrl }}">Dashboard</a>@endif
       @else
         <a class="btn btn-login" href="{{ route('login') }}">Login</a>
       @endauth
@@ -88,8 +109,8 @@
         @endphp
         <div class="product-card" data-name="{{ e($laserWork->product_name) }}">
           <div class="card-img-wrap">
-            @if($laserWork->image)
-              <img src="{{ asset('storage/' . $laserWork->image) }}" alt="{{ $laserWork->product_name }}" class="laser-product-image" loading="lazy">
+            @if($imageUrl = \App\Support\PublicImage::url($laserWork->image))
+              <img src="{{ $imageUrl }}" alt="{{ $laserWork->product_name }}" class="laser-product-image" loading="lazy">
             @else
               <div class="card-img-placeholder frame-img" aria-label="No product image available"><i class="fas fa-bolt"></i></div>
             @endif
@@ -107,9 +128,7 @@
                 From <strong>Rs {{ number_format((float) $laserWork->price, 2) }}</strong>
               @endif
             </p>
-            @if($laserWork->production_type === 'ready_made')
-              <p class="stock-availability {{ $laserWork->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $laserWork->available_stock > 0 ? $laserWork->available_stock.' ready-made units available' : 'Out of stock' }}</p>
-            @else
+            @if($laserWork->production_type === 'custom_made')
               <p class="stock-availability text-info">Made to order</p>
             @endif
             <div class="card-actions">
@@ -144,7 +163,7 @@
     <div class="gallery-grid" id="galleryGrid">
       @forelse($galleryImages as $galleryImage)
         <figure class="gallery-item m-0">
-          <img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? 'Laser Work gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;" onerror="this.closest('figure').style.display='none'">
+          @if($imageUrl = \App\Support\PublicImage::url($galleryImage->image))<img src="{{ $imageUrl }}" alt="{{ $galleryImage->title ?? 'Laser Work gallery image' }}" class="w-100 h-100" style="display: block; object-fit: cover;">@else<span class="gallery-image-placeholder" style="width:100%;height:100%;display:grid;place-items:center;">Laser gallery image unavailable</span>@endif
         </figure>
       @empty
         <p class="mb-0">Our latest laser work will be added here soon.</p>

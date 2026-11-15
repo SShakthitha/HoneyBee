@@ -58,18 +58,29 @@
     <link rel="stylesheet" href="<?php echo e(asset('css/responsive.css')); ?>">
 </head>
 <body>
+    <?php if(auth()->guard()->check()): ?>
     <?php
-        $dashboardUrl = route('dashboard');
-        if (auth()->check()) {
-            $staffRole = strtolower((string) \App\Models\Staff::where('email', auth()->user()->email)->value('role'));
-            $dashboardUrl = match ($staffRole) {
-                'admin' => route('admin.dashboard'),
-                'manager' => route('manager.dashboard'),
-                'staff' => route('staff.dashboard'),
-                default => route('customer.dashboard'),
+        $dashboardUser = auth()->user();
+        $dashboardStaffRecords = \App\Models\Staff::where('email', $dashboardUser->email)->get(['role']);
+        $dashboardCustomerExists = \App\Models\Customer::where('email', $dashboardUser->email)->exists();
+
+        if ($dashboardStaffRecords->count() === 1 && ! $dashboardCustomerExists) {
+            $dashboardRole = strtolower((string) $dashboardStaffRecords->first()->role);
+            $dashboardRoute = match ($dashboardRole) {
+                'admin' => 'admin.dashboard',
+                'manager' => 'manager.dashboard',
+                'staff' => 'staff.dashboard',
+                default => null,
             };
+        } elseif ($dashboardStaffRecords->isEmpty() && $dashboardCustomerExists) {
+            $dashboardRoute = 'dashboard';
+        } else {
+            $dashboardRoute = null;
         }
+
+        $dashboardUrl = $dashboardRoute !== null ? route($dashboardRoute) : null;
     ?>
+    <?php endif; ?>
     <header class="header" id="header">
         <div class="header-inner container">
             <a href="<?php echo e(route('home')); ?>" class="brand">
@@ -84,7 +95,7 @@
                     <li><a href="<?php echo e(route('laser.work')); ?>" class="<?php echo e(request()->routeIs('laser.*') ? 'active' : ''); ?>">Laser Work</a></li>
                     <li><a href="<?php echo e(route('events')); ?>" class="<?php echo e(request()->routeIs('events') ? 'active' : ''); ?>">Events</a></li>
                     <?php if(auth()->guard()->check()): ?>
-                        <li class="mobile-account-link"><a href="<?php echo e($dashboardUrl); ?>">Dashboard</a></li>
+                        <?php if($dashboardUrl): ?><li class="mobile-account-link"><a href="<?php echo e($dashboardUrl); ?>">Dashboard</a></li><?php endif; ?>
                         <li class="mobile-account-link"><form method="POST" action="<?php echo e(route('logout')); ?>"><?php echo csrf_field(); ?><button type="submit">Logout</button></form></li>
                     <?php else: ?>
                         <li class="mobile-account-link"><a href="<?php echo e(route('login')); ?>">Login</a></li>
@@ -103,9 +114,9 @@
                 </button>
 
                 <?php if(auth()->guard()->check()): ?>
-                    <a class="btn btn-login" href="<?php echo e($dashboardUrl); ?>">
-                        Dashboard
-                    </a>
+                    <?php if($dashboardUrl): ?>
+                        <a class="btn btn-login" href="<?php echo e($dashboardUrl); ?>">Dashboard</a>
+                    <?php endif; ?>
 
                     <form method="POST" action="<?php echo e(route('logout')); ?>" style="display:inline;">
                         <?php echo csrf_field(); ?>

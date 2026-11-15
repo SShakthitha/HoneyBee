@@ -11,7 +11,7 @@
 
 <div style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
 
-    <form action="/admin/laser/store" method="POST">
+    <form action="{{ route('admin.laser.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -60,6 +60,12 @@
                     style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
             </div>
 
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;" for="laser-image">Product Image</label>
+                <input id="laser-image" type="file" name="image" accept="image/jpeg,image/png,image/webp" style="width: 100%; padding: 10px;">
+                <div id="laser-image-preview" class="mt-2" aria-live="polite"></div>
+            </div>
+
         </div>
 
         <div style="margin-top: 20px;">
@@ -83,5 +89,21 @@
 
     </form>
 </div>
+
+@push('scripts')
+<script>
+document.getElementById('laser-image')?.addEventListener('change', function () {
+    const preview = document.getElementById('laser-image-preview');
+    preview.replaceChildren();
+    const file = this.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const image = document.createElement('img');
+    image.src = URL.createObjectURL(file);
+    image.alt = 'Selected laser product image preview';
+    image.style.cssText = 'width:120px;height:120px;object-fit:cover;border-radius:8px';
+    preview.append(image);
+});
+</script>
+@endpush
 
 @endsection

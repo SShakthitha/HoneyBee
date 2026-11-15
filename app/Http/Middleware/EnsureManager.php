@@ -20,7 +20,7 @@ class EnsureManager
 
         $staffRole = Staff::where('email', $user->email)->value('role');
 
-        abort_unless(strtolower((string) $staffRole) === 'manager', 403);
+        abort_unless(strtolower(trim((string) $staffRole)) === 'manager', 403);
 
         return $next($request);
     }

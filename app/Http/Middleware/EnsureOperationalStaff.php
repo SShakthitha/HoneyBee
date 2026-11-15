@@ -18,7 +18,7 @@ class EnsureOperationalStaff
             return redirect()->route('login');
         }
 
-        $staffRole = strtolower((string) Staff::where('email', $user->email)->value('role'));
+        $staffRole = strtolower(trim((string) Staff::where('email', $user->email)->value('role')));
 
         abort_unless(in_array($staffRole, ['staff', 'manager'], true), 403);
 

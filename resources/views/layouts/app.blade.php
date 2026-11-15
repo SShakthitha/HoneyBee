@@ -78,8 +78,7 @@
             $dashboardRoute = null;
         }
 
-        abort_unless($dashboardRoute !== null, 403);
-        $dashboardUrl = route($dashboardRoute);
+        $dashboardUrl = $dashboardRoute !== null ? route($dashboardRoute) : null;
     @endphp
     @endauth
     <header class="header" id="header">
@@ -96,7 +95,7 @@
                     <li><a href="{{ route('laser.work') }}" class="{{ request()->routeIs('laser.*') ? 'active' : '' }}">Laser Work</a></li>
                     <li><a href="{{ route('events') }}" class="{{ request()->routeIs('events') ? 'active' : '' }}">Events</a></li>
                     @auth
-                        <li class="mobile-account-link"><a href="{{ $dashboardUrl }}">Dashboard</a></li>
+                        @if($dashboardUrl)<li class="mobile-account-link"><a href="{{ $dashboardUrl }}">Dashboard</a></li>@endif
                         <li class="mobile-account-link"><form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Logout</button></form></li>
                     @else
                         <li class="mobile-account-link"><a href="{{ route('login') }}">Login</a></li>
@@ -115,9 +114,9 @@
                 </button>
 
                 @auth
-                    <a class="btn btn-login" href="{{ $dashboardUrl }}">
-                        Dashboard
-                    </a>
+                    @if($dashboardUrl)
+                        <a class="btn btn-login" href="{{ $dashboardUrl }}">Dashboard</a>
+                    @endif
 
                     <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                         @csrf

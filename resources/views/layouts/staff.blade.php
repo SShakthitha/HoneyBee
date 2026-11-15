@@ -8,24 +8,27 @@
     <style>
         :root { --honey:#f5a623; --dark:#1a1a1a; --cream:#fff8ea; --border:#eee5d5; }
         * { box-sizing:border-box } body { margin:0; font-family:'Segoe UI',sans-serif; color:var(--dark); background:var(--cream); }
-        .staff-sidebar { position:fixed; inset:0 auto 0 0; width:250px; padding:28px 18px; background:var(--dark); z-index:10; }
+        .staff-sidebar { position:fixed; inset:0 auto 0 0; width:250px; padding:28px 18px; background:var(--dark); z-index:10; display:flex; flex-direction:column; overflow:hidden; }
         .brand { display:flex; justify-content:center; margin-bottom:32px }.brand img { height:58px; max-width:100%; object-fit:contain }
+        .staff-sidebar > nav { flex:1 1 0%; height:0; min-width:0; min-height:0; overflow-y:scroll; overflow-x:hidden; overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; scrollbar-gutter:stable; }
         .staff-sidebar a { display:flex; align-items:center; gap:11px; padding:11px 14px; margin:5px 0; border-radius:9px; text-decoration:none; color:#bdbdbd; font-size:15px; }
         .staff-sidebar a:hover { color:var(--honey); background:#303030 }.staff-sidebar a.active { color:var(--dark); background:var(--honey); font-weight:700 }.staff-sidebar .logout { color:var(--honey); margin-top:30px; border:0; background:transparent; width:100%; text-align:left }
         .staff-main { margin-left:250px; padding:36px; min-height:100vh }.page-head { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:28px }.page-head h1 { font-size:28px; font-weight:700; margin:0 }.page-head h1 span { color:var(--honey) }
         .honey-card { background:#fff; border:1px solid var(--border); box-shadow:0 5px 20px rgba(0,0,0,.07); border-radius:15px; padding:24px }.btn-honey { background:var(--honey); border-color:var(--honey); color:var(--dark); font-weight:700 }.btn-honey:hover { background:#dd941f; border-color:#dd941f; color:var(--dark) }.table thead th { background:var(--honey); color:var(--dark); white-space:nowrap }.badge-status { display:inline-block; padding:.38rem .7rem; border-radius:999px; font-size:.78rem; font-weight:700 }.status-pending { background:#fff3cd; color:#856404 }.status-processing { background:#cfe2ff; color:#084298 }.status-completed { background:#d4edda; color:#155724 }.status-cancelled { background:#f8d7da; color:#842029 }
         .staff-mobile-bar { display:none }
-        @media(max-width:900px) { .staff-mobile-bar { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--dark); color:#fff; position:sticky; top:0; z-index:30 }.staff-mobile-bar button { border:1px solid rgba(255,255,255,.3); background:transparent; color:#fff; border-radius:7px; padding:7px 10px }.staff-sidebar { transform:translateX(-105%); transition:transform .2s ease; width:min(280px,85vw); overflow-y:auto; box-shadow:8px 0 24px rgba(0,0,0,.25) } body.staff-sidebar-open .staff-sidebar { transform:translateX(0) }.staff-nav-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9 } body.staff-sidebar-open .staff-nav-overlay { display:block }.brand { justify-content:flex-start; margin-bottom:12px }.brand img { height:42px }.staff-main { margin-left:0; padding:22px 16px }.page-head { align-items:flex-start; flex-direction:column }.honey-card { padding:16px } }
+        @media(max-width:900px) { .staff-mobile-bar { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--dark); color:#fff; position:sticky; top:0; z-index:30 }.staff-mobile-bar button { border:1px solid rgba(255,255,255,.3); background:transparent; color:#fff; border-radius:7px; padding:7px 10px }.staff-sidebar { transform:translateX(-105%); transition:transform .2s ease; width:min(280px,85vw); box-shadow:8px 0 24px rgba(0,0,0,.25) } body.staff-sidebar-open .staff-sidebar { transform:translateX(0) }.staff-nav-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9 } body.staff-sidebar-open .staff-nav-overlay { display:block }.brand { justify-content:flex-start; margin-bottom:12px }.brand img { height:42px }.staff-main { margin-left:0; padding:22px 16px }.page-head { align-items:flex-start; flex-direction:column }.honey-card { padding:16px } }
     </style><link href="{{ asset('css/responsive.css') }}" rel="stylesheet"><link href="{{ asset('css/sidebar-dropdown.css') }}?v={{ filemtime(public_path('css/sidebar-dropdown.css')) }}" rel="stylesheet">@stack('styles')
 </head>
 <body>
 <div class="staff-mobile-bar"><button type="button" id="staff-menu-toggle" aria-controls="staff-sidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i> Menu</button><strong>HoneyBee Staff</strong></div><div class="staff-nav-overlay" id="staff-nav-overlay"></div>
 <aside class="staff-sidebar" id="staff-sidebar"><div class="brand"><img src="{{ asset('images/logo.webp') }}" alt="HoneyBee Shop"></div><nav>
-    @php($isManager = strtolower((string) \App\Models\Staff::where('email', auth()->user()->email)->value('role')) === 'manager')
+    @php($isManager = strtolower(trim((string) \App\Models\Staff::where('email', auth()->user()->email)->value('role'))) === 'manager')
     @php($staffProductType = request()->route('type'))
     <a class="{{ request()->routeIs('manager.dashboard', 'staff.dashboard') ? 'active' : '' }}" href="{{ $isManager ? route('manager.dashboard') : route('staff.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
     <a class="{{ request()->routeIs('staff.orders.*') ? 'active' : '' }}" href="{{ route('staff.orders.index') }}"><i class="fa-solid fa-receipt"></i> Orders</a>
-    <a class="{{ request()->routeIs('staff.inventory.*') ? 'active' : '' }}" href="{{ route('staff.inventory.index') }}"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+    @if($isManager)
+    <a class="{{ request()->routeIs('manager.inventory.*') ? 'active' : '' }}" href="{{ route('manager.inventory.index') }}"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
+    @endif
     <ul class="staff-products-menu">
         <li>
             <details class="sidebar-services" {{ request()->routeIs('staff.products.*') ? 'open' : '' }}>

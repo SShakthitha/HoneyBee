@@ -70,7 +70,12 @@ class OrderController extends Controller
 
     public function create(Service $service)
     {
-        return view('order-create', compact('service'));
+        abort_unless($service->availability_status === 'available', 404);
+
+        return view('order-create', [
+            'service' => $service,
+            'submissionToken' => Str::random(64),
+        ]);
     }
 
     /*
@@ -81,36 +86,51 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $serviceId = $request->validate([
-            'service_id' => ['required', 'integer', 'exists:services,service_id'],
-        ])['service_id'];
-
-        $service = Service::query()
-            ->where('availability_status', 'available')
-            ->findOrFail($serviceId);
-
-        $totalCents = $this->amountInCents($service->price);
         $validated = $request->validate([
-            'payment_method' => ['required', Rule::in(['cash', 'bank_transfer', 'card'])],
+            'service_id' => ['required', 'integer', 'exists:services,service_id'],
+            'submission_token' => ['required', 'string', 'size:64', 'alpha_num'],
+            'payment_method' => ['required', Rule::in(['bank_transfer'])],
             'delivery_date' => ['nullable', 'date', 'after_or_equal:today'],
             'attribute' => ['nullable', 'string', 'max:5000'],
         ]);
 
+        $service = Service::query()
+            ->where('availability_status', 'available')
+            ->findOrFail($validated['service_id']);
+
+        $totalCents = $this->amountInCents($service->price);
+
         $customer = Customer::where('email', $request->user()->email)
             ->firstOrFail();
 
-        $order = DB::transaction(fn () => Order::create([
-            'customer_id' => $customer->customer_id,
-            'service_id' => $service->service_id,
-            'order_date' => now(),
-            'paid_amount' => $this->centsToAmount($totalCents),
-            'advanced_paid' => '0.00',
-            'discount' => '0.00',
-            'payment_method' => $validated['payment_method'],
-            'status' => 'pending',
-            'delivery_date' => $validated['delivery_date'] ?? null,
-            'attribute' => $validated['attribute'] ?? null,
-        ]));
+        if ($this->orderForSubmission($customer, $validated['submission_token'])) {
+            return redirect('/orders')->with('success', 'This order was already received.');
+        }
+
+        $total = $this->centsToAmount($totalCents);
+        try {
+            DB::transaction(function () use ($customer, $service, $validated, $total): void {
+                Order::create([
+                    'customer_id' => $customer->customer_id,
+                    'submission_token' => $validated['submission_token'],
+                    'service_id' => $service->service_id,
+                    'order_date' => now(),
+                    'paid_amount' => $total,
+                    'advanced_paid' => '0.00',
+                    'discount' => '0.00',
+                    'payment_method' => $validated['payment_method'],
+                    'status' => 'pending',
+                    'delivery_date' => $validated['delivery_date'] ?? null,
+                    'attribute' => $validated['attribute'] ?? null,
+                ]);
+
+                $customer->increment('total_spent', $total);
+            });
+        } catch (QueryException $exception) {
+            if (! $this->orderForSubmission($customer, $validated['submission_token'])) {
+                throw $exception;
+            }
+        }
 
         return redirect('/orders')
             ->with('success', 'Order placed successfully!');

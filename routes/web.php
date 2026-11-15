@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\GalleryImageController;
 use App\Http\Controllers\Admin\ServiceRecordController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\StaffInvitationAdminController;
 use App\Http\Controllers\Admin\WhatsAppSettingsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CheckoutConfirmationController;
@@ -20,16 +21,20 @@ use App\Http\Controllers\LaserWorkController;
 use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ManagerStaffController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PrepareWhatsAppCheckoutController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\StaffDashboardController;
+use App\Http\Controllers\StaffInvitationController;
 use App\Http\Controllers\Staff\ProductExportController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 // Home
+Route::get('/staff/register-invitation/{token}', [StaffInvitationController::class, 'create'])->middleware('throttle:10,1')->name('staff.invitation.register');
+Route::post('/staff/register-invitation/{token}', [StaffInvitationController::class, 'store'])->middleware('throttle:5,1')->name('staff.invitation.store');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/about', 'about')->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
@@ -67,12 +72,12 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     // can be kept while the customer signs in and navigates to this page.
     Route::get('/checkout', function () {
         $customer = Customer::where('email', auth()->user()->email)->first();
-        $submissionToken = Str::random(64);
 
-        return view('checkout', compact('customer', 'submissionToken'));
+        return view('checkout', compact('customer'));
     })->name('checkout');
 
     Route::post('/checkout', [OrderController::class, 'storeCartOrder'])->name('checkout.store');
+    Route::post('/checkout/whatsapp', PrepareWhatsAppCheckoutController::class)->name('checkout.whatsapp.prepare');
     Route::get('/orders/{order}/confirmation', [CheckoutConfirmationController::class, 'show'])->name('checkout.confirmation');
     Route::get('/orders/{id}/pdf', [OrderController::class, 'downloadPdf'])->name('orders.pdf');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
@@ -83,7 +88,7 @@ Route::get('/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware(['auth', 'customer', 'verified'])
     ->name('dashboard');
 
-Route::middleware(['auth', 'customer'])->group(function () {
+Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
     Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])->name('customer.dashboard');
 
@@ -103,8 +108,16 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::get('/manager/dashboard', [ManagerDashboardController::class, 'index'])
-    ->middleware(['auth', 'manager'])
+    ->middleware(['auth', 'verified', 'manager'])
     ->name('manager.dashboard');
+
+Route::prefix('manager')->middleware(['auth', 'verified', 'manager'])->name('manager.')->group(function () {
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::put('/inventory/{type}/{id}', [InventoryController::class, 'adjust'])
+        ->whereIn('type', ['gift', 'frame', 'laser', 'event'])
+        ->whereNumber('id')
+        ->name('inventory.adjust');
+});
 
 /*
  | Operational workspace.  This is intentionally separate from /admin:
@@ -113,7 +126,6 @@ Route::get('/manager/dashboard', [ManagerDashboardController::class, 'index'])
  */
 Route::prefix('staff')->middleware(['auth', 'verified', 'staff'])->name('staff.')->group(function () {
     Route::get('/dashboard', [StaffDashboardController::class, 'dashboard'])->name('dashboard');
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 
     Route::get('/orders', [StaffDashboardController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{id}', [StaffDashboardController::class, 'showOrder'])->name('orders.show');
@@ -156,10 +168,6 @@ Route::prefix('staff')->middleware(['auth', 'verified', 'staff'])->name('staff.'
         Route::delete('/{id}', [ManagerStaffController::class, 'destroy'])->name('destroy');
     });
 
-    Route::middleware('manager')->put('/inventory/{type}/{id}', [InventoryController::class, 'adjust'])
-        ->whereIn('type', ['gift', 'frame', 'laser', 'event'])
-        ->whereNumber('id')
-        ->name('inventory.adjust');
 });
 
 Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->group(function () {
@@ -265,4 +273,5 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->group(functio
     Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])->name('admin.staff.edit');
     Route::put('/staff/{id}', [StaffController::class, 'update'])->name('admin.staff.update');
     Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('admin.staff.delete');
+    Route::post('/staff/{id}/invitation', [StaffInvitationAdminController::class, 'issue'])->middleware('throttle:10,1')->name('admin.staff.invitation');
 });

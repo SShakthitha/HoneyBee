@@ -121,8 +121,8 @@ class WhatsAppOrderFlowTest extends TestCase
         $product = GiftDesign::create(['item_name' => 'Repeat Gift', 'category' => 'Gift', 'price' => 1250, 'stock_quantity' => 2]);
         $this->actingAs($customer)->get(route('checkout'))
             ->assertOk()
-            ->assertSee('name="submission_token"', false)
-            ->assertSee('Payment is by bank transfer only.');
+            ->assertSee(route('checkout.whatsapp.prepare'), false)
+            ->assertSee('This opens a WhatsApp request. No order is saved');
         $payload = [
             'submission_token' => str_repeat('j', 64),
             'items' => [['item_id' => $product->gift_design_id, 'item_type' => 'gift', 'quantity' => 2]],

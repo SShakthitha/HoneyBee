@@ -23,7 +23,7 @@ class EnsureStaffAdmin
 
         $staffRole = Staff::where('email', $user->email)->value('role');
 
-        abort_unless(strtolower((string) $staffRole) === 'admin', 403);
+        abort_unless(strtolower(trim((string) $staffRole)) === 'admin', 403);
 
         $response = $next($request);
         $response->headers->set('Cache-Control', 'no-store, private, max-age=0, must-revalidate');

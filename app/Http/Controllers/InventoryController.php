@@ -36,13 +36,15 @@ class InventoryController extends Controller
 
         $history = InventoryAdjustment::query()->with('adjustedBy')->latest()->limit(100)->get();
 
+        $isAdminInventoryRoute = $request->routeIs('admin.inventory.*');
+
         return view('inventory.index', [
             'items' => $items->sortBy('name')->values(),
             'history' => $history,
             'search' => $search,
             'canAdjust' => $this->canAdjust($request->user()),
-            'layout' => $request->routeIs('admin.inventory.*') ? 'layouts.admin' : 'layouts.staff',
-            'adjustRoute' => $request->routeIs('admin.inventory.*') ? 'admin.inventory.adjust' : 'staff.inventory.adjust',
+            'layout' => $isAdminInventoryRoute ? 'layouts.admin' : 'layouts.staff',
+            'adjustRoute' => $isAdminInventoryRoute ? 'admin.inventory.adjust' : 'manager.inventory.adjust',
         ]);
     }
 
@@ -80,6 +82,9 @@ class InventoryController extends Controller
 
     private function canAdjust(User $user): bool
     {
-        return Staff::query()->where('email', $user->email)->whereIn('role', ['admin', 'manager'])->exists();
+        return Staff::query()
+            ->where('email', $user->email)
+            ->whereRaw('LOWER(TRIM(role)) IN (?, ?)', ['admin', 'manager'])
+            ->exists();
     }
 }

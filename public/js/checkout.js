@@ -17,7 +17,10 @@
             item =>
               item &&
               item.name &&
-              Number.isFinite(Number(item.price))
+              Number.isFinite(Number(item.price)) &&
+              Number.isInteger(Number(item.item_id)) &&
+              Number(item.item_id) > 0 &&
+              ['gift', 'frame'].includes(item.item_type)
           )
         : [];
     } catch (error) {
@@ -32,9 +35,7 @@
 
         const key = [
           item.item_type || 'product',
-          item.item_id || '',
-          item.name,
-          price
+            item.item_id || ''
         ].join('|');
 
         if (!items[key]) {
@@ -119,6 +120,11 @@
       checkoutTotal.textContent = formatPrice(total);
     }
 
+    const estimatedPriceNote = document.getElementById('checkout-price-note');
+    if (estimatedPriceNote) {
+      estimatedPriceNote.hidden = false;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Special requirements
@@ -146,13 +152,20 @@
     */
 
     const orderForm =
-      document.getElementById('place-order-form');
+      document.getElementById('whatsapp-order-form');
 
     if (orderForm) {
+      let submitting = false;
 
       orderForm.addEventListener('submit', event => {
 
+        if (submitting) {
+          event.preventDefault();
+          return;
+        }
+
         event.preventDefault();
+        submitting = true;
 
         // Remove previously generated item fields.
         orderForm
@@ -160,28 +173,11 @@
           .forEach(input => input.remove());
 
         /*
-        Create Laravel array inputs like:
-
-        items[0][name]
-        items[0][price]
-        items[0][quantity]
-        items[0][item_id]
-        items[0][item_type]
+        Send only product identifiers and quantities. The server resolves
+        product names, categories, and current prices from the database.
         */
 
         items.forEach((item, index) => {
-
-          addHiddenInput(
-            orderForm,
-            `items[${index}][name]`,
-            item.name
-          );
-
-          addHiddenInput(
-            orderForm,
-            `items[${index}][price]`,
-            item.price
-          );
 
           addHiddenInput(
             orderForm,
@@ -210,9 +206,11 @@
           notes ? notes.value.trim() : ''
         );
 
-        /*
-        Submit normally after creating the hidden inputs.
-        */
+        const button = orderForm.querySelector('button[type="submit"]');
+        if (button) {
+          button.disabled = true;
+          button.textContent = 'Preparing WhatsApp request…';
+        }
 
         orderForm.submit();
       });

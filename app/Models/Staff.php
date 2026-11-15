@@ -28,4 +28,9 @@ class Staff extends Model
     {
         return $this->hasMany(Handles::class, 'staff_id');
     }
+
+    public function invitation()
+    {
+        return $this->hasOne(StaffInvitation::class, 'staff_id', 'staff_id');
+    }
 }

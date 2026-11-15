@@ -10,12 +10,13 @@
 @endpush
 
 @section('content')
+@php($imageUrl = \App\Support\PublicImage::url($gift->image))
 <main class="product-detail">
   <a class="product-detail__back" href="{{ route('gift.design') }}">← Back to Gift &amp; Design</a>
   <article class="product-detail__card">
     <div>
-      @if($gift->image)
-        <img class="product-detail__image" src="{{ asset('storage/'.$gift->image) }}" alt="{{ $gift->item_name }}">
+      @if($imageUrl)
+        <img class="product-detail__image" src="{{ $imageUrl }}" alt="{{ $gift->item_name }}">
       @else
         <div class="product-detail__placeholder">Product image not available</div>
       @endif
@@ -28,13 +29,8 @@
       @if($gift->size)<p><strong>Size:</strong> {{ $gift->size }}</p>@endif
       @if($gift->customization_option)<p><strong>Customization:</strong> {{ $gift->customization_option }}</p>@endif
       <p class="product-detail__price">@if($gift->hasValidOfferPrice())<del class="text-muted">Rs. {{ number_format((float)$gift->price,2) }}</del> Rs. {{ number_format((float)$gift->offer_price,2) }}@else Rs. {{ number_format((float)$gift->price,2) }}@endif</p>
-      <p class="{{ $gift->available_stock > 0 ? 'text-success' : 'text-danger' }}">{{ $gift->available_stock }} available</p>
       <div class="product-detail__actions">
-        @if($gift->available_stock > 0)
-          <form method="POST" action="{{ route('orders.catalog.store') }}" class="d-flex gap-2 align-items-center">@csrf<input type="hidden" name="item_type" value="{{ in_array(strtolower(trim($gift->category)), ['frame', 'frames'], true) ? 'frame' : 'gift' }}"><input type="hidden" name="item_id" value="{{ $gift->gift_design_id }}"><input type="hidden" name="submission_token" value="{{ $submissionToken }}"><label class="visually-hidden" for="gift-quantity">Quantity</label><input id="gift-quantity" class="form-control" type="number" name="quantity" min="1" max="{{ $gift->available_stock }}" value="1" style="width:90px"><button class="btn btn-warning">Order</button></form>
-        @else
-          <button class="btn btn-secondary" type="button" disabled>Out of stock</button>
-        @endif
+        <form method="POST" action="{{ route('orders.catalog.store') }}" class="d-flex gap-2 align-items-center">@csrf<input type="hidden" name="item_type" value="{{ in_array(strtolower(trim($gift->category)), ['frame', 'frames'], true) ? 'frame' : 'gift' }}"><input type="hidden" name="item_id" value="{{ $gift->gift_design_id }}"><input type="hidden" name="submission_token" value="{{ $submissionToken }}"><label class="visually-hidden" for="gift-quantity">Quantity</label><input id="gift-quantity" class="form-control" type="number" name="quantity" min="1" value="1" style="width:90px"><button class="btn btn-warning">Order</button></form>
         <a class="btn btn-primary" href="{{ route('gift.design') }}#gifts">Browse more products</a>
         <a class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer" href="https://wa.me/{{ config('honeybee.contact.whatsapp_number') }}?text={{ rawurlencode('Hello HoneyBee, I would like to enquire about '.$gift->item_name.'.') }}">Ask about this product</a>
       </div>

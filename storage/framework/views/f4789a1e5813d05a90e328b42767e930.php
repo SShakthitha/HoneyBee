@@ -25,15 +25,20 @@
         .sidebar {
             background: var(--admin-dark);
             width: 250px;
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh;
             padding: 30px 20px;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 20;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .sidebar .logo {
+            flex: 0 0 auto;
             margin-bottom: 40px;
             text-align: center;
         }
@@ -46,6 +51,24 @@
         .sidebar ul {
             list-style: none;
             padding-left: 0;
+        }
+
+        .sidebar-nav {
+            flex: 1 1 0%;
+            height: 0;
+            min-width: 0;
+            min-height: 0;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-gutter: stable;
+        }
+
+        .sidebar-nav > ul {
+            list-style: none;
+            margin: 0;
+            padding: 0 0 12px;
         }
 
         .sidebar ul li {
@@ -202,10 +225,8 @@
             .sidebar {
                 position: fixed;
                 width: min(280px, 85vw);
-                min-height: 100vh;
                 transform: translateX(-105%);
                 transition: transform .2s ease;
-                overflow-y: auto;
                 box-shadow: 8px 0 24px rgba(0,0,0,.25);
             }
             body.admin-sidebar-open .sidebar { transform:translateX(0); }
@@ -235,6 +256,7 @@
         <div class="logo">
             <img src="<?php echo e(asset('images/logo.webp')); ?>" alt="HoneyBee">
         </div>
+        <nav class="sidebar-nav" aria-label="Admin navigation">
         <ul>
             <?php ($servicesOpen = request()->is('admin/services*') || request()->is('admin/service-records*') || request()->is('admin/gift*') || request()->is('admin/laser*') || request()->is('admin/event*')); ?>
             <li><a href="/admin" class="<?php echo e(request()->is('admin') ? 'active' : ''); ?>"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
@@ -251,6 +273,7 @@
                 </details>
             </li>
             <li><a href="/admin/orders" class="<?php echo e(request()->is('admin/orders') ? 'active' : ''); ?>"><i class="fa-solid fa-receipt"></i> Orders</a></li>
+            <li><a href="<?php echo e(route('admin.inventory.index')); ?>" class="<?php echo e(request()->is('admin/inventory*') ? 'active' : ''); ?>"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a></li>
             <li><a href="/admin/customers" class="<?php echo e(request()->is('admin/customers*') ? 'active' : ''); ?>"><i class="fa-solid fa-users"></i> Customers</a></li>
             <li><a href="<?php echo e(route('admin.promotions.index')); ?>" class="<?php echo e(request()->is('admin/promotions*') ? 'active' : ''); ?>"><i class="fa-solid fa-bullhorn"></i> Promotions</a></li>
             <li><a href="<?php echo e(route('admin.settings.whatsapp.edit')); ?>" class="<?php echo e(request()->is('admin/settings/whatsapp') ? 'active' : ''); ?>"><i class="fa-brands fa-whatsapp"></i> WhatsApp Settings</a></li>
@@ -265,6 +288,7 @@
             <li style="margin-top: 30px;"><a href="/" style="color: #f5a623;"><i class="fa-solid fa-globe"></i> View Website</a></li>
             <li><form method="POST" action="<?php echo e(route('logout')); ?>"><?php echo csrf_field(); ?><button class="sidebar-logout" type="submit"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></form></li>
         </ul>
+        </nav>
     </div>
 
     <main class="main-content">

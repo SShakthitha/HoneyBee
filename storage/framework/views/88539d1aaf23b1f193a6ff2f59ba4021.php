@@ -13,6 +13,17 @@
         <i class="fa-solid fa-plus me-1"></i> Add Staff
     </button>
 </div>
+
+<?php if(session('success')): ?><div class="alert alert-success"><?php echo e(session('success')); ?></div><?php endif; ?>
+<?php if(session('invitation')): ?>
+    <div class="admin-card mb-3"><div class="admin-card-body">
+        <h2 class="h5">Registration invitation</h2>
+        <p><strong><?php echo e(session('invitation.name')); ?></strong> · <?php echo e(session('invitation.email')); ?></p>
+        <p>Status: Pending · Expires: <?php echo e(session('invitation.expires_at')); ?></p>
+        <div class="input-group"><input id="registrationLink" class="form-control" readonly value="<?php echo e(session('invitation.url')); ?>"><button class="btn btn-honey" type="button" id="copyRegistrationLink">Copy Registration Link</button></div>
+        <div id="copyFeedback" class="text-success mt-2" role="status" aria-live="polite"></div>
+    </div></div>
+<?php endif; ?>
  
 <div class="admin-card">
     <div class="admin-card-body">
@@ -218,6 +229,15 @@ $(function () {
     });
  
 });
+
+const copyButton = document.getElementById('copyRegistrationLink');
+if (copyButton) copyButton.addEventListener('click', async () => {
+    const field = document.getElementById('registrationLink');
+    try { await navigator.clipboard.writeText(field.value); }
+    catch (error) { field.select(); document.execCommand('copy'); }
+    document.getElementById('copyFeedback').textContent = 'Registration link copied successfully!';
+});
 </script>
 <?php $__env->stopPush(); ?>
+
 <?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\HoneyBeeshop\resources\views/admin/staff/index.blade.php ENDPATH**/ ?>

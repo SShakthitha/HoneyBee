@@ -60,8 +60,9 @@
 
             <div style="margin-top: 20px;">
                 <label style="display: block; margin-bottom: 8px; font-weight: bold;">Image</label>
-                <input type="file" name="image"
+                <input id="event-image" type="file" name="image" accept="image/jpeg,image/png,image/webp"
                     style="width: 100%; padding: 10px;">
+                <div id="event-image-preview" class="mt-2" aria-live="polite"></div>
             </div>
 
         </div>
@@ -93,5 +94,21 @@
 
     </form>
 </div>
+
+@push('scripts')
+<script>
+document.getElementById('event-image')?.addEventListener('change', function () {
+    const preview = document.getElementById('event-image-preview');
+    preview.replaceChildren();
+    const file = this.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const image = document.createElement('img');
+    image.src = URL.createObjectURL(file);
+    image.alt = 'Selected event image preview';
+    image.style.cssText = 'width:120px;height:120px;object-fit:cover;border-radius:8px';
+    preview.append(image);
+});
+</script>
+@endpush
 
 @endsection

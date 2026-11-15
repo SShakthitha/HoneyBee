@@ -31,9 +31,29 @@ class StaffDashboardAuthorizationTest extends TestCase
     public function test_staff_can_access_their_operational_workspace(): void
     {
         $user = $this->staffUser();
-        $this->actingAs($user)->get(route('staff.dashboard'))->assertOk();
+        $this->actingAs($user)->get(route('staff.dashboard'))
+            ->assertOk()
+            ->assertSee('.staff-sidebar { position:fixed;', false)
+            ->assertSee('.staff-sidebar > nav { flex:1 1 0%; height:0; min-width:0; min-height:0; overflow-y:scroll; overflow-x:hidden;', false);
         $this->actingAs($user)->get(route('staff.products.index'))->assertOk();
         $this->actingAs($user)->get(route('staff.gallery.index'))->assertOk();
+    }
+
+    public function test_admin_sidebar_navigation_has_an_independent_scroll_area(): void
+    {
+        $email = 'administrator@example.com';
+        Staff::create(['full_name' => 'Administrator', 'role' => 'admin', 'email' => $email, 'phone' => '0771234567', 'hire_date' => now()->toDateString()]);
+        $user = User::factory()->create(['email' => $email, 'email_verified_at' => now()]);
+
+        $this->actingAs($user)->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('.sidebar {', false)
+            ->assertSee('height: 100dvh;', false)
+            ->assertSee('.sidebar-nav {', false)
+            ->assertSee('flex: 1 1 0%;', false)
+            ->assertSee('height: 0;', false)
+            ->assertSee('overflow-y: scroll;', false)
+            ->assertSee('overflow-x: hidden;', false);
     }
 
     public function test_staff_product_menu_exposes_only_staff_product_routes_and_tracks_the_active_type(): void

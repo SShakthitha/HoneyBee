@@ -27,7 +27,7 @@
         <section class="hb-original__category-section" id="services"><div class="container"><div class="hb-original__section-heading"><span class="hb-original__eyebrow">What We Do</span><h2>Explore Our Categories</h2><p>Three specialties, one studio — pick a path to see what we can create for you.</p></div><div class="hb-original__category-band">
             @foreach($categoryCards as $card)
                 <a href="{{ route($card['route']) }}" class="hb-original__category-panel">
-                    @if($card['image'])<img src="{{ asset('storage/' . $card['image']) }}" alt="{{ $card['label'] }}" onerror="this.style.display='none'">@endif
+                    @if($categoryImageUrl = \App\Support\PublicImage::url($card['image']))<img src="{{ $categoryImageUrl }}" alt="{{ $card['label'] }}">@endif
                     <span class="hb-original__category-fallback" aria-hidden="true"></span><span class="hb-original__category-overlay"></span>
                     <span class="hb-original__category-content"><span class="hb-original__category-icon"><i class="bi {{ $card['icon'] }}"></i></span><span class="hb-original__category-label">{{ $card['label'] }}</span><span class="hb-original__category-description">{{ $card['description'] }}</span></span>
                 </a>
@@ -35,25 +35,25 @@
         </div></div></section>
 
         @if($promotions->isNotEmpty())
-            <section class="hb-original__offers" id="offers"><div class="container"><div class="hb-original__section-heading"><span class="hb-original__eyebrow">Limited Time</span><h2>Special Offers &amp; Promotions</h2><p>Sweet deals across gifts, events, and laser work — while stocks and slots last.</p></div>
+            <section class="hb-original__offers" id="offers"><div class="container"><div class="hb-original__section-heading"><span class="hb-original__eyebrow">Limited Time</span><h2>Special Offers &amp; Promotions</h2><p>Sweet deals across gifts, events, and laser work.</p></div>
                 <div class="hb-original__offers-grid">
                     @foreach($promotions as $promotion)
                         <a href="{{ route($promotion->destinationRoute()) }}" class="hb-original__offer-card">
                             <span class="hb-original__ribbon">{{ $promotion->button_text ?: 'Shop Now' }}</span>
-                            <div class="hb-original__offer-image">@if($promotion->image)<img src="{{ asset('storage/' . $promotion->image) }}" alt="{{ $promotion->title }}" onerror="this.style.display='none'">@endif<span>{{ $promotion->title }}</span></div>
+                            <div class="hb-original__offer-image">@if($promotionImageUrl = \App\Support\PublicImage::url($promotion->image))<img src="{{ $promotionImageUrl }}" alt="{{ $promotion->title }}">@endif<span>{{ $promotion->title }}</span></div>
                             <div class="hb-original__offer-body"><h3>{{ $promotion->title }}</h3><p>{{ $promotion->short_description ?: 'Limited Time Only' }}</p><div class="hb-original__price"><strong>{{ $promotion->button_text ?: 'Shop Now' }}</strong></div><span class="hb-original__offer-button">{{ $promotion->button_text ?: 'Shop Now' }}</span></div>
                         </a>
                     @endforeach
                 </div>
             </div></section>
         @else
-            <section class="hb-original__offers" id="offers"><div class="container"><div class="hb-original__section-heading"><span class="hb-original__eyebrow">Limited Time</span><h2>Special Offers &amp; Promotions</h2><p>Sweet deals across gifts, events, and laser work — while stocks and slots last.</p></div>
+            <section class="hb-original__offers" id="offers"><div class="container"><div class="hb-original__section-heading"><span class="hb-original__eyebrow">Limited Time</span><h2>Special Offers &amp; Promotions</h2><p>Sweet deals across gifts, events, and laser work.</p></div>
                 @if($featuredItems->isNotEmpty())<div class="hb-original__offers-grid">
                     @foreach($featuredItems->take(3) as $item)
                         @php $discount = $item['has_offer_price'] ? $item['discount_percentage'] : null; @endphp
                         <a href="{{ route($item['route']) }}" class="hb-original__offer-card">
                             @if($discount)<span class="hb-original__ribbon">{{ $discount }}% Off</span>@else<span class="hb-original__ribbon">Featured</span>@endif
-                            <div class="hb-original__offer-image">@if($item['image'])<img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['name'] }}" onerror="this.style.display='none'">@endif<span>{{ $item['type'] }}</span></div>
+                            <div class="hb-original__offer-image">@if($featuredImageUrl = \App\Support\PublicImage::url($item['image']))<img src="{{ $featuredImageUrl }}" alt="{{ $item['name'] }}">@endif<span>{{ $item['type'] }}</span></div>
                             <div class="hb-original__offer-body"><h3>{{ $item['name'] }}</h3><p>{{ $item['type'] }} created by HoneyBee.</p>@if($discount)<div class="hb-original__price"><del>Rs. {{ number_format($item['price'], 2) }}</del><strong>Rs. {{ number_format($item['selling_price'], 2) }}</strong></div>@elseif($item['price'])<div class="hb-original__price"><strong>Rs. {{ number_format($item['selling_price'], 2) }}</strong></div>@endif<span class="hb-original__offer-button">Claim Offer</span></div>
                         </a>
                     @endforeach
@@ -62,7 +62,7 @@
         @endif
 
         <section class="hb-original__gallery-section" id="gallery"><div class="container"><div class="hb-original__section-heading"><span class="hb-original__eyebrow">Our Work</span><h2>Gallery</h2><p>A glimpse into our gifts, events, and laser craftsmanship.</p></div>
-            @if($galleryImages->isNotEmpty())<div class="hb-original__gallery-grid">@foreach($galleryImages->take(6) as $galleryImage)<figure class="hb-original__gallery-item"><img src="{{ asset('storage/' . $galleryImage->image) }}" alt="{{ $galleryImage->title ?? $galleryImage->category . ' creation' }}" onerror="this.closest('figure').style.display='none'"><figcaption>{{ $galleryImage->title ?? $galleryImage->category }}</figcaption></figure>@endforeach</div>@else<p class="hb-original__empty">Our latest work will be added here soon.</p>@endif
+            @if($galleryImages->isNotEmpty())<div class="hb-original__gallery-grid">@foreach($galleryImages->take(6) as $galleryImage)<figure class="hb-original__gallery-item">@if($galleryImageUrl = \App\Support\PublicImage::url($galleryImage->image))<img src="{{ $galleryImageUrl }}" alt="{{ $galleryImage->title ?? $galleryImage->category . ' creation' }}">@else<span class="hb-original__category-fallback" aria-label="Gallery image unavailable"></span>@endif<figcaption>{{ $galleryImage->title ?? $galleryImage->category }}</figcaption></figure>@endforeach</div>@else<p class="hb-original__empty">Our latest work will be added here soon.</p>@endif
         </div></section>
 
         <section class="hb-original__contact" id="contact"><div class="container"><div class="hb-original__section-heading"><span class="hb-original__eyebrow">Get In Touch</span><h2>Contact Us</h2><p>Have a question or ready to place an order? Reach out — we'd love to hear from you.</p></div><div class="hb-original__contact-grid"><a href="{{ route('contact') }}" class="hb-original__contact-item"><span><i class="bi bi-telephone"></i></span><h3>Phone</h3><p>Contact our HoneyBee team</p></a><a href="{{ route('contact') }}" class="hb-original__contact-item"><span><i class="bi bi-envelope"></i></span><h3>Email</h3><p>Send us an enquiry</p></a><a href="{{ route('contact') }}" class="hb-original__contact-item"><span><i class="bi bi-chat-dots"></i></span><h3>Message Us</h3><p>Start a custom request</p></a></div><div class="hb-original__contact-action"><a href="{{ route('contact') }}">Message Us</a></div></div></section>

@@ -1,0 +1,444 @@
+\n=== Guidelines for User Documentation.pdf ===\n---PAGE 1---\nGuidelines for User Documentation (40% of Report)
+The User Documentation should provide a straightforward, non-technical guide for end-users,
+focused solely on installation, navigation, and using the primary features of the software.
+Section Breakdown
+1. Title Page
+○ Project Title
+○ Submission Date
+2. Copyright & Licensing
+3. Introduction
+○ One-paragraph description of the software’s purpose and its primary features, written
+for a general audience.
+4. Installation Guide
+○ Prerequisites: Any necessary system requirements.
+○ Installation Steps: Simple, clear steps for installing the software with the screenshot
+of your software’s UIs.
+5. Getting Started with the Interface
+○ Main Features: List of the main features with concise descriptions.
+○ Navigating the Interface: Visuals or screenshots of the interface, with brief
+explanations of menus and navigation.
+6. Troubleshooting and FAQs
+○ List common issues with straightforward troubleshooting steps.
+○ Include a FAQ section to address typical user questions.
+7. Support Information
+○ Provide point of contact information.
+○ Links to user support resources, if available.\n\n=== User DOcumentation.pdf ===\n---PAGE 1---\nDepartment of CSC
+Management
+System
+Supervised by
+Dr.S.Shriparen
+Team Software project
+CSC304G3
+User
+Documentation
+Prepared by :
+Black Squad\n---PAGE 2---\nCONTENTS
+Copyright 01
+Introduction 02
+Installation Guide 03
+Interface 04
+Login 04
+Admin 07
+Teacher 24
+Student 32
+Troubleshooting and FAQs 37
+Team – Black squad 39
+I.\n---PAGE 3---\nCopyright
+Copyright Statement
+Institute Management System – City Centre of Media
+© 2025 City Centre of Media, Owned by Mr. P. Kirupananthan. All Rights Reserved.
+This software system, including its codebase, structural design, documentation, interfaces, and
+all associated digital components (collectively referred to as the “Software”), is the intellectual
+property of City Centre of Media, under the ownership of Mr. P. Kirupananthan.
+Authorized individuals and organizations are granted a limited right to access and use this
+Software solely for institutional operations and academic management purposes. No part of the
+Software may be copied, reproduced, modified, distributed, published, or transmitted in any
+form without prior written authorization from the owner.
+Any unauthorized use, reverse engineering, disclosure, or distribution of the Software is strictly
+prohibited and may result in legal action.
+Disclaimer
+The Software is provided “AS IS” without any warranties of any kind, whether express or
+implied, including but not limited to warranties of accuracy, performance, reliability,
+merchantability, or fitness for a particular purpose. The owner shall not be held liable for any
+damages, losses, or disruptions arising from the use or misuse of the Software.
+All rights not expressly granted in this document remain exclusively reserved by City Centre
+of Media.
+1\n---PAGE 4---\nIntroduction
+The City Centre of Media Institute Management System is a modern digital platform created
+to make day-to-day activities in an educational institute easier, faster, and more organized.
+Instead of relying on paper files or manual work, the system brings all important tasks—such
+as managing students, teachers, courses, attendance, fees, and exams—into one place. It is
+designed to be simple to use, so anyone in the institute can access the information they need
+without confusion.
+This system provides separate, easy-to-navigate panels for administrators, teachers, and
+students. Administrators can manage the entire institution, teachers can handle their classes
+and student performance, and students can view their timetable, results, fees, and
+announcements. The platform also works smoothly on computers and mobile devices, making
+it convenient to use anywhere, anytime.
+Overall, the Institute Management System helps improve communication, reduces paperwork,
+saves time, and ensures that important information is always up-to-date. It provides a complete
+digital experience that supports smooth academic and administrative operations within the City
+Centre of Media.
+2\n---PAGE 5---\nInstallation Guide
+You don’t need to install anything.
+Just open the link → log in → start using the system.
+Everything works online because the system is hosted on render, which keeps it fast, secure,
+and always available.
+3\n---PAGE 6---\nInterface
+Login page
+Admin
+Use email and password to login
+Eg: admincitycenterofmedia@gmail.com
+admin123
+Login after as an Admin
+4\n---PAGE 7---\nTeacher
+Admin can register the teacher at that time default password will be given
+while teacher’s first login using that default password
+After that set new password page will come
+This is the Teacher dashboard
+Student
+5\n---PAGE 8---\nStudent
+Admin can register the student at that time default password will be given
+while student’s first login using that default password
+After that set new password page will come
+Login after as a Student
+6\n---PAGE 9---\nAdmin
+Add Student
+Click on Students Add Student
+Fill all details and click on create
+7\n---PAGE 10---\nAdd Teacher
+Click on Teacher Add Teacher
+Fill all details and click on create
+8\n---PAGE 11---\nAdd new Course
+Admin dashboard
+Click on courses Add Course
+Fill the form and click on create
+9\n---PAGE 12---\nView Student
+Click on Students View Student
+10\n---PAGE 13---\nView Teacher
+Click on Teacher Add Teacher
+11\n---PAGE 14---\nView Course
+Admin dashboard
+Click on courses View Course
+12\n---PAGE 15---\nStudent Attendance Marking - Simple Guide
+Step 1: Go to Dashboard
+• Login as Admin
+• Click "Attendance" in left menu
+• Select "Students"
+Step 2: Select Date & Course
+• Choose Date (e.g., 2025-11-19)
+• Select Course from dropdown
+• System shows students in that course
+13\n---PAGE 16---\nStep 3: Mark Attendance
+See student list appear
+Quick Options:
+• All Present - Mark all teachers present
+• 🔴 All Absent - Mark all teachers absent
+• All Late - Mark all teachers late
+• 🔄 Reset - Clear all marks
+Or mark individually:
+• Click Present/Absent/Late/Excused for each student
+Step 4: Save
+• Click 💾 Save to record
+• Click 🖨️ Print Summary for paper copy
+14\n---PAGE 17---\nTeacher Attendance Marking
+Step 1: Go to Teacher Attendance
+Login as Admin
+Click "Attendance" in left menu
+Select "Teachers"
+Step 2: Select Date
+Choose Date (e.g., 2025-11-05)
+System shows all teachers automatically
+15\n---PAGE 18---\nStep 3: Mark Teacher Attendance
+See teacher list appear
+Quick Options:
+All Present - Mark all teachers present
+🔴 All Absent - Mark all teachers absent
+All Late - Mark all teachers late
+Or mark individually:
+Click present/absent/late/leave for each teacher
+Teacher Information Shown:
+Name - Teacher's name
+Email - Contact email
+Subjects - What they teach
+Contact - Phone number
+Status - Attendance buttons
+Step 4: Save
+Click 💾 Save to record attendance
+16\n---PAGE 19---\nCreate Exams
+Step 1: Go to Exams Section
+From the left menu, click:
+Academics → Exams
+Step 2: Create New Exam
+Fill in the exam details:
+Exam name - Enter exam name (e.g., "Mid-Term 2025")
+Date - Select exam date (mm/dd/yyyy)
+Select course - Choose course from dropdown
+Click "Create exam" button
+17\n---PAGE 20---\nStep 3: Verify Exam Created
+The new exam will appear in the exam list with:
+Name - Your exam name
+Date - Exam date
+Course - Associated course
+Actions - Update date / Delete options
+🎯 What Admin Can Do:
+✅ CREATE
+Add new exams with name, date, and course
+Create multiple exams for different courses
+✅ MANAGE
+View all exams in one list
+Update exam dates
+Delete exams
+Track all exam schedules
+18\n---PAGE 21---\nPayment Management - Admin
+Step 1: Access Payment Section
+Login as Admin
+Go to Dashboard
+Click "Finance" in left sidebar
+Finance Summary Page
+What You See:
+Overview of all financial data
+Quick statistics - Total payments, pending amounts
+Two Paths:
+1. Student Payments → Manage student fees
+2. Teacher Payments → Manage teacher salaries
+19\n---PAGE 22---\nStudent Payments Page
+Three Main Sections:
+1. Payment Summary
+Total collected amounts
+Pending payments overview
+Monthly/Weekly statistics
+2. Add Payment for Students
+Select student from dropdown
+Enter payment amount
+Choose payment date
+Add description (optional)
+Click "Add Payment" to save
+3. Student Payments List
+Shows all payment records with:
+Student name
+Payment amount
+Payment date
+Status (Paid/Pending)
+Two action buttons:
+o ✏️ Edit - Modify payment details
+o 🗑️ Delete - Remove payment record
+20\n---PAGE 23---\nTeacher Payments Page
+Same Three Sections:
+1. Payment Summary
+Teacher salary overview
+Payment history
+Financial reports
+2. Add Payment for Teachers
+Select teacher from list
+Enter payment amount
+Choose payment date
+Select payment method:
+21\n---PAGE 24---\no Bank Transfer
+o Cash Payment
+Add notes if needed
+Click "Add Payment" to save
+3. Teacher Payments List
+Shows all salary records with:
+Teacher name
+Payment amount
+Payment date
+Payment method
+Action buttons:
+o Edit - Change payment details
+o Delete - Remove payment record
+Edit Payment Process
+For Both Students & Teachers:
+Click Edit button on any payment record
+System shows previous details in a form
+Modify any information:
+o Amount
+o Date
+o Description
+o Payment method (for teachers)
+Click "Update" to save changes
+List automatically updates with new information
+Delete Payment Process
+For Both Students & Teachers:
+Click Delete button on any payment record
+System asks for confirmation
+22\n---PAGE 25---\nClick "Confirm Delete"
+Record removed from list immediately
+Summary updates automatically
+23\n---PAGE 26---\nTeacher
+Teacher Manage Exams
+Step 1: Go to Exams Section
+From the left menu, click:
+Academics → Manage Exams
+Step 2: Create New Exam
+Fill in the exam details:
+Exam name - Enter exam name (e.g., "mid exam")
+Date - Select exam date (mm/dd/yyyy)
+Select course - Choose course from dropdown
+Click "Create exam" button
+24\n---PAGE 27---\nStep 3: Verify Exam Created
+The new exam will appear in the exam list with:
+Name - Your exam name
+Date - Exam date
+Course - Associated course
+Actions - Update date / Delete options
+🎯 What Teacher Can Do:
+✅ CREATE
+Add new exams with name, date, and course
+Create exams for their assigned courses
+✅ MANAGE
+View all exams in one list
+Update exam dates
+Delete exams
+Track exam schedules
+25\n---PAGE 28---\nMark Student Attendance
+Step 1:
+Click "Attendance" in left menu
+Select "Students"
+Step 2: Select Date & Course
+Choose Date (click calendar)
+Select Course from dropdown
+Wait for student list to appear
+26\n---PAGE 29---\nStep 3: Mark Students
+When students appear:
+Option A: Quick Marking (Fast)
+Click 🟢 All Present - All students present
+Click 🔴 All Absent - All students absent
+Click 🟡 All Late - All students late
+Option B: Individual Marking
+For each student, click:
+➢ Present 🟢 - Student is in class
+➢ Absent 🔴 - Student is missing
+➢ Late 🟡 - Student came late
+➢ Excused 🔵 - Valid absence reason
+Step 4: Save
+Click 💾 Save to record
+Done! ✅
+27\n---PAGE 30---\nTeachers View Salary
+Step 1: Go to My Salary Section
+From the left menu, click:
+Payments → My Salary
+Step 2: View Salary Details
+See your complete salary information:
+Salary Overview:
+Salary Amount - Your total salary (e.g., $1000)
+Paid - Amount received (e.g., $1000)
+Status - Payment status
+Method - Payment method (e.g., Cash)
+Salary History:
+Amount - Salary amount
+28\n---PAGE 31---\nPaid - Amount paid
+Date - Payment date (e.g., 1/13/2025)
+Method - Payment method
+Reference - Payment reference
+What Teachers Can See:
+VIEW
+Total salary amount
+Paid amount and status
+Payment method (Cash/Bank/etc.)
+Payment dates
+Salary history records
+View Courses
+Click on Academics View Courses
+29\n---PAGE 32---\nView Students
+Click on Academics View Students
+30\n---PAGE 33---\nTimetable
+Click on Classroom Timetable
+After schedule a time table click on notify for send Email to students
+31\n---PAGE 34---\nStudent
+View Courses
+Click on courses My Courses
+32\n---PAGE 35---\nTimetable
+Click on My Info Timetable
+33\n---PAGE 36---\nStudents View Their Attendance
+Step 1: Go to My Attendance
+One ways to access:
+1. From Dashboard → Click "My Attendance"
+Step 2: View Attendance History
+See your complete attendance record:
+Date - Class date
+Course - Course name (course1)
+34\n---PAGE 37---\nStatus - 🟢 Present / 🔴 Absent / 🟡 Late
+Automatically shows:
+• All your courses
+• All dates attended
+• Your attendance status
+📋 Student Can Only:
+✅ VIEW
+• See their own attendance
+• Check attendance history
+• Monitor attendance patterns
+❌ CANNOT
+• Mark attendance
+• Change attendance
+• See other students' attendance
+35\n---PAGE 38---\nPayment Details
+Click on My Info fee
+36\n---PAGE 39---\nTroubleshooting and FAQs
+Common Issues & Solutions
+1. Unable to Login
+Possible Causes:
+➢ Incorrect username or password
+➢ Account not activated
+➢ Internet connection issues
+Troubleshooting Steps:
+➢ Verify username and password
+➢ Check for stable internet connectivity
+➢ If the problem continues, contact the system administrator.
+2. Dashboard or Pages Not Loading
+Possible Causes:
+➢ Slow internet connection
+➢ Browser cache causing conflicts
+➢ Server temporarily busy
+Troubleshooting Steps:
+➢ Refresh the page or try again after a few minutes.
+➢ Clear browser cache/cookies and reload the system
+➢ Make sure stable internet connection
+3. System Logging Out Automatically
+Possible Causes:
+➢ Inactive session timeout for security
+Troubleshooting Steps:
+➢ Regularly save work while using the system.
+➢ Log in again if the session expires.
+4. Data Not Saving After Submission
+Possible Causes:
+➢ Required fields not filled
+➢ Session timeout
+➢ Poor internet connectivity
+Troubleshooting Steps
+➢ Re-submit after confirming internet status.
+➢ Log out and log back into the system
+37\n---PAGE 40---\nFAQs
+Q1: Who can access the system?
+The system can be accessed by Admin, Teachers, and Students. Each role has different
+permissions.
+Q2: Can I update my profile?
+No. Only admin can update the profile
+Q3: What browsers does the system support?
+Google Chrome, Firefox, Microsoft Edge, and other modern browsers.
+Q4: Can the admin add new teachers and students?
+Yes, the admin has full control to create, edit, and remove user accounts.
+Q5: Can I use the system without internet?
+No. The system requires an active internet connection to function.
+38\n---PAGE 41---\nTeam – Black Squad
+Mr.T.Adsajan - Team Leader and ui/ux designer
+Reg. No: 2021/SP/146
+Contact No: 0761234260
+Email: adsajan2001@gmail.com
+Mr.S.Janarthan – Full Stack Developer
+Reg. No: 2021/SP/137
+Contact No: 0767616117
+Email: janasathu@gmail.com
+Mr.M.Sadurjan - Full Stack Developer
+Reg. No: 2021/SP/080
+Contact No: 0784588538
+Email : vinosadu123@gmail.com
+Mr.L.D.Charuka Dilshan - Full Stack Developer
+Reg. No: 2021/SP/078
+Contact No: 0776576997
+Email: charuka282@gmail.com
+Mr.S.Koneswaran - Tester
+Reg. No: 2021/SP/196
+Contact No: 0741678309
+Email: konesselvaraththinam@gmail.com
+39\n

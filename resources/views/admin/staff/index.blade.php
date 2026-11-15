@@ -13,6 +13,17 @@
         <i class="fa-solid fa-plus me-1"></i> Add Staff
     </button>
 </div>
+
+@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+@if(session('invitation'))
+    <div class="admin-card mb-3"><div class="admin-card-body">
+        <h2 class="h5">Registration invitation</h2>
+        <p><strong>{{ session('invitation.name') }}</strong> · {{ session('invitation.email') }}</p>
+        <p>Status: Pending · Expires: {{ session('invitation.expires_at') }}</p>
+        <div class="input-group"><input id="registrationLink" class="form-control" readonly value="{{ session('invitation.url') }}"><button class="btn btn-honey" type="button" id="copyRegistrationLink">Copy Registration Link</button></div>
+        <div id="copyFeedback" class="text-success mt-2" role="status" aria-live="polite"></div>
+    </div></div>
+@endif
  
 <div class="admin-card">
     <div class="admin-card-body">
@@ -217,6 +228,14 @@ $(function () {
         modal.show();
     });
  
+});
+
+const copyButton = document.getElementById('copyRegistrationLink');
+if (copyButton) copyButton.addEventListener('click', async () => {
+    const field = document.getElementById('registrationLink');
+    try { await navigator.clipboard.writeText(field.value); }
+    catch (error) { field.select(); document.execCommand('copy'); }
+    document.getElementById('copyFeedback').textContent = 'Registration link copied successfully!';
 });
 </script>
 @endpush

@@ -15,12 +15,12 @@ class ServiceOrderFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function customer(): array
+    private function customer(string $email = 'customer@example.com'): array
     {
-        $user = User::factory()->create(['email' => 'customer@example.com']);
+        $user = User::factory()->create(['email' => $email]);
         $customer = Customer::create([
             'full_name' => 'Customer',
-            'email' => $user->email,
+            'email' => $email,
             'registered_date' => now(),
         ]);
 
@@ -62,6 +62,7 @@ class ServiceOrderFlowTest extends TestCase
     {
         $available = $this->service();
         $this->service('unavailable');
+        [$customer] = $this->customer();
 
         $this->get(route('services'))
             ->assertOk()
@@ -75,7 +76,13 @@ class ServiceOrderFlowTest extends TestCase
             ->assertSee('Rs. 5,000.00')
             ->assertSee('Request this service');
 
+        $this->actingAs($customer)->get(route('orders.create', $available->service_id))
+            ->assertOk()
+            ->assertSee('name="submission_token"', false)
+            ->assertSee('Bank Transfer');
+
         $unavailableId = Service::where('availability_status', 'unavailable')->value('service_id');
+        $this->actingAs($customer)->get(route('orders.create', $unavailableId))->assertNotFound();
         $this->get(route('services.show', $unavailableId))->assertNotFound();
         $this->get(route('services.show', 999999))->assertNotFound();
     }
@@ -86,8 +93,9 @@ class ServiceOrderFlowTest extends TestCase
         $service = $this->service();
 
         $this->actingAs($user)->post(route('orders.store'), [
+            'submission_token' => str_repeat('d', 64),
             'service_id' => $service->service_id,
-            'payment_method' => 'cash',
+            'payment_method' => 'bank_transfer',
             'paid_amount' => '0.01',
             'advanced_paid' => '5000.00',
             'discount' => '4999.99',
@@ -97,11 +105,12 @@ class ServiceOrderFlowTest extends TestCase
 
         $order = Order::sole();
         $this->assertSame($customer->customer_id, $order->customer_id);
+        $this->assertSame(5000.0, (float) $customer->fresh()->total_spent);
         $this->assertSame($service->service_id, $order->service_id);
         $this->assertSame('5000.00', $order->paid_amount);
         $this->assertSame('0.00', $order->advanced_paid);
         $this->assertSame('0.00', $order->discount);
-        $this->assertSame('cash', $order->payment_method);
+        $this->assertSame('bank_transfer', $order->payment_method);
         $this->assertSame('pending', $order->status);
         $this->assertSame('Please use honey-colored ribbons.', $order->attribute);
     }
@@ -113,6 +122,7 @@ class ServiceOrderFlowTest extends TestCase
 
         $this->actingAs($user)->from(route('orders.create', $service->service_id))
             ->post(route('orders.store'), [
+                'submission_token' => str_repeat('e', 64),
                 'service_id' => $service->service_id,
                 'payment_method' => 'unrecognized',
                 'delivery_date' => now()->subDay()->toDateString(),
@@ -121,6 +131,30 @@ class ServiceOrderFlowTest extends TestCase
             ->assertSessionHasErrors(['payment_method', 'delivery_date']);
 
         $this->assertDatabaseCount('orders', 0);
+
+        foreach (['cash', 'card'] as $paymentMethod) {
+            $this->actingAs($user)->post(route('orders.store'), [
+                'submission_token' => str_repeat('f', 64),
+                'service_id' => $service->service_id,
+                'payment_method' => $paymentMethod,
+            ])->assertSessionHasErrors('payment_method');
+        }
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_customers_can_only_view_and_download_their_own_orders(): void
+    {
+        [$owner, $ownerCustomer] = $this->customer();
+        [$other] = $this->customer('other@example.com');
+        $order = Order::create([
+            'customer_id' => $ownerCustomer->customer_id,
+            'order_date' => now(),
+            'paid_amount' => 1250,
+        ]);
+
+        $this->actingAs($other)->get(route('orders.show', $order->order_id))->assertNotFound();
+        $this->actingAs($other)->get(route('orders.pdf', $order->order_id))->assertNotFound();
     }
 
     public function test_staff_and_admin_can_record_only_confirmed_advances_within_the_order_total(): void
@@ -128,6 +162,7 @@ class ServiceOrderFlowTest extends TestCase
         [$customerUser] = $this->customer();
         $service = $this->service();
         $this->actingAs($customerUser)->post(route('orders.store'), [
+            'submission_token' => str_repeat('g', 64),
             'service_id' => $service->service_id,
             'payment_method' => 'bank_transfer',
         ])->assertRedirect(route('orders.index'));
@@ -156,4 +191,5 @@ class ServiceOrderFlowTest extends TestCase
             'advanced_paid' => '1000.00',
         ])->assertForbidden();
     }
+
 }

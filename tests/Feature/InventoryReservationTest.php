@@ -90,7 +90,7 @@ class InventoryReservationTest extends TestCase
         ]);
 
         $manager = $this->employee('manager', 'frame-manager@example.com');
-        $this->actingAs($manager)->put(route('staff.inventory.adjust', ['type' => 'frame', 'id' => $frame->gift_design_id]), [
+        $this->actingAs($manager)->put(route('manager.inventory.adjust', ['type' => 'frame', 'id' => $frame->gift_design_id]), [
             'action' => 'add', 'quantity' => 1,
         ])->assertRedirect();
 
@@ -213,16 +213,19 @@ class InventoryReservationTest extends TestCase
         $staff = $this->employee('staff', 'staff@example.com');
         $customer = $this->customer();
 
-        $this->actingAs($manager)->get(route('staff.inventory.index'))->assertOk()->assertSee('Inventory');
-        $this->put(route('staff.inventory.adjust', ['type' => 'gift', 'id' => $gift->gift_design_id]), [
+        $this->actingAs($manager)->get(route('manager.inventory.index'))->assertOk()->assertSee('Inventory');
+        $this->put(route('manager.inventory.adjust', ['type' => 'gift', 'id' => $gift->gift_design_id]), [
             'action' => 'add', 'quantity' => 6, 'low_stock_threshold' => 2, 'note' => 'Opening count',
         ])->assertRedirect();
         $this->assertDatabaseHas('gift_designs', ['gift_design_id' => $gift->gift_design_id, 'stock_quantity' => 6, 'low_stock_threshold' => 2]);
         $this->assertDatabaseHas('inventory_adjustments', ['item_type' => 'gift', 'item_id' => $gift->gift_design_id, 'quantity_delta' => 6, 'note' => 'Opening count']);
 
-        $this->actingAs($staff)->get(route('staff.inventory.index'))->assertOk();
-        $this->put(route('staff.inventory.adjust', ['type' => 'gift', 'id' => $gift->gift_design_id]), ['action' => 'add', 'quantity' => 1])->assertForbidden();
-        $this->actingAs($customer)->get(route('staff.inventory.index'))->assertForbidden();
+        $this->actingAs($staff)->get('/staff/inventory')->assertNotFound();
+        $this->put('/staff/inventory/gift/'.$gift->gift_design_id, ['action' => 'add', 'quantity' => 1])->assertNotFound();
+        $this->get(route('manager.inventory.index'))->assertForbidden();
+        $this->put(route('manager.inventory.adjust', ['type' => 'gift', 'id' => $gift->gift_design_id]), ['action' => 'add', 'quantity' => 1])->assertForbidden();
+        $this->actingAs($customer)->get('/staff/inventory')->assertNotFound();
+        $this->get(route('manager.inventory.index'))->assertForbidden();
         $this->get(route('admin.inventory.index'))->assertForbidden();
     }
 
@@ -240,5 +243,22 @@ class InventoryReservationTest extends TestCase
         $this->order($customer, 'gift', $gift->gift_design_id, 2)->assertRedirect();
         $this->actingAs($admin)->put(route('admin.inventory.adjust', ['type' => 'gift', 'id' => $gift->gift_design_id]), ['action' => 'set', 'quantity' => 1])->assertSessionHasErrors('quantity');
         $this->assertSame(4, $gift->fresh()->stock_quantity);
+    }
+
+    public function test_admin_and_manager_keep_distinct_inventory_dashboard_access(): void
+    {
+        $admin = $this->employee('admin', 'admin-inventory@example.com');
+        $manager = $this->employee('manager', 'manager-inventory@example.com');
+
+        $this->actingAs($admin)->get(route('admin.inventory.index'))->assertOk()->assertSee('Inventory');
+        $this->actingAs($admin)->put(route('admin.inventory.adjust', ['type' => 'gift', 'id' => $this->gift(2)->gift_design_id]), [
+            'action' => 'add', 'quantity' => 1,
+        ])->assertRedirect();
+
+        $this->actingAs($manager)->get(route('manager.inventory.index'))->assertOk()->assertSee('Inventory');
+        $this->actingAs($manager)->get(route('admin.inventory.index'))->assertForbidden();
+        $this->actingAs($manager)->put(route('manager.inventory.adjust', ['type' => 'gift', 'id' => GiftDesign::firstOrFail()->gift_design_id]), [
+            'action' => 'add', 'quantity' => 1,
+        ])->assertRedirect();
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\GalleryImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class GalleryWebsiteIntegrationTest extends TestCase
@@ -12,6 +13,7 @@ class GalleryWebsiteIntegrationTest extends TestCase
 
     public function test_the_home_gallery_displays_images_from_every_category(): void
     {
+        Storage::fake('public');
         $gift = $this->galleryImage('Gift & Design', 'gallery/gift.jpg');
         $laser = $this->galleryImage('Laser Work', 'gallery/laser.jpg');
         $event = $this->galleryImage('Events', 'gallery/event.jpg');
@@ -26,6 +28,7 @@ class GalleryWebsiteIntegrationTest extends TestCase
 
     public function test_each_category_page_displays_only_its_gallery_images(): void
     {
+        Storage::fake('public');
         $gift = $this->galleryImage('Gift & Design', 'gallery/gift.jpg');
         $laser = $this->galleryImage('Laser Work', 'gallery/laser.jpg');
         $event = $this->galleryImage('Events', 'gallery/event.jpg');
@@ -51,6 +54,8 @@ class GalleryWebsiteIntegrationTest extends TestCase
 
     private function galleryImage(string $category, string $path): GalleryImage
     {
+        Storage::disk('public')->put($path, 'gallery image');
+
         return GalleryImage::create([
             'title' => $category . ' sample',
             'category' => $category,

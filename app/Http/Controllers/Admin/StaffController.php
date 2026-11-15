@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
+use App\Models\StaffInvitation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -18,8 +20,16 @@ class StaffController extends Controller
             return $s->hire_date ? \Carbon\Carbon::parse($s->hire_date)->format('Y-m-d') : '—';
         })
         ->addColumn('action', function ($s) {
+            $invitation = StaffInvitation::where('staff_id', $s->staff_id)->first();
+            $hasAccount = User::where('email', $s->email)->exists();
+            $status = $invitation && $invitation->accepted_at ? 'Accepted · Registered' : ($hasAccount ? 'Registered' : ($invitation ? ($invitation->expires_at->isPast() ? 'Expired' : 'Pending') : 'Awaiting registration'));
+            $inviteButton = strtolower(trim($s->role)) === 'staff' && ! $hasAccount
+                ? '<form method="POST" action="'.route('admin.staff.invitation', $s->staff_id).'" class="d-inline">'.csrf_field().'<button class="btn btn-outline-warning btn-sm" type="submit">'.($invitation && $invitation->expires_at->isFuture() ? 'Regenerate Invitation' : 'Send Invitation').'</button></form>'
+                : '';
             return '
                 <div class="d-flex justify-content-end gap-1">
+                    <span class="badge text-bg-light">'.$status.'</span>
+                    '.$inviteButton.'
                     <button type="button"
                         class="btn btn-honey btn-sm editBtn"
                         data-id="' . $s->staff_id . '">

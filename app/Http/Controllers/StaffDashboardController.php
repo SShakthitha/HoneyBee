@@ -215,7 +215,9 @@ class StaffDashboardController extends Controller
 
     private function currentStaff(Request $request): Staff
     {
-        return Staff::where('email', $request->user()->email)->whereIn('role', ['staff', 'manager'])->firstOrFail();
+        return Staff::where('email', $request->user()->email)
+            ->whereRaw('LOWER(TRIM(role)) IN (?, ?)', ['staff', 'manager'])
+            ->firstOrFail();
     }
 
     private function product(string $type, $id)
