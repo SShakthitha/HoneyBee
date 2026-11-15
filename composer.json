@@ -10,6 +10,7 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
+        "resend/resend-laravel": "^1.7",
         "yajra/laravel-datatables-oracle": "^12.0"
     },
     "require-dev": {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\RoleDashboardRouter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 class EmailVerificationNotificationController extends Controller
 {
@@ -18,7 +19,14 @@ class EmailVerificationNotificationController extends Controller
             return redirect()->route($dashboardRouter->routeNameFor($request->user()) ?? 'login');
         }
 
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            $request->user()->sendEmailVerificationNotification();
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withErrors([
+                'email' => __("We couldn't send the verification email right now. Please try again later."),
+            ]);
+        }
 
         return back()->with('status', 'verification-link-sent');
     }

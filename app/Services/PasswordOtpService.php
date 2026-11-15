@@ -66,7 +66,12 @@ class PasswordOtpService
             'updated_at' => now(),
         ]);
 
-        Mail::to($email)->send(new PasswordOtpMail($user, $otp, $this->expiryMinutes));
+        try {
+            Mail::to($email)->send(new PasswordOtpMail($user, $otp, $this->expiryMinutes));
+        } catch (\Throwable $e) {
+            report($e);
+            return false;
+        }
 
         return true;
     }

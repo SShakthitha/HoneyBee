@@ -29,11 +29,16 @@ class ForgotPasswordController extends Controller
             'email' => ['required', 'string', 'email', 'max:255'],
         ]);
 
-        $otp->requestOtp($request->email);
+        $sent = $otp->requestOtp($request->email);
 
-        // Redirect to the reset page and pre-fill the email field via session.
-        // The status message is intentionally generic to avoid disclosing
-        // whether an account exists for the given address.
+        if ($sent === false) {
+            // Could mean no account OR a mail failure. Use a generic message
+            // that does not reveal account existence, but also covers mail errors.
+            return back()->with('status', __(
+                'If an account exists for that email, a 6-digit reset code has been sent. Please check your inbox.'
+            ));
+        }
+
         return redirect()->route('password.reset')
             ->with('reset_email', strtolower(trim($request->email)))
             ->with('status', __(
