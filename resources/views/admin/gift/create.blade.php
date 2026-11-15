@@ -32,7 +32,7 @@
         @csrf
         @if($galleryImage)
             <input type="hidden" name="gallery_image_id" value="{{ $galleryImage->id }}">
-            <div class="d-flex align-items-center gap-3 mb-3 p-3" style="background:#fff8e8;border-radius:10px;">
+            <div class="d-flex align-items-center gap-3 mb-3 p-3" role="status" aria-live="polite" style="background:#fff8e8;border-radius:10px;">
                 <img src="{{ asset('storage/'.$galleryImage->image) }}"
                      alt="{{ $galleryImage->title ?? 'Selected gallery image' }}"
                      style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
