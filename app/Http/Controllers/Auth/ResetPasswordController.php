@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Services\PasswordOtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -21,11 +20,56 @@ use Illuminate\Auth\Events\PasswordReset;
 class ResetPasswordController extends Controller
 {
     /** Display the password reset view. */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
+        $email = session('reset_email', old('email'));
+
+        if (! $email) {
+            return redirect()->route('password.request');
+        }
+
         return view('auth.reset-password', [
-            'email' => session('reset_email', old('email')),
+            'email' => $email,
         ]);
+    }
+
+    /** Verify the email OTP before showing the new-password form. */
+    public function verify(Request $request, PasswordOtpService $otp): RedirectResponse
+    {
+        $request->validate([
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'otp' => ['required', 'string', 'digits:'.config('password_otp.digits')],
+        ]);
+
+        $email = strtolower(trim($request->email));
+        $user = User::where('email', $email)->first();
+        $verifiedUser = $user ? $otp->verifyOtp($email, $request->otp) : null;
+
+        if (! $verifiedUser) {
+            return back()->withInput(['email' => $email])
+                ->withErrors(['otp' => __('The reset code is invalid, expired, or has been used too many times.')]);
+        }
+
+        $request->session()->regenerate();
+        $request->session()->put([
+            'password_reset_verified_user_id' => $verifiedUser->id,
+            'password_reset_verified_at' => now()->timestamp,
+        ]);
+
+        return redirect()->route('password.new');
+    }
+
+    /** Show the password form only after this session verified a valid OTP. */
+    public function createPassword(Request $request): View|RedirectResponse
+    {
+        if (! $this->hasRecentOtpVerification($request)) {
+            $this->clearVerificationSession($request);
+
+            return redirect()->route('password.request')
+                ->withErrors(['email' => __('Please request and verify a reset code first.')]);
+        }
+
+        return view('auth.new-password');
     }
 
     /**
@@ -35,26 +79,23 @@ class ResetPasswordController extends Controller
      */
     public function store(Request $request, PasswordOtpService $otp): RedirectResponse
     {
+        if (! $this->hasRecentOtpVerification($request)) {
+            $this->clearVerificationSession($request);
+
+            return redirect()->route('password.request')
+                ->withErrors(['email' => __('Please request and verify a reset code first.')]);
+        }
+
         $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'otp' => ['required', 'string', 'digits:'.config('password_otp.digits')],
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $email = strtolower(trim($request->email));
-
-        // Ensure a matching account exists before verifying the OTP so the
-        // response does not vary based on account existence.
-        $user = User::where('email', $email)->first();
+        $user = User::find($request->session()->get('password_reset_verified_user_id'));
         if (! $user) {
-            return back()->withInput($request->only('email'))
-                ->withErrors(['email' => __('We could not find an account for that email address.')]);
-        }
+            $this->clearVerificationSession($request);
 
-        $verifiedUser = $otp->verifyOtp($email, $request->otp);
-        if (! $verifiedUser) {
-            return back()->withInput($request->only('email'))
-                ->withErrors(['otp' => __('The reset code is invalid, expired, or has been used too many times.')]);
+            return redirect()->route('password.request')
+                ->withErrors(['email' => __('Please request and verify a reset code first.')]);
         }
 
         DB::transaction(function () use ($user, $request) {
@@ -71,9 +112,31 @@ class ResetPasswordController extends Controller
 
         // Clear any per-email/IP rate-limit state so a legitimate user is not
         // penalized after a successful reset.
-        RateLimiter::clear('password_otp.request.'.sha1($email.'|'.request()->ip()));
-        RateLimiter::clear('password_otp.verify.'.sha1($email.'|'.request()->ip()));
+        $email = strtolower($user->email);
+        RateLimiter::clear('password_otp.request.'.sha1($email.'|'.$request->ip()));
+        RateLimiter::clear('password_otp.verify.'.sha1($email.'|'.$request->ip()));
+        $this->clearVerificationSession($request);
 
         return redirect()->route('login')->with('status', __('Your password has been reset. Please log in with your new password.'));
+    }
+
+    private function hasRecentOtpVerification(Request $request): bool
+    {
+        $verifiedAt = (int) $request->session()->get('password_reset_verified_at', 0);
+        $userId = $request->session()->get('password_reset_verified_user_id');
+        $validForSeconds = (int) config('password_otp.expiry', 10) * 60;
+
+        return $userId !== null
+            && $verifiedAt > 0
+            && $verifiedAt <= now()->timestamp
+            && now()->timestamp - $verifiedAt <= $validForSeconds;
+    }
+
+    private function clearVerificationSession(Request $request): void
+    {
+        $request->session()->forget([
+            'password_reset_verified_user_id',
+            'password_reset_verified_at',
+        ]);
     }
 }

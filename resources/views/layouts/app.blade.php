@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.ico') }}">
     <title>HoneyBee - {{ trim($__env->yieldContent('title', 'Shop')) }}</title>
     <meta name="description" content="{{ trim($__env->yieldContent('meta_description', 'Discover handcrafted gifts, custom designs, laser work, and event services from HoneyBee Gifts & Designs.')) }}">
 

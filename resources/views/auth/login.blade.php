@@ -1,16 +1,22 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div class="auth-card-intro">
+        <span class="auth-eyebrow">HONEYBEE GIFTS &amp; DESIGNS</span>
+        <h1>Welcome back</h1>
+        <p>Sign in to continue to your account.</p>
+    </div>
 
-    <form id="login-form" method="POST" action="{{ route('login') }}">
+    <!-- Session Status -->
+    <x-auth-session-status class="auth-status mb-4" :status="session('status')" />
+
+    <form id="login-form" class="auth-form" method="POST" action="{{ route('login') }}">
         @csrf
 
         <!-- Email Address -->
-        <div>
+        <div class="auth-field">
             <x-input-label for="email" :value="__('Email')" />
 
             <x-text-input id="email"
-                          class="block mt-1 w-full"
+                          class="auth-input block mt-1 w-full"
                           type="email"
                           name="email"
                           :value="old('email')"
@@ -22,12 +28,12 @@
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
+        <div class="auth-field mt-5">
             <x-input-label for="password" :value="__('Password')" />
 
             <div class="relative">
                 <x-text-input id="password"
-                              class="block mt-1 w-full pr-10"
+                              class="auth-input block mt-1 w-full pr-10"
                               type="password"
                               name="password"
                               required
@@ -38,7 +44,7 @@
                         aria-label="Show password"
                         aria-controls="password"
                         aria-pressed="false"
-                        class="absolute right-3 top-3 text-gray-500 hover:text-amber-500">
+                        class="auth-password-toggle absolute right-3 top-3 text-gray-500 hover:text-amber-500">
                     <i class="fa-solid fa-eye" aria-hidden="true"></i>
                 </button>
             </div>
@@ -49,7 +55,7 @@
 
         <!-- Login Button (Full Width) -->
         <div class="mt-6">
-            <x-primary-button id="login-submit" class="w-full justify-center">
+            <x-primary-button id="login-submit" class="auth-submit w-full justify-center">
                 <span id="login-submit-label">{{ __('Log in') }}</span>
                 <span id="login-loading" class="hidden" role="status" aria-live="polite">
                     {{ __('Signing in…') }}
@@ -59,11 +65,10 @@
 
 
         <!-- Forgot Password + Remember Me -->
-        <div class="flex items-center justify-between mt-4">
+        <div class="auth-options flex items-center justify-between mt-5">
 
             @if (Route::has('password.request'))
-                <a class="underline text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                   style="color: #f5a623; font-weight: bold;"
+                <a class="auth-link underline text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
                    href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
                 </a>
@@ -73,10 +78,10 @@
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me"
                        type="checkbox"
-                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                       class="auth-checkbox rounded border-gray-300 text-amber-600 shadow-sm focus:ring-amber-500"
                        name="remember">
 
-                <span class="ms-2 text-sm" style="color: #f5a623; font-weight: bold;">
+                <span class="ms-2 text-sm auth-remember-label">
                     {{ __('Remember me') }}
                 </span>
             </label>
@@ -85,11 +90,10 @@
 
 
         <!-- Register Link -->
-        <div style="text-align: center; margin-top: 20px;">
-            <p style="color: white;">
+        <div class="auth-register-prompt">
+            <p>
                 Don't have an account?
-                <a href="{{ route('register') }}" 
-                   style="color: #f5a623; font-weight: bold;">
+                <a class="auth-link" href="{{ route('register') }}">
                     Register here
                 </a>
             </p>

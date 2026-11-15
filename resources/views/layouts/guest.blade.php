@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.ico') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -19,15 +20,15 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 auth-bg">
+    <div class="min-h-screen flex flex-col justify-center items-center px-4 py-10 auth-bg">
 
-        <div>
+        <div class="auth-brand">
             <a href="/">
                 <x-application-logo class="w-20 h-20 fill-current text-amber-400" />
             </a>
         </div>
 
-        <div class="w-full sm:max-w-3xl mt-6 px-8 py-8 bg-black/80 backdrop-blur-md border border-amber-500/30 shadow-2xl overflow-hidden sm:rounded-xl text-black">
+        <div class="auth-panel {{ request()->routeIs('login') ? 'auth-panel--login' : 'auth-panel--default' }} w-full">
             {{ $slot }}
         </div>
 
