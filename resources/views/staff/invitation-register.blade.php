@@ -5,11 +5,11 @@
         </div>
 
         <div style="text-align: center; margin-top: 20px;">
-            <p style="color: white;">
+           " <p style="color: #A52A2A;">
                 Already have an account?
                 <a href="{{ route('login') }}" style="color: #f5a623; font-weight: bold;">
                     Login here
-                </a>
+                </a>" "   "
             </p>
         </div>
     @else
@@ -54,7 +54,7 @@
             </div>
 
             <div style="text-align: center; margin-top: 20px;">
-                <p style="color: white;">
+                <p style="color: #A52A2A;">
                     Already have an account?
                     <a href="{{ route('login') }}" style="color: #f5a623; font-weight: bold;">
                         Login here
