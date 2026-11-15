@@ -1,0 +1,5 @@
+@extends('layouts.staff')
+@section('title', 'My Profile')
+@section('content')
+<div class="page-head"><h1>My <span>Profile</span></h1></div><section class="honey-card" style="max-width:720px"><p class="text-muted">You can update your own name and phone number. Role and access permissions are managed only by administrators.</p><form method="POST" action="{{ route('staff.profile.update') }}">@csrf @method('PUT')<div class="mb-3"><label class="form-label">Full name *</label><input class="form-control" name="full_name" value="{{ old('full_name',$staff->full_name) }}" required></div><div class="mb-3"><label class="form-label">Email</label><input class="form-control" value="{{ $staff->email }}" disabled><small class="text-muted">Email cannot be changed here.</small></div><div class="mb-3"><label class="form-label">Phone *</label><input class="form-control" name="phone" value="{{ old('phone',$staff->phone) }}" required></div><div class="mb-4"><label class="form-label">Role</label><input class="form-control" value="{{ ucfirst($staff->role) }}" disabled></div><button class="btn btn-honey">Save my profile</button></form></section>
+@endsection

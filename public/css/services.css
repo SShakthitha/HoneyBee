@@ -1,0 +1,229 @@
+.honey-services {
+    --service-amber: #f5a623;
+    --service-honey: #ffd166;
+    --service-jet: #1a1a1a;
+    --service-cream: #fffdf5;
+    --service-slate: #4a4a4a;
+    color: var(--service-slate);
+}
+
+.honey-services__heading {
+    max-width: 720px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+}
+
+.honey-services__eyebrow {
+    color: var(--service-amber);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+.honey-services__heading h1,
+.honey-service-detail h1 {
+    margin: .35rem 0 .75rem;
+    color: var(--service-jet);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+}
+
+.honey-services__heading h1 span {
+    color: var(--service-amber);
+}
+
+.honey-services__heading p {
+    margin: 0;
+}
+
+.honey-services__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.honey-service-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    padding: 1.5rem;
+    border: 1px solid rgba(26, 26, 26, .08);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(26, 26, 26, .07);
+}
+
+.honey-service-card__topline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem;
+    margin-bottom: .85rem;
+}
+
+.honey-service-card__type,
+.honey-service-card__category {
+    padding: .3rem .65rem;
+    border-radius: 50px;
+    background: #fff3d6;
+    color: #69490c;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.honey-service-card__category {
+    background: #f5f3ef;
+    color: var(--service-slate);
+}
+
+.honey-service-card h2 {
+    margin: 0 0 .7rem;
+    color: var(--service-jet);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+}
+
+.honey-service-card h2 a:hover {
+    color: #8a590e;
+}
+
+.honey-service-card__description {
+    flex: 1;
+    margin: 0 0 .75rem;
+}
+
+.honey-service-card__business {
+    margin: 0 0 .75rem;
+    color: #6b6256;
+    font-size: .88rem;
+}
+
+.honey-service-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .75rem;
+    padding-top: .75rem;
+    border-top: 1px solid rgba(26, 26, 26, .08);
+}
+
+.honey-service-card__footer strong,
+.honey-service-detail__order strong {
+    color: var(--service-jet);
+    font-size: 1.15rem;
+}
+
+.honey-service-card__link {
+    justify-content: center;
+    border-color: var(--service-amber);
+    background: var(--service-amber);
+    color: var(--service-jet);
+    font-weight: 700;
+}
+
+.honey-service-card__link:hover {
+    border-color: var(--service-honey);
+    background: var(--service-honey);
+    color: var(--service-jet);
+}
+
+.honey-services__pagination {
+    margin-top: 2rem;
+}
+
+.honey-services__empty {
+    padding: 2.5rem 1.5rem;
+    border-radius: 16px;
+    background: #fff;
+    text-align: center;
+}
+
+.honey-services__empty h2 {
+    color: var(--service-jet);
+    font-family: 'Playfair Display', serif;
+}
+
+.honey-services__breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-bottom: 1.5rem;
+    color: #6b6256;
+    font-size: .9rem;
+}
+
+.honey-services__breadcrumb a:hover,
+.honey-service-detail__back:hover {
+    color: #8a590e;
+    text-decoration: underline;
+}
+
+.honey-service-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    gap: 2rem;
+    align-items: start;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(26, 26, 26, .08);
+}
+
+.honey-service-detail__description {
+    margin-top: 1.25rem;
+    white-space: pre-line;
+}
+
+.honey-service-detail__order {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    padding: 1.4rem;
+    border: 1px solid rgba(245, 166, 35, .25);
+    border-radius: 14px;
+    background: var(--service-cream);
+}
+
+.honey-service-detail__order > span {
+    color: #6b6256;
+    font-size: .85rem;
+}
+
+.honey-service-detail__order strong {
+    font-size: 1.6rem;
+}
+
+.honey-service-detail__order p {
+    margin: 0;
+    font-size: .88rem;
+}
+
+.honey-service-detail__order .btn {
+    width: 100%;
+}
+
+.honey-service-detail__back {
+    align-self: center;
+    color: #6b6256;
+    font-size: .88rem;
+}
+
+@media (max-width: 900px) {
+    .honey-services__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .honey-services__grid,
+    .honey-service-detail {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .honey-service-card__footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
