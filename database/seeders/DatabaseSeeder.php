@@ -10,6 +10,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             GalleryImageSeeder::class,
+            GiftDesignSeeder::class,
+            HoneyBeeAccountsSeeder::class,
         ]);
     }
 }

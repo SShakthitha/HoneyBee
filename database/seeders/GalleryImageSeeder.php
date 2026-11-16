@@ -9,11 +9,8 @@ class GalleryImageSeeder extends Seeder
 {
     public function run(): void
     {
-        if (DB::table('gallery_images')->count() > 0) {
-            $this->command->info('GalleryImageSeeder: table already has data — skipping.');
-            return;
-        }
-
+        // Always delete and reinsert so re-running this seeder refreshes images.
+        DB::table('gallery_images')->delete();
         $now = now();
 
         DB::table('gallery_images')->insert([
@@ -22,65 +19,77 @@ class GalleryImageSeeder extends Seeder
             [
                 'title'      => 'Personalised Gift Box',
                 'category'   => 'Gift & Design',
+                // Wrapped gift box with bow on clean white background
                 'image'      => 'https://images.unsplash.com/photo-1512909006721-3d6018887383?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title'      => 'Wrapped Gift with Ribbon',
+                'title'      => 'Ribbon Wrapped Gift',
                 'category'   => 'Gift & Design',
+                // Gold ribbon wrapped around a gift — festive and clean
                 'image'      => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
                 'title'      => 'Custom Gift Hamper',
                 'category'   => 'Gift & Design',
+                // Wicker hamper basket filled with treats and gifts
                 'image'      => 'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title'      => 'Handcrafted Gift Package',
+                'title'      => 'Keepsake Gift Box',
                 'category'   => 'Gift & Design',
-                'image'      => 'https://images.unsplash.com/photo-1481553231771-02cb5a9e6b1b?w=800&q=80',
+                // Wooden keepsake box open with velvet lining — gift shop item
+                'image'      => 'https://images.unsplash.com/photo-1619683618983-b22a4c3f0e37?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
 
             // ── Frame Designs ─────────────────────────────────────────────
             [
-                'title'      => 'Wooden Photo Frame',
+                'title'      => 'Classic Wooden Frame',
                 'category'   => 'Frame Designs',
-                'image'      => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+                // Natural pine photo frame on a shelf
+                'image'      => 'https://images.unsplash.com/photo-1534536281715-e28d76689b4d?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title'      => 'Custom Engraved Frame',
+                'title'      => 'Engraved Memory Frame',
                 'category'   => 'Frame Designs',
+                // White picture frame with photo — personalised memory gift
                 'image'      => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title'      => 'Decorative Wall Frame',
+                'title'      => 'Gallery Wall Frames',
                 'category'   => 'Frame Designs',
-                'image'      => 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=800&q=80',
+                // Collage of photo frames arranged on white wall
+                'image'      => 'https://images.unsplash.com/photo-1522444195799-478538b28823?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
 
             // ── Laser Work ────────────────────────────────────────────────
+            // All three show laser-engraved GIFT SHOP items — wooden keepsakes,
+            // engraved signs, personalised name boards — NOT industrial equipment.
             [
-                'title'      => 'Laser Engraved Wood',
+                'title'      => 'Laser Engraved Name Board',
                 'category'   => 'Laser Work',
-                'image'      => 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80',
+                // Engraved wooden name plaque / sign — personalised gift
+                'image'      => 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title'      => 'Precision Laser Cutting',
+                'title'      => 'Engraved Wooden Keepsake',
                 'category'   => 'Laser Work',
-                'image'      => 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&q=80',
+                // Personalised engraved wooden gift with text and design
+                'image'      => 'https://images.unsplash.com/photo-1627738668643-67a3f2f7b32e?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title'      => 'Custom Laser Design Panel',
+                'title'      => 'Custom Laser Engraved Gift',
                 'category'   => 'Laser Work',
-                'image'      => 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?w=800&q=80',
+                // Engraved wooden coaster / keepsake item — craft gift shop
+                'image'      => 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
 
@@ -88,24 +97,28 @@ class GalleryImageSeeder extends Seeder
             [
                 'title'      => 'Wedding Event Decor',
                 'category'   => 'Events',
+                // Elegant wedding table décor with flowers and candles
                 'image'      => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
                 'title'      => 'Birthday Celebration',
                 'category'   => 'Events',
+                // Birthday party table setup with balloons and decorations
                 'image'      => 'https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
                 'title'      => 'Floral Event Styling',
                 'category'   => 'Events',
+                // Event venue with floral centrepiece styling
                 'image'      => 'https://images.unsplash.com/photo-1478146059778-26028b07395a?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
                 'title'      => 'Party Celebration Setup',
                 'category'   => 'Events',
+                // Party table with confetti, balloons and celebration décor
                 'image'      => 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&q=80',
                 'created_at' => $now, 'updated_at' => $now,
             ],
