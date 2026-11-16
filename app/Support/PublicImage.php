@@ -18,6 +18,19 @@ final class PublicImage
         }
 
         $path = str_replace('\\', '/', $path);
+
+        // ── Paths that live directly under public/ (not in storage) ───────
+        // e.g. "laser works/laser engrave/file.jpg"
+        //      "images/logo.webp"
+        // These are served via asset() without going through Laravel storage.
+        if (preg_match('#^(?:public/)?(.+)$#i', $path, $m) === 1) {
+            $publicRelative = ltrim(str_replace('\\', '/', $m[1]), '/');
+            $fullPath = public_path($publicRelative);
+            if (file_exists($fullPath)) {
+                return asset($publicRelative);
+            }
+        }
+
         if (preg_match('#(?:^|/)storage/app/public/(.+)$#i', $path, $matches) === 1) {
             $path = $matches[1];
         } else {
